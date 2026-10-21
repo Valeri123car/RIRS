@@ -1,0 +1,64 @@
+---
+status: sprejeto
+date: 2026-10-21
+decision-makers: Valeri Kamburov
+---
+
+# Python (FastAPI) za backend in strojno učenje
+
+## Kontekst in problem
+
+Backend mora ponujati REST API, klicati Riot API, izračunavati značilke ter učiti in uporabljati modela LightGBM in Gaussian Mixture. V katerem jeziku in ogrodju naj bo backend, da API in strojno učenje delujeta skupaj brez nepotrebne kompleksnosti?
+
+## Dejavniki odločitve
+
+- Najboljša orodja za strojno učenje (LightGBM, scikit-learn, Polars) so v Pythonu.
+- Značilke za učenje in za napoved morajo biti izračunane z isto kodo.
+- Omejen čas razvoja v okviru vaj.
+- API mora samodejno ustvariti OpenAPI specifikacijo za generiranje tipov na frontendu.
+
+## Obravnavane možnosti
+
+- Python s FastAPI
+- Java s Spring Boot in ločenim Python servisom za učenje (napoved prek ONNX)
+- Node.js (TypeScript) z ločenim Python servisom za ML
+
+## Odločitev
+
+Izbrana možnost: "Python s FastAPI", ker je API in strojno učenje mogoče imeti v enem jeziku in eni kodni bazi, zato ista funkcija izračuna značilke pri učenju in pri napovedi.
+
+### Posledice
+
+- Dobro, ker ni razhajanja med značilkami pri učenju in pri napovedi (training/serving skew).
+- Dobro, ker FastAPI samodejno ustvari OpenAPI, iz katerega generiramo TypeScript tipe.
+- Dobro, ker je potreben en servis manj kot pri Javi ali Node.js.
+- Slabo, ker je Python počasnejši od Jave pri CPU-intenzivnem delu; težke naloge zato tečejo v delavcih (ADR-0004).
+- Slabo, ker ima Python šibkejšo tipno varnost; to omilimo s Pydantic modeli in mypy.
+
+### Potrditev
+
+Izračun značilk je v enem modulu, ki ga uvažata tako učni cevovod kot analiza. Test preveri, da ista tekma da enake značilke v obeh poteh.
+
+## Prednosti in slabosti možnosti
+
+### Python s FastAPI
+
+- Dobro, ker so knjižnice za ML na voljo neposredno.
+- Dobro, ker je hiter za razvoj in asinhron za klice zunanjih API.
+- Slabo, ker je manj primeren za zelo obremenjene sisteme kot Java.
+
+### Java s Spring Boot + Python za učenje
+
+- Dobro, ker je Spring zrel za varnost, transakcije in dolgotrajne storitve.
+- Dobro, ker je bližje industrijski praksi ločitve učenja in strežbe modela.
+- Slabo, ker zahteva dva jezika, izvoz modela v ONNX in usklajevanje značilk med njima.
+- Slabo, ker za iste funkcionalnosti zahteva bistveno več kode.
+
+### Node.js + Python za ML
+
+- Dobro, ker bi bil frontend in backend v istem jeziku.
+- Slabo, ker še vedno potrebuje ločen Python servis za ML.
+
+## Dodatne informacije
+
+Različica z Javo je opisana v `04-arhitektura-in-tehnoloski-sklad-java.md`. Če bi se odločitev spremenila, nov ADR nadomesti tega.
