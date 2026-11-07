@@ -1,0 +1,50 @@
+# Skrivnosti / okolje
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# ML modeli in podatki
+*.pkl
+*.joblib
+backend/data/
+backend/models/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.pnpm-store/
+next-env.d.ts
+*.tsbuildinfo
+
+# Testi
+coverage/
+playwright-report/
+test-results/
+
+# Logi
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Osebno / oddaje
+*.zip
+github.txt
