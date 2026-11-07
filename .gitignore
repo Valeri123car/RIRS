@@ -45,6 +45,5 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Osebno / oddaje
-*.zip
+# Osebno
 github.txt
