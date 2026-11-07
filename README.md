@@ -39,6 +39,18 @@ docker compose exec api alembic upgrade head
 
 `RIOT_API_MODE=fixtures` uporablja posnete Riot odgovore, zato aplikacija deluje tudi brez ključa.
 
+### Backend brez Dockerja
+
+Predpogoj: [uv](https://docs.astral.sh/uv/).
+
+```bash
+cd backend
+uv sync                                 # namesti odvisnosti
+uv run uvicorn app.main:app --reload    # API na http://localhost:8000
+uv run pytest                           # testi
+uv run ruff check .                     # linter
+```
+
 ## Razvojni proces
 
 - Naloge: GitHub Issues, označene z uporabniško zgodbo (npr. `US-03`)
