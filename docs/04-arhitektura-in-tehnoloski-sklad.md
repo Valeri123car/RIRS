@@ -77,7 +77,7 @@ docker compose up -d --build
 docker compose exec api alembic upgrade head
 ```
 
-Frontend: `http://localhost:3000`, API dokumentacija: `http://localhost:8000/docs`. Način `fixtures` uporablja posnete Riot odgovore, zato razvoj in testi delujejo brez ključa.
+Frontend: `http://localhost:3000`, API dokumentacija: `http://localhost:8989/docs`. Način `fixtures` uporablja posnete Riot odgovore, zato razvoj in testi delujejo brez ključa.
 
 ## Tehnološki sklad
 

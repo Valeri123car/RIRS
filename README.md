@@ -35,7 +35,7 @@ docker compose exec api alembic upgrade head
 ```
 
 - Frontend: http://localhost:3000
-- API dokumentacija: http://localhost:8000/docs
+- API dokumentacija: http://localhost:8989/docs
 
 `RIOT_API_MODE=fixtures` uporablja posnete Riot odgovore, zato aplikacija deluje tudi brez ključa.
 
@@ -46,7 +46,7 @@ Predpogoj: [uv](https://docs.astral.sh/uv/).
 ```bash
 cd backend
 uv sync                                 # namesti odvisnosti
-uv run uvicorn app.main:app --reload    # API na http://localhost:8000
+uv run uvicorn app.main:app --reload --port 8989    # API na http://localhost:8989
 uv run pytest                           # testi
 uv run ruff check .                     # linter
 ```
