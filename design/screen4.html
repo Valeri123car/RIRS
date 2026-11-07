@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="sl"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"inverse-primary":"#006782","tertiary-container":"#c0963c","on-primary-fixed-variant":"#004d63","on-secondary-fixed-variant":"#84222f","surface-container-high":"#222c2a","surface-bright":"#313b39","primary-fixed-dim":"#86d0f0","tertiary-fixed-dim":"#eec061","on-primary-fixed":"#001f29","error":"#ffb4ab","on-tertiary-container":"#453100","on-tertiary":"#402d00","on-secondary":"#65081b","tertiary-fixed":"#ffdea2","primary":"#86d0f0","primary-fixed":"#bbe9ff","surface-container-highest":"#2d3735","outline-variant":"#3f484d","secondary-container":"#872431","surface-variant":"#2d3735","secondary-fixed":"#ffdada","inverse-on-surface":"#283230","on-primary":"#003545","surface":"#0b1513","on-surface":"#dae5e1","tertiary":"#eec061","on-tertiary-fixed":"#261900","inverse-surface":"#dae5e1","surface-container":"#182220","secondary-fixed-dim":"#ffb3b5","surface-container-low":"#131d1b","error-container":"#93000a","on-background":"#dae5e1","surface-dim":"#0b1513","background":"#0b1513","on-error":"#690005","surface-tint":"#86d0f0","surface-container-lowest":"#06100e","on-secondary-fixed":"#40000c","on-secondary-container":"#ff9da2","on-primary-container":"#00394a","on-surface-variant":"#bfc8cd","secondary":"#ffb3b5","outline":"#899297","on-tertiary-fixed-variant":"#5c4200","on-error-container":"#ffdad6","primary-container":"#5ba6c4"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-sm":"0.5rem","gutter":"0.75rem","margin":"1rem","space-xs":"0.25rem","space-xl":"2rem","space-lg":"1.25rem","space-md":"0.75rem"},"fontFamily":{"tabular-num":["Archivo Narrow"],"body-md":["Archivo Narrow"],"body-lg":["Archivo Narrow"],"label-md":["Archivo Narrow"],"headline-sm":["Archivo Narrow"],"headline-md":["Archivo Narrow"],"headline-lg":["Archivo Narrow"],"label-sm":["Archivo Narrow"],"body-sm":["Archivo Narrow"]},"fontSize":{"tabular-num":["14px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"label-md":["13px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"600"}],"headline-sm":["17px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"26px","letterSpacing":"-0.005em","fontWeight":"600"}],"headline-lg":["26px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.01em","fontWeight":"500"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-low/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.2)]"><div class="h-16 max-w-[1440px] mx-auto px-margin flex items-center justify-between"><div class="flex items-center gap-space-xl"><a class="flex items-center tracking-tight text-on-surface select-none group" data-path="live" href="#"><span class="font-headline-md text-headline-md uppercase tracking-wider text-on-surface">RiftSense</span><span class="w-1.5 h-1.5 rounded-full bg-primary ml-1 group-hover:scale-125 transition-transform"></span></a><nav class="flex items-center gap-space-lg" data-active-classes="text-primary border-b-2 border-primary"><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="my-analyses" href="#">Moje analize</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="live" href="#">V živo</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="progress" href="#">Napredek</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="team" href="#">Ekipa</a></nav></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm bg-surface-container px-space-md py-1.5 rounded-lg border border-outline-variant/30"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-tabular-num text-tabular-num text-on-surface tracking-tight">Ranked solo/duo • EUNE</span></div><button aria-label="Filter and Settings" class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">tune</span></button><div class="flex items-center gap-space-sm pl-space-xs"><div class="flex flex-col text-right"><span class="font-label-md text-label-md text-on-surface leading-tight">Luka#EUNE</span><span class="font-label-sm text-label-sm text-on-surface-variant">Gold II</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-16 bg-background flex-1 max-w-[1440px] mx-auto px-margin py-space-lg"><div class="flex flex-col w-full text-on-surface">
+<!-- Team Header / Context Bar -->
+<section class="w-full bg-surface-container-low mb-space-lg">
+<div class="p-space-lg flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Ekipe / Analitika</span>
+<span class="text-outline-variant text-[10px]">•</span>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Aktivna ekipa (5 igralcev)</span>
+</div>
+<div class="flex flex-wrap items-center gap-space-md">
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-on-surface">FERI Esports B</h1>
+<div class="inline-flex items-center gap-1.5 px-space-sm py-0.5 bg-surface-container text-tertiary rounded">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">EUT Division 3 / Kvalifikacije</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Taktični dosje igralcev, zgodnje metrike in trenerska navodila za redni del sezone</p>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm">
+<button class="inline-flex items-center gap-space-xs px-space-md py-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">share</span>
+<span class="font-label-md text-label-md">Deli pregled</span>
+</button>
+<button class="inline-flex items-center gap-space-xs px-space-md py-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">settings</span>
+<span class="font-label-md text-label-md">Nastavitve ekipe</span>
+</button>
+<button class="inline-flex items-center gap-space-xs px-space-md py-2 rounded bg-primary-container text-on-primary-container font-headline-sm hover:brightness-110 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">person_add</span>
+<span class="font-label-md text-label-md">Povabi igralca</span>
+</button>
+</div>
+</div>
+</section>
+<!-- KPI Strip / Team Summary -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-xl">
+<div class="bg-surface-container p-space-md flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Ekipni CS @ 10 min</span>
+<span class="material-symbols-outlined text-[16px] text-primary">analytics</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-on-surface">71.4</span>
+<span class="font-tabular-num text-tabular-num text-primary">+3.8 zadnji teden</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Nad povprečjem divizije (67.1)</span>
+</div>
+<div class="bg-surface-container p-space-md flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Smrti pred 14. min</span>
+<span class="material-symbols-outlined text-[16px] text-primary">security</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-on-surface">1.4</span>
+<span class="font-tabular-num text-tabular-num text-primary">-0.3 varna faza</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Nizek gank profil v zgodnji igri</span>
+</div>
+<div class="bg-surface-container p-space-md flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Nadzor prvega zmaja</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">military_tech</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-tertiary">68%</span>
+<span class="font-tabular-num text-tabular-num text-on-surface-variant">17 / 25 iger</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Spodnja rečna prioriteta stabilna</span>
+</div>
+<div class="bg-surface-container p-space-md flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Aktivne trenerske naloge</span>
+<span class="material-symbols-outlined text-[16px] text-primary">assignment_turned_in</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-on-surface">3</span>
+<span class="font-tabular-num text-tabular-num text-tertiary">82% uspešnost</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">2 nalogi pred zaključkom danes</span>
+</div>
+</section>
+<!-- Main Content Layout (Roster Table 65% + Player Dossier 35%) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left Column: Roster Table -->
+<section class="lg:col-span-8 flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-1.5 h-3.5 bg-primary"></span>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight uppercase">Seznam postave in linijska analitika</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Zadnjih 20 tekmovalnih iger</span>
+</div>
+<!-- Dossier Table Container -->
+<div class="w-full overflow-x-auto bg-surface-container">
+<table class="w-full text-left border-collapse min-w-[700px]">
+<thead>
+<tr class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-space-sm px-space-md w-16">Vloga</th>
+<th class="py-space-sm px-space-md">Igralec (ID)</th>
+<th class="py-space-sm px-space-md">Prvaki</th>
+<th class="py-space-sm px-space-md">Rang</th>
+<th class="py-space-sm px-space-md">CS@10</th>
+<th class="py-space-sm px-space-md">Smrti &lt;14m</th>
+<th class="py-space-sm px-space-md">Slog igre</th>
+<th class="py-space-sm px-space-md text-right">Zadnjih 8</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 font-body-sm text-body-sm">
+<!-- TOP ROW -->
+<tr class="hover:bg-surface-container-high/60 transition-colors">
+<td class="py-space-md px-space-md font-label-md text-label-md uppercase text-on-surface-variant">TOP</td>
+<td class="py-space-md px-space-md">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">ShenMaster#EUNE</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Glavni iniciator</span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<div class="flex gap-1">
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Shen">SH</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Ornn">OR</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Aatrox">AA</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-on-surface">Emerald IV</td>
+<td class="py-space-md px-space-md">
+<span class="font-tabular-num text-tabular-num text-primary">74.0</span>
+<span class="text-[10px] text-primary block leading-tight">+2.4</span>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-on-surface">0.8</td>
+<td class="py-space-md px-space-md">
+<span class="inline-block px-2 py-0.5 bg-surface-container-highest text-on-surface font-label-sm text-label-sm rounded">Trdna defenziva &amp; TP</span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex gap-1 items-center">
+<span class="w-2.5 h-2.5 bg-primary rounded-none" title="Zmaga"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none" title="Zmaga"></span>
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none" title="Poraz"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none" title="Zmaga"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none" title="Zmaga"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none" title="Zmaga"></span>
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none" title="Poraz"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none" title="Zmaga"></span>
+</div>
+</td>
+</tr>
+<!-- JGL ROW -->
+<tr class="hover:bg-surface-container-high/60 transition-colors">
+<td class="py-space-md px-space-md font-label-md text-label-md uppercase text-on-surface-variant">JGL</td>
+<td class="py-space-md px-space-md">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">FrostTusk#010</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Objektni nadzor</span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<div class="flex gap-1">
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Sejuani">SE</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Vi">VI</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Jarvan IV">J4</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-on-surface">Gold I</td>
+<td class="py-space-md px-space-md">
+<span class="font-tabular-num text-tabular-num text-on-surface">58.2</span>
+<span class="text-[10px] text-on-surface-variant block leading-tight">-0.8</span>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-on-surface">1.2</td>
+<td class="py-space-md px-space-md">
+<span class="inline-block px-2 py-0.5 bg-surface-container-highest text-on-surface font-label-sm text-label-sm rounded">Zgodnje bot gankanje</span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex gap-1 items-center">
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+</div>
+</td>
+</tr>
+<!-- MID ROW -->
+<tr class="hover:bg-surface-container-high/60 transition-colors">
+<td class="py-space-md px-space-md font-label-md text-label-md uppercase text-on-surface-variant">MID</td>
+<td class="py-space-md px-space-md">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">DarkOrb#EUNE</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Kontrolni mag</span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<div class="flex gap-1">
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Syndra">SY</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Orianna">OR</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-on-surface font-label-sm text-label-sm" title="Viktor">VI</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-on-surface">Plat III</td>
+<td class="py-space-md px-space-md">
+<span class="font-tabular-num text-tabular-num text-primary">78.5</span>
+<span class="text-[10px] text-primary block leading-tight">+3.1</span>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-secondary-fixed">1.5</td>
+<td class="py-space-md px-space-md">
+<span class="inline-block px-2 py-0.5 bg-surface-container-highest text-on-surface font-label-sm text-label-sm rounded">Močan linijski pritisk</span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex gap-1 items-center">
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+</div>
+</td>
+</tr>
+<!-- ADC ROW (SELECTED) -->
+<tr class="bg-surface-container-high border-l-4 border-l-primary cursor-pointer">
+<td class="py-space-md px-space-md font-label-md text-label-md uppercase text-primary">ADC</td>
+<td class="py-space-md px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-primary">Luka#EUNE</span>
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Izbran profil igralca</span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<div class="flex gap-1">
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-primary font-label-sm text-label-sm" title="Jinx">JI</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-primary font-label-sm text-label-sm" title="Caitlyn">CA</span>
+<span class="w-6 h-6 flex items-center justify-center bg-surface-container-lowest text-primary font-label-sm text-label-sm" title="Kai'Sa">KS</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-on-surface">Gold II</td>
+<td class="py-space-md px-space-md">
+<span class="font-tabular-num text-tabular-num text-primary">74.2</span>
+<span class="text-[10px] text-primary block leading-tight">+5.2</span>
+</td>
+<td class="py-space-md px-space-md font-tabular-num text-tabular-num text-primary">1.1</td>
+<td class="py-space-md px-space-md">
+<span class="inline-block px-2 py-0.5 bg-primary-container/20 text-primary font-label-sm text-label-sm rounded">Dober late-game, paziti engage</span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex gap-1 items-center">
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+<span class="w-2.5 h-2.5 bg-primary rounded-none"></span>
+</div>
+</td>
+</tr>
+<!-- SUP ROW (PENDING) -->
+<tr class="opacity-60 bg-surface-container-lowest/40">
+<td class="py-space-md px-space-md font-label-md text-label-md uppercase text-on-surface-variant">SUP</td>
+<td class="py-space-md px-space-md">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface-variant italic">PendingInvite#000</span>
+<span class="font-body-sm text-body-sm text-tertiary">Povabilo v teku</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant font-label-sm text-label-sm">—</td>
+<td class="py-space-md px-space-md text-on-surface-variant font-tabular-num text-tabular-num">—</td>
+<td class="py-space-md px-space-md text-on-surface-variant font-tabular-num text-tabular-num">—</td>
+<td class="py-space-md px-space-md text-on-surface-variant font-tabular-num text-tabular-num">—</td>
+<td class="py-space-md px-space-md text-on-surface-variant font-body-sm text-body-sm">Čakanje na potrditev igralca</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex items-center gap-space-xs">
+<button class="px-space-sm py-1 bg-surface-container text-on-surface font-label-sm text-label-sm rounded hover:bg-surface-container-high transition-colors" type="button">Ponovno pošlji</button>
+<button class="px-space-sm py-1 bg-surface-container text-secondary font-label-sm text-label-sm rounded hover:bg-secondary-container/40 transition-colors" type="button">Prekliči</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Scrim & Match Scheduling Note -->
+<div class="p-space-md bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary">event_available</span>
+<span class="font-body-sm text-body-sm text-on-surface">Naslednji scrim: <strong>Ponedeljek ob 19:30</strong> proti ekipi UL FMF Blue. Fokus: zgodnje rotacije na Herald.</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Trener: Marko (Coach)</span>
+</div>
+</section>
+<!-- Right Column: Player Detail Side Panel (Luka#EUNE) -->
+<aside class="lg:col-span-4 flex flex-col gap-space-md">
+<!-- Selected Player Identity Panel -->
+<div class="bg-surface-container p-space-md flex flex-col gap-space-md">
+<div class="flex items-start justify-between pb-space-sm border-b border-outline-variant/30">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">ADC • Bot Lane</span>
+<span class="text-outline-variant">•</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">40 iger v sezoni</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Luka#EUNE</h3>
+</div>
+<div class="text-right">
+<span class="font-tabular-num text-tabular-num text-tertiary block">Gold II</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">61 LP</span>
+</div>
+</div>
+<!-- Metric Bars Compared to Gold Median -->
+<div class="flex flex-col gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Profil igralca proti Gold mediani</span>
+<!-- Metric 1: Early Aggression -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-on-surface">Zgodnja agresivnost</span>
+<span class="font-tabular-num text-tabular-num text-primary">+14% nad mediano</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none overflow-hidden">
+<div class="bg-primary h-full" style="width: 74%;"></div>
+</div>
+</div>
+<!-- Metric 2: Roaming -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-on-surface">Roaming / Premikanje</span>
+<span class="font-tabular-num text-tabular-num text-on-surface-variant">-5% (ostaja na liniji)</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none overflow-hidden">
+<div class="bg-on-surface-variant/50 h-full" style="width: 45%;"></div>
+</div>
+</div>
+<!-- Metric 3: Vision -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-on-surface">Vizija (Ward / min)</span>
+<span class="font-tabular-num text-tabular-num text-secondary">0.82 (-0.12 opozorilo)</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none overflow-hidden">
+<div class="bg-secondary-container h-full" style="width: 38%;"></div>
+</div>
+</div>
+<!-- Metric 4: CS@10 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-on-surface">CS ob 10. minuti</span>
+<span class="font-tabular-num text-tabular-num text-primary">74.2 (+7.4)</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none overflow-hidden">
+<div class="bg-primary h-full" style="width: 82%;"></div>
+</div>
+</div>
+<!-- Metric 5: Early Deaths -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-on-surface">Zgodnje smrti pred 14. min</span>
+<span class="font-tabular-num text-tabular-num text-primary">1.1 (odlično)</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none overflow-hidden">
+<div class="bg-primary h-full" style="width: 88%;"></div>
+</div>
+</div>
+</div>
+<!-- Recent Analyses Summary List -->
+<div class="flex flex-col gap-space-xs pt-space-sm border-t border-outline-variant/30">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Zadnje analizirane igre</span>
+<a class="p-space-xs bg-surface-container-high hover:bg-surface-bright transition-colors flex flex-col gap-0.5" href="#">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Jinx vs Caitlyn</span>
+<span class="font-label-sm text-label-sm text-secondary">Poraz (31m)</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Zgrešen Mortal Reminder timing proti Soraki</span>
+</a>
+<a class="p-space-xs bg-surface-container-high hover:bg-surface-bright transition-colors flex flex-col gap-0.5" href="#">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Jinx vs Varus</span>
+<span class="font-label-sm text-label-sm text-primary">Zmaga (34m)</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Brezhiben CS in pozicioniranje v river teamfightu</span>
+</a>
+<a class="p-space-xs bg-surface-container-high hover:bg-surface-bright transition-colors flex flex-col gap-0.5" href="#">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Caitlyn vs Ezreal</span>
+<span class="font-label-sm text-label-sm text-primary">Zmaga (32m)</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Zgodnje rušenje stolpa na botu ob 12:40</span>
+</a>
+</div>
+</div>
+<!-- Coach Tasks & Notes Thread -->
+<div class="bg-surface-container p-space-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs border-b border-outline-variant/30">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Zapiski trenerja &amp; Naloge</h4>
+<button class="text-primary hover:text-primary-fixed font-label-sm text-label-sm inline-flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">add</span> Dodaj nalogo
+          </button>
+</div>
+<!-- Active Task Card -->
+<div class="bg-surface-container-low p-space-sm border-l-2 border-l-tertiary">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm uppercase text-tertiary font-bold tracking-wider">Aktivna tedenska naloga</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Rok: Nedelja, 23:59</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mb-1">CS@10 nad 70 v vseh tekmovalnih tekmah</p>
+<div class="flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Trenutno povprečje: <strong class="text-on-surface">74.2</strong></span>
+<span class="text-tertiary font-tabular-num text-tabular-num">78% tekem uspešnih</span>
+</div>
+</div>
+<!-- Notes Thread -->
+<div class="flex flex-col gap-space-sm">
+<div class="bg-surface-container-high p-space-sm flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-on-primary font-bold">M</span>
+<span class="font-label-md text-label-md text-on-surface">Trener Marko</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Pred 2 dnevi</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface leading-relaxed">
+              Odlična disciplina pri zadnjih zadetkih pod stolpom. Za naslednji scrim se osredotoči na pravočasen nakup Executioner's proti Soraki že pred zmajem ob 15. minuti.
+            </p>
+</div>
+</div>
+<!-- Note Input Form -->
+<div class="flex flex-col gap-space-xs">
+<label class="sr-only" for="coach-note">Dodaj opombo za igralca</label>
+<textarea class="w-full bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant/50 p-space-sm font-body-sm text-body-sm rounded outline-none focus:ring-1 focus:ring-primary" id="coach-note" placeholder="Dodaj taktično opombo ali navodilo za igralca Luka#EUNE..." rows="2"></textarea>
+<div class="flex justify-end">
+<button class="px-space-md py-1.5 bg-primary-container text-on-primary-container font-label-md text-label-md rounded hover:brightness-110 transition-all" type="button">
+              Shrani opombo
+            </button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div></main><footer class="w-full bg-surface-container-lowest mt-auto"><div class="max-w-[1440px] mx-auto px-margin py-space-lg"><p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl leading-relaxed opacity-75">RiftSense ni podprt s strani Riot Games in ne odraža stališč ali mnenj Riot Games ali kogarkoli, ki je uradno vključen v proizvodnjo ali upravljanje Riot Games lastnine. Riot Games in vse povezane lastnine so blagovne znamke ali registrirane blagovne znamke Riot Games, Inc.</p></div></footer></body></html>

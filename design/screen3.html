@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="sl"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<title>RiftSense • Hextech Arhiv Mojstrstva</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    /* Custom Hextech Rune / Arcane Ornaments */
+    .hextech-border {
+      border: 1px solid rgba(200, 155, 60, 0.28);
+      box-shadow: inset 0 0 16px rgba(0, 198, 183, 0.04), 0 8px 32px -4px rgba(5, 14, 28, 0.85);
+      position: relative;
+    }
+    .hextech-border::before {
+      content: "";
+      position: absolute;
+      top: -1px; left: -1px;
+      width: 8px; height: 8px;
+      border-top: 2px solid #f0bf5c;
+      border-left: 2px solid #f0bf5c;
+      pointer-events: none;
+    }
+    .hextech-border::after {
+      content: "";
+      position: absolute;
+      bottom: -1px; right: -1px;
+      width: 8px; height: 8px;
+      border-bottom: 2px solid #f0bf5c;
+      border-right: 2px solid #f0bf5c;
+      pointer-events: none;
+    }
+
+    .hex-glow {
+      box-shadow: 0 0 20px rgba(67, 226, 210, 0.15), inset 0 0 12px rgba(240, 191, 92, 0.08);
+    }
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fff2cc 0%, #f0bf5c 50%, #c89b3c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .arcane-gradient-text {
+      background: linear-gradient(135deg, #61f9e9 0%, #43e2d2 50%, #d0bcff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hex-corner-badge {
+      clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "secondary": "#43e2d2",
+            "tertiary-container": "#af8fff",
+            "outline-variant": "#4e4637",
+            "tertiary-fixed": "#e9ddff",
+            "on-error-container": "#ffdad6",
+            "inverse-on-surface": "#273140",
+            "on-surface": "#d9e3f7",
+            "on-background": "#d9e3f7",
+            "error-container": "#93000a",
+            "primary-fixed": "#ffdea4",
+            "surface-container-lowest": "#050e1c",
+            "surface-dim": "#0a1422",
+            "primary-container": "#c89b3c",
+            "secondary-fixed": "#61f9e9",
+            "on-secondary": "#003732",
+            "surface-container-high": "#212a39",
+            "inverse-surface": "#d9e3f7",
+            "on-secondary-container": "#004c46",
+            "on-primary-container": "#4b3500",
+            "on-tertiary-container": "#4500a5",
+            "on-secondary-fixed": "#00201d",
+            "surface-tint": "#f0bf5c",
+            "primary-fixed-dim": "#f0bf5c",
+            "inverse-primary": "#7b5900",
+            "on-tertiary-fixed": "#23005c",
+            "on-primary-fixed-variant": "#5d4200",
+            "on-surface-variant": "#d2c5b1",
+            "on-primary": "#412d00",
+            "error": "#ffb4ab",
+            "surface-bright": "#303a49",
+            "tertiary": "#d0bcff",
+            "on-tertiary": "#3c0091",
+            "surface-variant": "#2c3545",
+            "primary": "#f0bf5c",
+            "secondary-container": "#00c6b7",
+            "surface-container": "#16202f",
+            "on-primary-fixed": "#261900",
+            "outline": "#9b8f7d",
+            "on-secondary-fixed-variant": "#005049",
+            "tertiary-fixed-dim": "#d0bcff",
+            "secondary-fixed-dim": "#3bdccd",
+            "surface-container-highest": "#2c3545",
+            "on-tertiary-fixed-variant": "#5516be",
+            "surface": "#0a1422",
+            "surface-container-low": "#121c2a",
+            "background": "#0a1422",
+            "on-error": "#690005"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "margin": "2rem",
+            "gutter": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-mobile": "0.75rem",
+            "margin-mobile": "1rem",
+            "space-lg": "1.5rem"
+          },
+          fontFamily: {
+            "headline-lg": ["EB Garamond", "serif"],
+            "headline-md": ["EB Garamond", "serif"],
+            "headline-sm": ["EB Garamond", "serif"],
+            "display-lg": ["EB Garamond", "serif"],
+            "body-lg": ["Be Vietnam Pro", "sans-serif"],
+            "body-md": ["Be Vietnam Pro", "sans-serif"],
+            "body-sm": ["Be Vietnam Pro", "sans-serif"],
+            "label-lg": ["Space Mono", "monospace"],
+            "label-md": ["Space Mono", "monospace"],
+            "label-sm": ["Space Mono", "monospace"],
+            "tabular-num": ["Space Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary relative overflow-x-hidden" style="background-image: radial-gradient(circle at 50% 0%, rgba(33, 42, 57, 0.8) 0%, rgba(10, 20, 34, 0.95) 45%, #050e1c 100%), radial-gradient(circle at 10% 20%, rgba(67, 226, 210, 0.08) 0%, transparent 40%), radial-gradient(circle at 90% 60%, rgba(200, 155, 60, 0.07) 0%, transparent 50%);">
+<!-- Hextech Arcane Background Accents (Rune Constellations) -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none opacity-20 z-0 overflow-hidden">
+<div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-secondary/10 blur-3xl"></div>
+<div class="absolute top-1/3 -right-32 w-[32rem] h-[32rem] rounded-full bg-primary/10 blur-3xl"></div>
+<div class="absolute bottom-10 left-1/4 w-80 h-80 rounded-full bg-tertiary/10 blur-3xl"></div>
+<!-- Subtle Stardust Pattern SVG -->
+<svg class="absolute w-full h-full opacity-35" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="80" id="hex-stardust" patternunits="userSpaceOnUse" width="80">
+<circle cx="12" cy="18" fill="#f0bf5c" opacity="0.6" r="0.75"></circle>
+<circle cx="56" cy="42" fill="#43e2d2" opacity="0.5" r="0.6"></circle>
+<circle cx="72" cy="14" fill="#d0bcff" opacity="0.4" r="0.9"></circle>
+<circle cx="34" cy="68" fill="#ffffff" opacity="0.4" r="0.7"></circle>
+<polygon fill="#f0bf5c" opacity="0.15" points="40,2 43,8 37,8"></polygon>
+</pattern>
+</defs>
+<rect fill="url(#hex-stardust)" height="100%" width="100%"></rect>
+</svg>
+</div>
+<!-- Header: Hextech Piltover Mastery Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/30 shadow-[0_4px_24px_rgba(5,14,28,0.9)]">
+<div class="h-16 max-w-[1440px] mx-auto px-margin flex items-center justify-between">
+<div class="flex items-center gap-space-xl">
+<a class="flex items-center gap-2 tracking-tight text-on-surface select-none group" data-path="live" href="#">
+<div class="w-7 h-7 rotate-45 border border-primary bg-primary/10 flex items-center justify-center transition-transform group-hover:rotate-90 duration-500 shadow-[0_0_12px_rgba(240,191,92,0.4)]">
+<span class="material-symbols-outlined text-primary text-[16px] -rotate-45 group-hover:-rotate-90 transition-transform">bolt</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-[20px] tracking-[0.14em] uppercase text-primary font-semibold">RiftSense</span>
+<span class="text-[9px] font-label-sm tracking-[0.2em] -mt-1 text-secondary uppercase">Hextech Arhiv</span>
+</div>
+</a>
+<nav class="flex items-center gap-space-lg">
+<a class="font-label-md text-label-md tracking-wider text-on-surface-variant hover:text-primary transition-colors py-space-sm relative" data-path="my-analyses" href="#">Moje analize</a>
+<a class="font-label-md text-label-md tracking-wider text-on-surface-variant hover:text-primary transition-colors py-space-sm" data-path="live" href="#">V živo</a>
+<a class="font-label-md text-label-md tracking-wider text-primary border-b-2 border-primary transition-colors py-space-sm shadow-[0_2px_10px_rgba(240,191,92,0.3)]" data-path="progress" href="#">
+<span class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-primary rotate-45 inline-block"></span>
+              Napredek
+            </span>
+</a>
+<a class="font-label-md text-label-md tracking-wider text-on-surface-variant hover:text-primary transition-colors py-space-sm" data-path="team" href="#">Ceh / Ekipa</a>
+</nav>
+</div>
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-sm bg-surface-container-low px-3 py-1.5 border border-outline-variant/40 shadow-inner">
+<span class="w-2 h-2 rotate-45 bg-secondary animate-pulse shadow-[0_0_8px_#43e2d2]"></span>
+<span class="font-label-sm text-[11px] text-on-surface tracking-wider uppercase font-semibold">Ranked Solo • EUNE</span>
+</div>
+<button aria-label="Hextech Rune Tuning" class="w-9 h-9 border border-outline-variant/40 bg-surface-container-low flex items-center justify-center text-primary hover:text-secondary hover:border-secondary transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<div class="flex items-center gap-space-sm pl-space-xs border-l border-outline-variant/30">
+<div class="flex flex-col text-right">
+<span class="font-label-md text-label-md text-primary leading-tight font-semibold">Luka#EUNE</span>
+<span class="font-label-sm text-[10px] text-secondary tracking-wider">Gold II • Mojster Arcana</span>
+</div>
+<div class="w-9 h-9 border-2 border-primary bg-surface-container flex items-center justify-center shadow-[0_0_10px_rgba(240,191,92,0.35)] relative">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+<span class="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-secondary border border-surface-container-lowest rotate-45"></span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Arcane Archive -->
+<main class="w-full pt-20 bg-transparent flex-1 max-w-[1440px] mx-auto px-margin py-space-lg relative z-10">
+<div class="flex flex-col w-full">
+<!-- Command Strip & Title -->
+<div class="flex flex-col gap-space-sm pb-space-lg border-b border-outline-variant/25">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div>
+<div class="flex items-center gap-2 text-primary font-label-sm text-label-sm uppercase tracking-[0.2em] mb-1">
+<span class="w-2 h-2 bg-primary rotate-45 shadow-[0_0_6px_#f0bf5c]"></span>
+<span>Dossier mojstrstva in runskega napredka • Luka#EUNE</span>
+</div>
+<h1 class="font-headline-lg text-[38px] gold-gradient-text tracking-tight font-semibold font-serif">Osebni napredek &amp; Hextech Arhiv</h1>
+<p class="font-body-md text-on-surface-variant mt-0.5 max-w-2xl">
+              Analiza ključnih kazalnikov v primerjavi z zlato mediano ranga Gold. Črpanje runskih vzorcev iz bojišča.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-2 border border-outline-variant/40 text-on-surface font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">token</span>
+<span class="tracking-wider">40 analiziranih uvrščenih iger</span>
+</div>
+<button class="flex items-center gap-space-xs px-space-md py-2 bg-gradient-to-r from-primary-container/30 to-surface-container text-primary hover:text-white border border-primary/50 hover:border-primary transition-all font-label-md text-label-md shadow-[0_0_12px_rgba(200,155,60,0.2)]" type="button">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span class="uppercase tracking-wider">Izvozi runski zapis</span>
+</button>
+</div>
+</div>
+<!-- Filter Control Bar (Hextech Apparatus Style) -->
+<div class="bg-surface-container/70 border border-outline-variant/30 p-2.5 flex flex-wrap items-center justify-between gap-space-md mt-space-xs backdrop-blur-sm">
+<div class="flex flex-wrap items-center gap-space-md">
+<!-- Role Selector -->
+<div class="flex items-center gap-1 bg-surface-container-lowest p-1 border border-outline-variant/20">
+<span class="text-primary font-label-sm text-[10px] px-space-xs uppercase tracking-wider font-semibold">Vloga:</span>
+<button class="px-space-md py-1 bg-gradient-to-b from-primary to-primary-container text-on-primary font-label-md text-label-md font-bold shadow-[0_0_8px_rgba(240,191,92,0.4)]" type="button">ADC</button>
+<button class="px-space-md py-1 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Vse</button>
+<button class="px-space-md py-1 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Top</button>
+<button class="px-space-md py-1 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Jungle</button>
+<button class="px-space-md py-1 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Mid</button>
+<button class="px-space-md py-1 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Support</button>
+</div>
+<!-- Champion Selector -->
+<div class="flex items-center gap-space-xs">
+<span class="text-on-surface-variant font-label-sm text-[10px] uppercase tracking-wider">Prvak:</span>
+<div class="relative inline-block">
+<select class="appearance-none bg-surface-container-lowest text-primary font-label-md text-label-md px-space-md py-1.5 pr-8 border border-outline-variant/40 cursor-pointer focus:outline-none focus:border-secondary transition-colors">
+<option value="all">Vsi prvaki (All ADC)</option>
+<option selected="" value="jinx">Jinx (26 iger) • Ognjeni izstrelek</option>
+<option value="caitlyn">Caitlyn (8 iger) • Šerif Piltoverja</option>
+<option value="kaisa">Kai'Sa (4 igre) • Hči Praznine</option>
+<option value="ezreal">Ezreal (2 igri) • Raziskovalec</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-primary absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Timeframe Segment -->
+<div class="flex items-center gap-1 bg-surface-container-lowest p-1 border border-outline-variant/20">
+<button class="px-space-md py-1 bg-surface-container-high border border-primary/40 text-primary font-label-md text-label-md shadow-[0_0_8px_rgba(240,191,92,0.15)]" type="button">Zadnjih 30 dni</button>
+<button class="px-space-md py-1 text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors" type="button">Zadnjih 60 dni</button>
+<button class="px-space-md py-1 text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors" type="button">Trenutna sezona</button>
+</div>
+</div>
+</div>
+<!-- 4 Hextech KPI Crystals (Mastery Arcana Cards) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-xl mt-space-md">
+<!-- Block 1: CS ob 10. minuti -->
+<div class="hextech-border bg-gradient-to-b from-surface-container/90 via-surface-container-low to-surface-container-lowest p-space-md flex flex-col justify-between backdrop-blur-md">
+<div>
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-primary rotate-45"></span>
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-primary">CS ob 10. minuti</span>
+</div>
+<div class="w-7 h-7 border border-primary/40 bg-primary/10 flex items-center justify-center rotate-45">
+<span class="material-symbols-outlined text-[15px] text-primary -rotate-45">trending_up</span>
+</div>
+</div>
+<div class="flex items-baseline gap-space-sm mt-1">
+<span class="font-headline-lg text-[40px] leading-none font-bold gold-gradient-text font-serif">74.2</span>
+<span class="font-label-sm text-secondary flex items-center font-bold tracking-tight">
+                +6.4 <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-1.5">vs prejšnji mesec (67.8)</p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-lowest/80 border-t border-outline-variant/30 -mx-space-md -mb-space-md p-space-sm flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-label-sm text-[11px] text-on-surface-variant">
+<span>Mediana Gold ADC</span>
+<span class="text-primary font-bold">66.8</span>
+</div>
+<!-- Progress Bar comparison -->
+<div class="w-full h-2 bg-surface-container-highest border border-outline-variant/30 overflow-hidden relative">
+<div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-secondary-container to-secondary shadow-[0_0_8px_#43e2d2]" style="width: 82%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-primary z-10 shadow-[0_0_6px_#f0bf5c]" style="left: 70%;" title="Gold Mediana: 66.8"></div>
+</div>
+<div class="flex justify-between text-[10px] font-label-sm">
+<span class="text-secondary font-semibold">+7.4 nad povprečjem</span>
+<span class="text-primary font-medium">Tarča: 75.0</span>
+</div>
+</div>
+</div>
+<!-- Block 2: Zlato na minuto -->
+<div class="hextech-border bg-gradient-to-b from-surface-container/90 via-surface-container-low to-surface-container-lowest p-space-md flex flex-col justify-between backdrop-blur-md">
+<div>
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-primary rotate-45"></span>
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-primary">Zlato na minuto</span>
+</div>
+<div class="w-7 h-7 border border-primary/40 bg-primary/10 flex items-center justify-center rotate-45">
+<span class="material-symbols-outlined text-[15px] text-primary -rotate-45">monetization_on</span>
+</div>
+</div>
+<div class="flex items-baseline gap-space-sm mt-1">
+<span class="font-headline-lg text-[40px] leading-none font-bold gold-gradient-text font-serif">418</span>
+<span class="font-label-sm text-primary-fixed-dim text-[11px]">g/min</span>
+<span class="font-label-sm text-secondary flex items-center font-bold ml-auto tracking-tight">
+                +24 g <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-1.5">Stabilna rast dohodka po 15. min</p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-lowest/80 border-t border-outline-variant/30 -mx-space-md -mb-space-md p-space-sm flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-label-sm text-[11px] text-on-surface-variant">
+<span>Mediana Gold ADC</span>
+<span class="text-primary font-bold">385 g/min</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest border border-outline-variant/30 overflow-hidden relative">
+<div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-secondary-container to-secondary shadow-[0_0_8px_#43e2d2]" style="width: 76%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-primary z-10 shadow-[0_0_6px_#f0bf5c]" style="left: 68%;"></div>
+</div>
+<div class="flex justify-between text-[10px] font-label-sm">
+<span class="text-secondary font-semibold">+33 g/min nad r抉tjo</span>
+<span class="text-primary font-medium">Top 18% divizije</span>
+</div>
+</div>
+</div>
+<!-- Block 3: Vizija na minuto -->
+<div class="hextech-border bg-gradient-to-b from-surface-container/90 via-surface-container-low to-surface-container-lowest p-space-md flex flex-col justify-between backdrop-blur-md">
+<div>
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-tertiary rotate-45"></span>
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-tertiary">Vizija na minuto</span>
+</div>
+<div class="w-7 h-7 border border-tertiary/40 bg-tertiary/10 flex items-center justify-center rotate-45">
+<span class="material-symbols-outlined text-[15px] text-tertiary -rotate-45">visibility</span>
+</div>
+</div>
+<div class="flex items-baseline gap-space-sm mt-1">
+<span class="font-headline-lg text-[40px] leading-none font-bold text-tertiary-fixed-dim font-serif">0.82</span>
+<span class="font-label-sm text-tertiary text-[11px]">/min</span>
+<span class="font-label-sm text-error flex items-center font-bold ml-auto tracking-tight">
+                -0.08 <span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-1.5">Nezadostna uporaba Control Wardov</p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-lowest/80 border-t border-outline-variant/30 -mx-space-md -mb-space-md p-space-sm flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-label-sm text-[11px] text-on-surface-variant">
+<span>Mediana Gold ADC</span>
+<span class="text-primary font-bold">0.94 /min</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest border border-outline-variant/30 overflow-hidden relative">
+<div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-error/70 to-error shadow-[0_0_8px_#ffb4ab]" style="width: 54%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-primary z-10" style="left: 65%;"></div>
+</div>
+<div class="flex justify-between text-[10px] font-label-sm">
+<span class="text-error font-semibold">Primanjkljaj: -0.12 /min</span>
+<span class="text-on-surface-variant">Tarča: 2+ ward/baza</span>
+</div>
+</div>
+</div>
+<!-- Block 4: Zgodnje smrti pred 14. min -->
+<div class="hextech-border bg-gradient-to-b from-surface-container/90 via-surface-container-low to-surface-container-lowest p-space-md flex flex-col justify-between backdrop-blur-md">
+<div>
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-secondary rotate-45"></span>
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-secondary">Zgodnje smrti pred 14. min</span>
+</div>
+<div class="w-7 h-7 border border-secondary/40 bg-secondary/10 flex items-center justify-center rotate-45">
+<span class="material-symbols-outlined text-[15px] text-secondary -rotate-45">shield</span>
+</div>
+</div>
+<div class="flex items-baseline gap-space-sm mt-1">
+<span class="font-headline-lg text-[40px] leading-none font-bold text-secondary-fixed font-serif">1.1</span>
+<span class="font-label-sm text-secondary flex items-center font-bold ml-auto tracking-tight">
+                -0.5 smrti <span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-1.5">Pozitivno zmanjšanje ranljivosti</p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-lowest/80 border-t border-outline-variant/30 -mx-space-md -mb-space-md p-space-sm flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-label-sm text-[11px] text-on-surface-variant">
+<span>Mediana Gold ADC</span>
+<span class="text-primary font-bold">1.8 smrti</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest border border-outline-variant/30 overflow-hidden relative">
+<div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-secondary to-secondary-fixed shadow-[0_0_8px_#43e2d2]" style="width: 38%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-primary z-10" style="left: 60%;"></div>
+</div>
+<div class="flex justify-between text-[10px] font-label-sm">
+<span class="text-secondary font-semibold">Odličen lane nadzor</span>
+<span class="text-on-surface-variant">Varno igranje</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Runes & Celestial Trend Section -->
+<div class="hextech-border bg-gradient-to-b from-surface-container-low via-surface-container/70 to-surface-container-lowest p-space-lg mb-space-xl relative overflow-hidden">
+<!-- Arcane Crest Watermark -->
+<div class="absolute -right-16 -top-16 w-80 h-80 rounded-full border border-primary/10 pointer-events-none opacity-40"></div>
+<div class="absolute -right-12 -top-12 w-72 h-72 rounded-full border border-secondary/10 pointer-events-none opacity-30"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between pb-space-md gap-space-md border-b border-outline-variant/30 relative z-10">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+<h2 class="font-headline-md text-[24px] gold-gradient-text font-serif">Runsko ozvezdje metrike: CS ob 10. minuti</h2>
+<span class="px-2 py-0.5 bg-primary/20 border border-primary/50 text-primary font-label-sm text-[10px] font-bold uppercase tracking-wider">Vzpon +19.6%</span>
+</div>
+<p class="font-body-sm text-on-surface-variant mt-1">Zadnjih 40 tekem (Jinx in ostali ADC prvaki) v primerjavi z zlato referenčno orbito mediane Gold.</p>
+</div>
+<!-- Metric Selector Tabs -->
+<div class="flex items-center gap-1 bg-surface-container-lowest p-1 border border-outline-variant/30">
+<button class="px-space-md py-1.5 bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-md text-label-md font-bold shadow-[0_0_10px_rgba(240,191,92,0.3)]" type="button">CS ob 10. min</button>
+<button class="px-space-md py-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Zlato / min</button>
+<button class="px-space-md py-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Vizija / min</button>
+<button class="px-space-md py-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">Zgodnje smrti</button>
+</div>
+</div>
+<!-- Legend Strip -->
+<div class="flex flex-wrap items-center gap-space-lg py-space-sm text-label-sm text-on-surface-variant relative z-10">
+<div class="flex items-center gap-space-xs">
+<span class="w-3.5 h-1.5 bg-secondary shadow-[0_0_8px_#43e2d2]"></span>
+<span class="text-on-surface font-semibold">Vaš CS@10 (Tekme 1–40)</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-4 h-2.5 bg-secondary/15 border border-secondary/30"></span>
+<span>Referenčni razpon Gold ADC (64–70)</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-4 h-0.5 bg-primary border-dashed"></span>
+<span>Mediana divizije (67.0)</span>
+</div>
+<div class="flex items-center gap-space-xs ml-auto">
+<span class="w-2.5 h-2.5 bg-primary rotate-45 shadow-[0_0_8px_#f0bf5c]"></span>
+<span class="text-primary font-semibold tracking-wider uppercase text-[10px]">Hextech Spike Mejnik</span>
+</div>
+</div>
+<!-- SVG Celestial Line Chart -->
+<div class="w-full overflow-x-auto relative z-10">
+<div class="min-w-[760px] w-full h-[280px] relative mt-space-sm">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 280">
+<defs>
+<!-- Arcane Glow Filter -->
+<filter height="140%" id="hex-glow-filter" width="140%" x="-20%" y="-20%">
+<fegaussianblur result="blur" stddeviation="3"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+<!-- Area Gradient: Arcane Teal to Deep Void -->
+<lineargradient id="arcane-chart-grad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#43e2d2" stop-opacity="0.35"></stop>
+<stop offset="60%" stop-color="#f0bf5c" stop-opacity="0.10"></stop>
+<stop offset="100%" stop-color="#050e1c" stop-opacity="0.0"></stop>
+</lineargradient>
+<lineargradient id="gold-band-grad" x1="0" x2="1" y1="0" y2="0">
+<stop offset="0%" stop-color="#f0bf5c" stop-opacity="0.05"></stop>
+<stop offset="50%" stop-color="#43e2d2" stop-opacity="0.12"></stop>
+<stop offset="100%" stop-color="#f0bf5c" stop-opacity="0.05"></stop>
+</lineargradient>
+</defs>
+<!-- Horizontal Constellation Grid Lines -->
+<g class="text-outline-variant/30 text-[10px] font-label-sm">
+<!-- 90 CS -->
+<line stroke="rgba(200,155,60,0.15)" stroke-dasharray="3 6" stroke-width="1" x1="45" x2="990" y1="20" y2="20"></line>
+<text fill="#d2c5b1" text-anchor="end" x="35" y="24">90</text>
+<!-- 80 CS -->
+<line stroke="rgba(200,155,60,0.15)" stroke-dasharray="3 6" stroke-width="1" x1="45" x2="990" y1="75" y2="75"></line>
+<text fill="#d2c5b1" text-anchor="end" x="35" y="79">80</text>
+<!-- 70 CS -->
+<line stroke="rgba(200,155,60,0.2)" stroke-dasharray="3 6" stroke-width="1" x1="45" x2="990" y1="130" y2="130"></line>
+<text fill="#d2c5b1" text-anchor="end" x="35" y="134">70</text>
+<!-- 60 CS -->
+<line stroke="rgba(200,155,60,0.15)" stroke-dasharray="3 6" stroke-width="1" x1="45" x2="990" y1="185" y2="185"></line>
+<text fill="#d2c5b1" text-anchor="end" x="35" y="189">60</text>
+<!-- 50 CS -->
+<line stroke="rgba(200,155,60,0.3)" stroke-width="1.2" x1="45" x2="990" y1="240" y2="240"></line>
+<text fill="#d2c5b1" text-anchor="end" x="35" y="244">50</text>
+</g>
+<!-- Gold ADC Median Band (64 to 70 CS => y: 163 to 130) -->
+<rect fill="url(#gold-band-grad)" height="33" stroke="rgba(67, 226, 210, 0.25)" stroke-dasharray="2 4" width="940" x="50" y="130"></rect>
+<!-- Median Line at 67 CS => y: 146.5 -->
+<line stroke="#f0bf5c" stroke-dasharray="5 5" stroke-opacity="0.8" stroke-width="1.5" x1="50" x2="990" y1="146.5" y2="146.5"></line>
+<!-- Hextech Area Fill Under User Curve -->
+<path d="M 50,240
+                       L 50,180
+                       L 74,185 L 98,172 L 122,175 L 146,160 L 170,168 L 194,152 L 218,158 L 242,142
+                       L 266,150 L 290,140 L 314,145 L 338,132 L 362,138 L 386,128 L 410,135 L 434,120
+                       L 458,125 L 482,118 L 506,122 L 530,110 L 554,115 L 578,105 L 602,112 L 626,98
+                       L 650,105 L 674,92 L 698,96 L 722,85 L 746,90 L 770,78 L 794,84 L 818,70
+                       L 842,75 L 866,62 L 890,68 L 914,54 L 938,60 L 962,53 L 986,52
+                       L 986,240 Z" fill="url(#arcane-chart-grad)"></path>
+<!-- User Data Polyline (Arcane Beam) -->
+<polyline fill="none" filter="url(#hex-glow-filter)" points="50,180 74,185 98,172 122,175 146,160 170,168 194,152 218,158 242,142 266,150 290,140 314,145 338,132 362,138 386,128 410,135 434,120 458,125 482,118 506,122 530,110 554,115 578,105 602,112 626,98 650,105 674,92 698,96 722,85 746,90 770,78 794,84 818,70 842,75 866,62 890,68 914,54 938,60 962,53 986,52" stroke="#43e2d2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></polyline>
+<!-- Milestone Crystal 1 (Game 16 - permanent breakthrough) -->
+<g>
+<polygon fill="#f0bf5c" points="434,114 440,120 434,126 428,120" stroke="#050e1c" stroke-width="1.5"></polygon>
+</g>
+<!-- Milestone Crystal 2 (Game 28 - 80 CS threshold) -->
+<g>
+<polygon fill="#f0bf5c" points="722,79 728,85 722,91 716,85" stroke="#050e1c" stroke-width="1.5"></polygon>
+</g>
+<!-- Milestone Crystal 3 (Peak Game 36 - CS@10: 84) -->
+<g>
+<line stroke="#f0bf5c" stroke-dasharray="2 3" stroke-width="1.5" x1="914" x2="914" y1="54" y2="28"></line>
+<!-- Glowing Diamond -->
+<polygon fill="#f0bf5c" filter="url(#hex-glow-filter)" points="914,46 922,54 914,62 906,54" stroke="#fff" stroke-width="1.5"></polygon>
+<!-- Callout Parchment Box -->
+<rect fill="#16202f" height="22" stroke="#f0bf5c" stroke-width="1.2" width="186" x="821" y="9"></rect>
+<polygon fill="#f0bf5c" points="821,9 827,9 821,15"></polygon>
+<text fill="#f0bf5c" font-family="'Space Mono', monospace" font-size="11" font-weight="700" text-anchor="middle" x="914" y="24">Rekord tekme #36: 84 CS@10</text>
+</g>
+<!-- Current Game Point -->
+<polygon fill="#61f9e9" points="986,46 992,52 986,58 980,52" stroke="#050e1c" stroke-width="1.5"></polygon>
+<!-- X Axis Constellation Coordinates -->
+<g class="text-[10px] font-label-sm" fill="#9b8f7d" text-anchor="middle">
+<text x="50" y="262">Tekma 1</text>
+<text x="170" y="262">T 5</text>
+<text x="290" y="262">T 10</text>
+<text x="410" y="262">T 15</text>
+<text x="530" y="262">T 20</text>
+<text x="650" y="262">T 25</text>
+<text x="770" y="262">T 30</text>
+<text x="890" y="262">T 35</text>
+<text x="986" y="262">T 40 (Zadnja)</text>
+</g>
+</svg>
+</div>
+</div>
+<!-- Chart Tactical Notes -->
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/30 flex flex-wrap items-center justify-between gap-space-sm text-body-sm text-on-surface-variant relative z-10">
+<span>Zadnjih 10 tekem povprečje znaša <strong class="text-primary font-label-md font-semibold text-[13px]">78.4 CS@10</strong> (+17.3 % nad zlato mediano).</span>
+<span class="text-[11px] text-secondary font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">insights</span>
+            Opazka taktike: val 3 (cannon) je bil počiščen v 92 % primerov brez zamujenih zadetkov.
+          </span>
+</div>
+</div>
+<!-- Two-Column Lower Section: Match Table & Piltover Coach Scroll -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start mb-space-lg">
+<!-- Left Column: Match Log Archive (8 Cols) -->
+<div class="lg:col-span-8 hextech-border bg-surface-container/70 backdrop-blur-md">
+<div class="p-space-md flex items-center justify-between bg-surface-container-high/60 border-b border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-secondary rotate-45"></span>
+<div>
+<h3 class="font-headline-sm text-[20px] text-on-surface font-serif font-semibold">Zadnje analizirane igre</h3>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Kronološki pregled lane metrik in odstopanj od taktičnega načrta.</p>
+</div>
+</div>
+<span class="font-label-sm text-[11px] text-primary border border-primary/30 px-2 py-0.5 bg-primary/10">Zadnjih 7 iger</span>
+</div>
+<!-- Hextech Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest text-primary font-label-sm text-[11px] uppercase tracking-wider border-b border-outline-variant/30">
+<th class="py-3 px-space-md font-bold">Prvak</th>
+<th class="py-3 px-space-md font-bold">Izid &amp; Čas</th>
+<th class="py-3 px-space-md font-bold">KDA</th>
+<th class="py-3 px-space-md font-bold text-right">CS@10</th>
+<th class="py-3 px-space-md font-bold">Odstopanje načrta</th>
+<th class="py-3 px-space-md font-bold text-right">Dossier</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 font-body-sm text-body-sm">
+<!-- Row 1: Jinx Win -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 border border-primary/40 bg-surface-container-highest flex-shrink-0 flex items-center justify-center font-label-sm text-primary font-bold shadow-[0_0_8px_rgba(240,191,92,0.2)]">
+                        JX
+                      </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-none font-semibold">Jinx</span>
+<span class="text-[11px] text-on-surface-variant">vs Kai'Sa</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rotate-45 bg-secondary shadow-[0_0_6px_#43e2d2]"></span>
+<span class="text-secondary font-bold font-label-sm text-[12px]">Zmaga</span>
+<span class="text-on-surface-variant font-label-sm text-[11px]">28:14</span>
+</div>
+</td>
+<td class="py-3 px-space-md font-label-sm text-on-surface">
+                    8 / 2 / 11
+                  </td>
+<td class="py-3 px-space-md text-right font-label-sm font-bold text-secondary text-[14px]">
+                    81
+                  </td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 bg-secondary/10 border border-secondary/30 text-secondary text-[11px] font-label-sm">Skladno z načrtom</span>
+</td>
+<td class="py-3 px-space-md text-right">
+<button class="text-primary hover:text-white transition-colors text-label-sm flex items-center gap-0.5 ml-auto uppercase font-bold" type="button">
+<span>Pregled</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Caitlyn Win -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 border border-primary/40 bg-surface-container-highest flex-shrink-0 flex items-center justify-center font-label-sm text-primary font-bold shadow-[0_0_8px_rgba(240,191,92,0.2)]">
+                        CT
+                      </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-none font-semibold">Caitlyn</span>
+<span class="text-[11px] text-on-surface-variant">vs Ezreal</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rotate-45 bg-secondary shadow-[0_0_6px_#43e2d2]"></span>
+<span class="text-secondary font-bold font-label-sm text-[12px]">Zmaga</span>
+<span class="text-on-surface-variant font-label-sm text-[11px]">32:40</span>
+</div>
+</td>
+<td class="py-3 px-space-md font-label-sm text-on-surface">
+                    6 / 1 / 9
+                  </td>
+<td class="py-3 px-space-md text-right font-label-sm font-bold text-secondary text-[14px]">
+                    79
+                  </td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 bg-surface-container-low border border-outline-variant/40 text-on-surface-variant text-[11px] font-label-sm">Prioriteta stolpa</span>
+</td>
+<td class="py-3 px-space-md text-right">
+<button class="text-primary hover:text-white transition-colors text-label-sm flex items-center gap-0.5 ml-auto uppercase font-bold" type="button">
+<span>Pregled</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Jinx Defeat -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 border border-primary/40 bg-surface-container-highest flex-shrink-0 flex items-center justify-center font-label-sm text-primary font-bold shadow-[0_0_8px_rgba(240,191,92,0.2)]">
+                        JX
+                      </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-none font-semibold">Jinx</span>
+<span class="text-[11px] text-on-surface-variant">vs Draven</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rotate-45 bg-error shadow-[0_0_6px_#ffb4ab]"></span>
+<span class="text-error font-bold font-label-sm text-[12px]">Poraz</span>
+<span class="text-on-surface-variant font-label-sm text-[11px]">22:18</span>
+</div>
+</td>
+<td class="py-3 px-space-md font-label-sm text-on-surface">
+                    3 / 5 / 2
+                  </td>
+<td class="py-3 px-space-md text-right font-label-sm font-bold text-error text-[14px]">
+                    63
+                  </td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 bg-error-container/30 border border-error/40 text-error text-[11px] font-label-sm">Zgodnji engage poraz</span>
+</td>
+<td class="py-3 px-space-md text-right">
+<button class="text-primary hover:text-white transition-colors text-label-sm flex items-center gap-0.5 ml-auto uppercase font-bold" type="button">
+<span>Pregled</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Jinx Peak Win -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 border border-primary bg-primary/20 flex-shrink-0 flex items-center justify-center font-label-sm text-primary font-bold shadow-[0_0_12px_rgba(240,191,92,0.4)]">
+                        JX
+                      </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-none font-semibold">Jinx</span>
+<span class="text-[11px] text-on-surface-variant">vs Varus</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rotate-45 bg-secondary shadow-[0_0_6px_#43e2d2]"></span>
+<span class="text-secondary font-bold font-label-sm text-[12px]">Zmaga</span>
+<span class="text-on-surface-variant font-label-sm text-[11px]">34:50</span>
+</div>
+</td>
+<td class="py-3 px-space-md font-label-sm text-on-surface">
+                    11 / 3 / 8
+                  </td>
+<td class="py-3 px-space-md text-right font-label-sm font-bold text-primary text-[14px] shadow-[0_0_6px_#f0bf5c]">
+                    84 ★
+                  </td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 bg-primary/10 border border-primary/40 text-primary text-[11px] font-label-sm">Brezhiben reset timing</span>
+</td>
+<td class="py-3 px-space-md text-right">
+<button class="text-primary hover:text-white transition-colors text-label-sm flex items-center gap-0.5 ml-auto uppercase font-bold" type="button">
+<span>Pregled</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: Kai'Sa Defeat -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 border border-primary/40 bg-surface-container-highest flex-shrink-0 flex items-center justify-center font-label-sm text-primary font-bold shadow-[0_0_8px_rgba(240,191,92,0.2)]">
+                        KS
+                      </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-none font-semibold">Kai'Sa</span>
+<span class="text-[11px] text-on-surface-variant">vs Lucian</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rotate-45 bg-error shadow-[0_0_6px_#ffb4ab]"></span>
+<span class="text-error font-bold font-label-sm text-[12px]">Poraz</span>
+<span class="text-on-surface-variant font-label-sm text-[11px]">31:12</span>
+</div>
+</td>
+<td class="py-3 px-space-md font-label-sm text-on-surface">
+                    4 / 6 / 5
+                  </td>
+<td class="py-3 px-space-md text-right font-label-sm font-bold text-on-surface text-[14px]">
+                    68
+                  </td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 bg-error-container/30 border border-error/40 text-error text-[11px] font-label-sm">Zamuda anti-heal (Soraka)</span>
+</td>
+<td class="py-3 px-space-md text-right">
+<button class="text-primary hover:text-white transition-colors text-label-sm flex items-center gap-0.5 ml-auto uppercase font-bold" type="button">
+<span>Pregled</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 6: Jinx Win -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 border border-primary/40 bg-surface-container-highest flex-shrink-0 flex items-center justify-center font-label-sm text-primary font-bold shadow-[0_0_8px_rgba(240,191,92,0.2)]">
+                        JX
+                      </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface leading-none font-semibold">Jinx</span>
+<span class="text-[11px] text-on-surface-variant">vs Ashe</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rotate-45 bg-secondary shadow-[0_0_6px_#43e2d2]"></span>
+<span class="text-secondary font-bold font-label-sm text-[12px]">Zmaga</span>
+<span class="text-on-surface-variant font-label-sm text-[11px]">26:05</span>
+</div>
+</td>
+<td class="py-3 px-space-md font-label-sm text-on-surface">
+                    7 / 0 / 6
+                  </td>
+<td class="py-3 px-space-md text-right font-label-sm font-bold text-secondary text-[14px]">
+                    76
+                  </td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 bg-secondary/10 border border-secondary/30 text-secondary text-[11px] font-label-sm">Skladno z načrtom</span>
+</td>
+<td class="py-3 px-space-md text-right">
+<button class="text-primary hover:text-white transition-colors text-label-sm flex items-center gap-0.5 ml-auto uppercase font-bold" type="button">
+<span>Pregled</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-space-sm bg-surface-container-lowest text-center border-t border-outline-variant/30">
+<button class="text-primary hover:text-white font-label-md text-label-md py-1 transition-colors uppercase tracking-wider flex items-center justify-center gap-1 mx-auto font-semibold" type="button">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+<span>Odpri celotni zvezek (Vseh 40 tekem obdobja)</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Piltover Guild Directives & Power Spikes (4 Cols) -->
+<div class="lg:col-span-4 flex flex-col gap-space-md">
+<!-- Coach Dossier Box (Guild Scroll Styling) -->
+<div class="hextech-border bg-gradient-to-b from-surface-container via-surface-container-low to-surface-container-lowest p-space-md shadow-xl backdrop-blur-md">
+<!-- Guild Status Header -->
+<div class="flex items-center justify-between pb-space-xs border-b border-outline-variant/30">
+<div class="flex items-center gap-space-xs">
+<div class="w-6 h-6 border border-primary/50 bg-primary/10 flex items-center justify-center rotate-45">
+<span class="material-symbols-outlined text-[14px] text-primary -rotate-45">groups</span>
+</div>
+<span class="font-label-md text-[11px] text-primary uppercase tracking-widest font-semibold">Ceh: FERI Esports B</span>
+</div>
+<span class="px-2 py-0.5 bg-secondary/10 text-secondary border border-secondary/30 text-[10px] font-label-sm uppercase font-bold">Aktivna ekipa</span>
+</div>
+<!-- Coach Directive Content -->
+<div class="pt-space-md flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<!-- Guild Master Avatar Stamp -->
+<div class="w-9 h-9 border border-primary bg-primary/10 flex items-center justify-center text-primary font-bold font-label-md shadow-[0_0_10px_rgba(240,191,92,0.3)] rotate-45">
+<span class="-rotate-45">TM</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Trener Marko#EUNE</div>
+<div class="font-label-sm text-[10px] text-secondary tracking-wider uppercase">Glavni analitik &amp; strateg</div>
+</div>
+<span class="text-[10px] font-label-sm text-on-surface-variant ml-auto">Pred 2 dnevi</span>
+</div>
+<!-- Directive Scroll Box -->
+<div class="bg-surface-container-lowest/90 border border-primary/30 p-space-sm mt-1 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-8 h-8 bg-gradient-to-bl from-primary/20 to-transparent pointer-events-none"></div>
+<div class="text-[10px] font-label-sm text-primary uppercase tracking-[0.18em] font-bold">Tedenska naloga ceha</div>
+<h4 class="font-headline-sm text-[18px] gold-gradient-text font-serif font-semibold mt-0.5">Ta teden: CS@10 nad 70 v vseh tekmah</h4>
+<!-- Directive Progress Meter -->
+<div class="mt-space-sm flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-label-sm text-[11px]">
+<span class="text-on-surface-variant">Doseženo v 14 od 18 zadnjih iger</span>
+<span class="text-secondary font-bold">78 %</span>
+</div>
+<div class="w-full h-2.5 bg-surface-container-highest border border-outline-variant/40 overflow-hidden relative">
+<div class="h-full bg-gradient-to-r from-primary-container via-secondary to-secondary-fixed transition-all duration-700 shadow-[0_0_10px_#43e2d2]" style="width: 78%;"></div>
+</div>
+</div>
+</div>
+<!-- Coach Tactical Comment -->
+<div class="bg-surface-container-high/40 border-l-2 border-primary p-space-sm flex flex-col gap-1">
+<div class="flex items-center gap-1.5 text-primary font-label-sm text-[11px] font-semibold">
+<span class="material-symbols-outlined text-[15px] text-primary">auto_fix_high</span>
+<span class="uppercase tracking-wider">Komentar k analizi</span>
+</div>
+<p class="text-[13px] leading-relaxed text-on-surface-variant italic font-body-sm">
+                  "Opazna boljša disciplina pri nadzoru valov minionov pred prvim zmajem. Ne tvegaj menjav pred 2. nivojem proti močnim engage podpornikom (glej arhiv #4829-EU)."
+                </p>
+</div>
+<!-- Sub-task Checklist with Runes -->
+<div class="flex flex-col gap-2 pt-space-xs">
+<span class="text-[10px] font-label-sm text-primary uppercase tracking-widest font-bold">Taktični kontrolni seznam</span>
+<!-- Item 1 (Done) -->
+<div class="flex items-start gap-space-xs p-2 bg-surface-container-lowest border border-secondary/20">
+<span class="material-symbols-outlined text-[16px] text-secondary mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="text-[12px] text-on-surface font-medium line-through decoration-on-surface-variant/70">Izogibaj se potiskanju brez vizije v reki</span>
+<span class="text-[10px] text-secondary font-label-sm">Opravljeno (Varnost zvišana za 24%)</span>
+</div>
+</div>
+<!-- Item 2 (Done) -->
+<div class="flex items-start gap-space-xs p-2 bg-surface-container-lowest border border-secondary/20">
+<span class="material-symbols-outlined text-[16px] text-secondary mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="text-[12px] text-on-surface font-medium line-through decoration-on-surface-variant/70">Kupuj Executioner's takoj proti Soraki/Aatroxu</span>
+<span class="text-[10px] text-secondary font-label-sm">Opravljeno v zadnjih 3 tekmah</span>
+</div>
+</div>
+<!-- Item 3 (In progress) -->
+<div class="flex items-start gap-space-xs p-2 bg-surface-container-lowest border border-primary/40">
+<span class="material-symbols-outlined text-[16px] text-primary mt-0.5">radio_button_unchecked</span>
+<div class="flex flex-col">
+<span class="text-[12px] text-on-surface font-medium">Ohrani povprečje nad 72 CS@10 do petkovega treninga</span>
+<span class="text-[10px] text-primary font-label-sm font-semibold">V teku (Trenutno stanje: 74.2 CS@10)</span>
+</div>
+</div>
+</div>
+<!-- Action Button for Coach Chat -->
+<button class="mt-space-xs w-full py-2.5 bg-gradient-to-r from-primary-container/40 via-surface-container-high to-primary-container/40 hover:from-primary hover:to-primary-container hover:text-on-primary text-primary border border-primary/50 transition-all font-label-md text-label-md flex items-center justify-center gap-space-xs shadow-[0_0_12px_rgba(200,155,60,0.15)] uppercase tracking-wider font-bold" type="button">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>Odgovori cehovskemu mojstru</span>
+</button>
+</div>
+</div>
+<!-- Quick Advice Box: Hextech Power Spike -->
+<div class="hextech-border bg-gradient-to-r from-surface-container-low via-surface-container to-surface-container-low p-space-md flex items-start gap-space-sm backdrop-blur-md">
+<div class="w-9 h-9 border border-primary bg-primary/20 flex items-center justify-center text-primary flex-shrink-0 rotate-45 shadow-[0_0_10px_rgba(240,191,92,0.3)]">
+<span class="material-symbols-outlined text-[20px] -rotate-45">bolt</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-primary font-bold uppercase tracking-wider">Priporočilo za skok moči (Power Spike)</h4>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-1 leading-relaxed">
+                Z vašim trenutnim CS@10 (74.2) skujete <span class="text-secondary font-semibold">Kraken Slayer</span> točno ob <strong class="text-primary font-label-sm">11:45</strong>, kar je 1 minuto in 20 sekund pred povprečnim nasprotnikom v diviziji Gold II.
+              </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Legal Notice (Riot Games Compliance) -->
+<div class="pt-space-lg pb-space-sm text-on-surface-variant font-body-sm text-[11px] opacity-60 max-w-4xl leading-relaxed border-t border-outline-variant/20">
+<p>
+          RiftSense ni podprt s strani Riot Games in ne odraža stališč ali mnenj Riot Games ali kogarkoli, ki je uradno vključen v proizvodnjo ali upravljanje Riot Games lastnine. Riot Games in vse povezane lastnine so blagovne znamke ali registrirane blagovne znamke Riot Games, Inc.
+        </p>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface-container-lowest border-t border-outline-variant/30 mt-auto relative z-10">
+<div class="max-w-[1440px] mx-auto px-margin py-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-primary rotate-45"></span>
+<span class="font-headline-sm text-primary font-semibold text-[15px]">RiftSense Hextech Arcana</span>
+</div>
+<p class="font-body-sm text-[11px] text-on-surface-variant opacity-75 text-center md:text-right">
+        Vsi podatki in runski algoritmi so optimizirani za sezono 2025.
+      </p>
+</div>
+</footer>
+</body></html>

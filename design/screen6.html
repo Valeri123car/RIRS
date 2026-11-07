@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="sl"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"inverse-primary":"#006782","tertiary-container":"#c0963c","on-primary-fixed-variant":"#004d63","on-secondary-fixed-variant":"#84222f","surface-container-high":"#222c2a","surface-bright":"#313b39","primary-fixed-dim":"#86d0f0","tertiary-fixed-dim":"#eec061","on-primary-fixed":"#001f29","error":"#ffb4ab","on-tertiary-container":"#453100","on-tertiary":"#402d00","on-secondary":"#65081b","tertiary-fixed":"#ffdea2","primary":"#86d0f0","primary-fixed":"#bbe9ff","surface-container-highest":"#2d3735","outline-variant":"#3f484d","secondary-container":"#872431","surface-variant":"#2d3735","secondary-fixed":"#ffdada","inverse-on-surface":"#283230","on-primary":"#003545","surface":"#0b1513","on-surface":"#dae5e1","tertiary":"#eec061","on-tertiary-fixed":"#261900","inverse-surface":"#dae5e1","surface-container":"#182220","secondary-fixed-dim":"#ffb3b5","surface-container-low":"#131d1b","error-container":"#93000a","on-background":"#dae5e1","surface-dim":"#0b1513","background":"#0b1513","on-error":"#690005","surface-tint":"#86d0f0","surface-container-lowest":"#06100e","on-secondary-fixed":"#40000c","on-secondary-container":"#ff9da2","on-primary-container":"#00394a","on-surface-variant":"#bfc8cd","secondary":"#ffb3b5","outline":"#899297","on-tertiary-fixed-variant":"#5c4200","on-error-container":"#ffdad6","primary-container":"#5ba6c4"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-sm":"0.5rem","gutter":"0.75rem","margin":"1rem","space-xs":"0.25rem","space-xl":"2rem","space-lg":"1.25rem","space-md":"0.75rem"},"fontFamily":{"tabular-num":["Archivo Narrow"],"body-md":["Archivo Narrow"],"body-lg":["Archivo Narrow"],"label-md":["Archivo Narrow"],"headline-sm":["Archivo Narrow"],"headline-md":["Archivo Narrow"],"headline-lg":["Archivo Narrow"],"label-sm":["Archivo Narrow"],"body-sm":["Archivo Narrow"]},"fontSize":{"tabular-num":["14px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"label-md":["13px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"600"}],"headline-sm":["17px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"26px","letterSpacing":"-0.005em","fontWeight":"600"}],"headline-lg":["26px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.01em","fontWeight":"500"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-low/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.2)]"><div class="h-16 max-w-[1440px] mx-auto px-margin flex items-center justify-between"><div class="flex items-center gap-space-xl"><a class="flex items-center tracking-tight text-on-surface select-none group" data-path="live" href="#"><span class="font-headline-md text-headline-md uppercase tracking-wider text-on-surface">RiftSense</span><span class="w-1.5 h-1.5 rounded-full bg-primary ml-1 group-hover:scale-125 transition-transform"></span></a><nav class="flex items-center gap-space-lg" data-active-classes="text-primary border-b-2 border-primary"><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="my-analyses" href="#">Moje analize</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="live" href="#">V živo</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="progress" href="#">Napredek</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors py-space-sm" data-path="team" href="#">Ekipa</a></nav></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm bg-surface-container px-space-md py-1.5 rounded-lg border border-outline-variant/30"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-tabular-num text-tabular-num text-on-surface tracking-tight">Ranked solo/duo • EUNE</span></div><button aria-label="Filter and Settings" class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">tune</span></button><div class="flex items-center gap-space-sm pl-space-xs"><div class="flex flex-col text-right"><span class="font-label-md text-label-md text-on-surface leading-tight">Luka#EUNE</span><span class="font-label-sm text-label-sm text-on-surface-variant">Gold II</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-16 bg-background flex-1 max-w-[1440px] mx-auto px-margin py-space-lg"><div class="flex flex-col w-full">
+<!-- Tactical dossier header stripe -->
+<div class="w-full flex flex-wrap items-center justify-between gap-space-sm pb-space-md border-b border-outline-variant/30 mb-space-lg">
+<div class="flex items-center gap-space-sm">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary">Avtentikacijski Protokol // RSO-v4.9</span>
+<span class="text-outline-variant/60">/</span>
+<span class="font-tabular-num text-tabular-num text-on-surface-variant">SEC-LEVEL 02</span>
+</div>
+<div class="flex items-center gap-space-md font-tabular-num text-body-sm text-on-surface-variant">
+<span>SERVER: <strong class="text-on-surface font-label-md">EUNE-PROD-01</strong></span>
+<span class="text-outline-variant/40">|</span>
+<span>LATENCY: <strong class="text-primary font-tabular-num">18ms</strong></span>
+</div>
+</div>
+<!-- Primary Headline Group -->
+<div class="mb-space-xl max-w-3xl">
+<div class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded bg-surface-container border border-outline-variant/40 text-tertiary font-label-sm text-label-sm uppercase tracking-wider mb-space-sm">
+<span class="material-symbols-outlined text-[14px]">verified_user</span>
+      Uradna Riot API verifikacija
+    </div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight uppercase mb-space-xs">
+      Povežite svoj Riot račun
+    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+      Za dostop do skavtskih analiz v živo, osebnega dosjeja napredka in neposredne sinhronizacije z ekipo <span class="text-primary font-label-md">FERI Esports B</span> avtorizirajte svoj Summoner profil prek varnega protokola.
+    </p>
+</div>
+<!-- 2-Column Tactical Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT COLUMN: Methods (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<!-- Option 1: Riot Sign-On Primary Card -->
+<div class="bg-surface-container rounded-none border border-outline-variant/40 p-space-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-12 -mt-12 rounded-full pointer-events-none"></div>
+<div class="flex items-start justify-between gap-space-sm mb-space-md">
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Priporočena metoda // 01</span>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-0.5">Riot Sign-On (RSO)</h2>
+</div>
+<span class="px-space-sm py-0.5 rounded bg-surface-container-high border border-primary/30 text-primary font-tabular-num text-label-sm uppercase">
+            Trenutno aktivno
+          </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-lg">
+          Hitra in kriptografsko zavarovana povezava. Preusmerjeni boste na uradno prijavno stran Riot Games, ki potrdi vašo identiteto brez deljenja gesel.
+        </p>
+<!-- Official Riot Sign-On Button -->
+<button class="w-full flex items-center justify-center gap-space-md bg-secondary-container hover:bg-secondary-container/90 text-on-secondary-fixed transition-all px-space-lg py-3 rounded-md shadow-sm border border-secondary/30 active:scale-[0.99] group/btn" type="button">
+<svg class="w-5 h-5 fill-current text-white shrink-0" viewbox="0 0 24 24">
+<path d="M13.41 12l6.29-6.29a1.004 1.004 0 0 0-1.42-1.42L12 10.59 5.71 4.29a1.004 1.004 0 0 0-1.42 1.42L10.59 12l-6.3 6.29a1.004 1.004 0 1 0 1.42 1.42L12 13.41l6.29 6.3a1.004 1.004 0 0 0 1.42-1.42L13.41 12z"></path>
+</svg>
+<span class="font-headline-sm text-headline-sm text-white uppercase tracking-wider">
+            Poveži se z Riot Games računom
+          </span>
+<span class="material-symbols-outlined text-white text-[18px] group-hover/btn:translate-x-1 transition-transform">
+            arrow_forward
+          </span>
+</button>
+<div class="mt-space-sm flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span>Odzivni čas preverjanja: &lt; 1.2s</span>
+<span class="font-tabular-num">OAuth 2.0 PKCE</span>
+</div>
+</div>
+<!-- Divider with dossier label -->
+<div class="flex items-center gap-space-md">
+<div class="h-px bg-outline-variant/30 flex-1"></div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant bg-surface-container-low px-space-sm py-1 border border-outline-variant/30">
+          Ali alternativna metoda // 02
+        </span>
+<div class="h-px bg-outline-variant/30 flex-1"></div>
+</div>
+<!-- Option 2: Third-Party Verification Code Manual Method -->
+<div class="bg-surface-container rounded-none border border-outline-variant/40 p-space-lg flex flex-col gap-space-md">
+<div class="flex items-start justify-between gap-space-sm">
+<div>
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">Ročna verifikacija v odjemalcu</span>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-0.5">Koda za preverjanje tretje osebe</h2>
+</div>
+<span class="px-space-sm py-0.5 rounded bg-surface-container-high border border-outline-variant/30 text-on-surface-variant font-label-sm uppercase">
+            Client-Native
+          </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Če ne želite uporabiti spletne prijave RSO, lahko v uradni League of Legends odjemalec vnesete varnostno kodo in potrdite lastništvo.
+        </p>
+<!-- One-Time Code Box -->
+<div class="bg-surface-container-low border border-outline-variant/40 p-space-md flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Vaša unikatna koda za vnos</span>
+<span class="font-headline-md text-headline-md text-primary tracking-wider font-tabular-num select-all" id="verification-token">
+              RIFTSENSE-7482-VERIFY
+            </span>
+</div>
+<button class="w-full sm:w-auto px-space-md py-2 bg-surface-container-high hover:bg-surface-bright text-on-surface border border-outline-variant/50 rounded flex items-center justify-center gap-space-xs transition-colors" id="btn-copy-code" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span class="font-label-md text-label-md uppercase" id="copy-label">Kopiraj kodo</span>
+</button>
+</div>
+<!-- Stepper Checklist -->
+<div class="bg-surface-container-lowest/60 p-space-md border border-outline-variant/20 flex flex-col gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Navodila po korakih</span>
+<div class="flex items-start gap-space-sm">
+<span class="font-tabular-num text-tabular-num text-primary bg-primary/10 w-5 h-5 flex items-center justify-center rounded">1</span>
+<span class="font-body-sm text-body-sm text-on-surface">Odprite League of Legends odjemalec (Client) na svojem računalniku.</span>
+</div>
+<div class="flex items-start gap-space-sm">
+<span class="font-tabular-num text-tabular-num text-primary bg-primary/10 w-5 h-5 flex items-center justify-center rounded">2</span>
+<span class="font-body-sm text-body-sm text-on-surface">Pojdite na <strong class="text-tertiary">Nastavitve (Settings)</strong> → <strong class="text-tertiary">Preverjanje tretje osebe (Third-Party Code)</strong>.</span>
+</div>
+<div class="flex items-start gap-space-sm">
+<span class="font-tabular-num text-tabular-num text-primary bg-primary/10 w-5 h-5 flex items-center justify-center rounded">3</span>
+<span class="font-body-sm text-body-sm text-on-surface">Prilepite kodo <code class="text-primary font-tabular-num">RIFTSENSE-7482-VERIFY</code> v polje in kliknite <strong>Shrani (Save)</strong>.</span>
+</div>
+<div class="flex items-start gap-space-sm">
+<span class="font-tabular-num text-tabular-num text-primary bg-primary/10 w-5 h-5 flex items-center justify-center rounded">4</span>
+<span class="font-body-sm text-body-sm text-on-surface">Vnesite svoj Riot ID spodaj in sprožite sinhronizacijo.</span>
+</div>
+</div>
+<!-- Manual Input Grid -->
+<form class="flex flex-col gap-space-md pt-space-xs" id="manual-verify-form">
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-space-sm">
+<!-- Game Name Input -->
+<div class="sm:col-span-5 flex flex-col gap-1">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant" for="riot-name">
+                Riot ID / Ime
+              </label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant/50 focus:border-primary text-on-surface px-space-md py-2 rounded text-body-md font-body-md outline-none transition-colors" id="riot-name" placeholder="Ime igralca" type="text" value="Luka"/>
+</div>
+</div>
+<!-- Tagline Input -->
+<div class="sm:col-span-3 flex flex-col gap-1">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant" for="riot-tag">
+                Oznaka (#)
+              </label>
+<div class="relative flex items-center">
+<span class="absolute left-space-sm font-label-md text-label-md text-on-surface-variant pointer-events-none">#</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 focus:border-primary text-on-surface pl-7 pr-space-sm py-2 rounded text-body-md font-body-md outline-none transition-colors font-tabular-num uppercase" id="riot-tag" placeholder="EUNE" type="text" value="EUNE"/>
+</div>
+</div>
+<!-- Region Dropdown -->
+<div class="sm:col-span-4 flex flex-col gap-1">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant" for="riot-region">
+                Strežnik / Regija
+              </label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border border-outline-variant/50 focus:border-primary text-on-surface px-space-md py-2 rounded text-body-md font-body-md outline-none appearance-none transition-colors cursor-pointer" id="riot-region">
+<option selected="" value="eune">Europe Nordic &amp; East (EUNE)</option>
+<option value="euw">Europe West (EUW)</option>
+<option value="na">North America (NA)</option>
+<option value="kr">Korea (KR)</option>
+<option value="lan">Latin America North (LAN)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-[18px] text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Submit Action Button -->
+<button class="w-full bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider py-2.5 rounded flex items-center justify-center gap-space-sm transition-all border border-primary/40 active:scale-[0.99]" type="submit">
+<span class="material-symbols-outlined text-[20px]">sync</span>
+<span>Preveri kodo in potrdi povezavo</span>
+</button>
+</form>
+</div>
+</div>
+<!-- RIGHT COLUMN: Permissions Dossier & Detected Profile Preview (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg">
+<!-- Detected Summoner Dossier Card -->
+<div class="bg-surface-container rounded-none border border-outline-variant/40 p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface">Zaznan Summoner profil</span>
+</div>
+<span class="font-tabular-num text-label-sm text-tertiary bg-tertiary/10 px-space-sm py-0.5 rounded border border-tertiary/30">
+            Pripravljeno za sinhronizacijo
+          </span>
+</div>
+<div class="flex items-center gap-space-md pt-space-xs">
+<!-- Champion/Profile Icon Mockup -->
+<div class="relative shrink-0">
+<div class="w-16 h-16 rounded border-2 border-primary/60 bg-surface-container-high overflow-hidden flex items-center justify-center relative">
+<img class="w-full h-full object-cover" data-alt="Dark tactical close-up portrait of the champion Jinx with intense focused blue neon eyes against a shadowy misty industrial background, sharp League of Legends character art style, high contrast, muted color palette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhxUgT_PoesKnIYZRkKaPL8TFWMySYphW836MSoA5bx6uisPT6auYm57Zi9NQYhywbTot4qsNp_b2DjbMddR4DIWC9NpiXJgqVI7Xc-sLo3arj4IZwu4mxtRrFOFV1QKa-bsdCMhzfNn5wznJL4MbjhovsTA2XpcgJA02wPIeco6I2JdUOkr5Ea3mMhmNmKv1B7dsB9A-NjNuPIWF7mEtBSEwA-x1Ys7eYRZZjlFzSl4OxvJLoaPTG"/>
+<div class="absolute bottom-0 inset-x-0 bg-surface-container-lowest/80 text-center py-0.5">
+<span class="font-tabular-num text-[10px] text-primary">LVL 482</span>
+</div>
+</div>
+<div class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-surface-container border-2 border-surface flex items-center justify-center">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface truncate">Luka</span>
+<span class="font-label-md text-label-md text-primary font-tabular-num">#EUNE</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm mt-0.5">
+<span class="text-tertiary font-label-md">Gold II</span>
+<span>•</span>
+<span class="font-tabular-num">64 LP</span>
+<span>•</span>
+<span>EUNE</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-tabular-num text-label-sm mt-1">
+<span>Sezonske zmage:</span>
+<strong class="text-on-surface">142W / 118L</strong>
+<span class="text-primary">(54.6%)</span>
+</div>
+</div>
+</div>
+<!-- Telemetry Spec Rows -->
+<div class="grid grid-cols-2 gap-space-xs bg-surface-container-low p-space-sm border border-outline-variant/30 text-body-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Primarna vloga</span>
+<span class="font-label-md text-label-md text-on-surface">ADC / Bot Lane</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Glavni prvak</span>
+<span class="font-label-md text-label-md text-on-surface">Jinx (61% WR)</span>
+</div>
+<div class="flex flex-col mt-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Ekipe</span>
+<span class="font-label-md text-label-md text-primary truncate">FERI Esports B</span>
+</div>
+<div class="flex flex-col mt-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Integriteta API</span>
+<span class="font-tabular-num text-tabular-num text-tertiary">V4 Validated</span>
+</div>
+</div>
+</div>
+<!-- Permissions & Security Dossier -->
+<div class="bg-surface-container rounded-none border border-outline-variant/40 p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface">Varnost in dovoljenja aplikacije</span>
+<span class="material-symbols-outlined text-[18px] text-primary">security</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase text-primary tracking-wider">Avtoriziran dostop (Read-Only)</span>
+<!-- Permission item: Allowed -->
+<div class="flex items-start gap-space-sm">
+<div class="w-5 h-5 rounded bg-primary/10 border border-primary/40 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-primary text-[14px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface leading-tight">Zgodovina tekem in statistike (Match-V5)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dostop do zgodovine uvrščenih iger, buildov, run in metrik.</span>
+</div>
+</div>
+<!-- Permission item: Allowed -->
+<div class="flex items-start gap-space-sm">
+<div class="w-5 h-5 rounded bg-primary/10 border border-primary/40 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-primary text-[14px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface leading-tight">Telemetrija tekoče tekme (Spectator-V5)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Zaznava aktivne igre v živo za takojšnjo analizo nasprotnikov.</span>
+</div>
+</div>
+<!-- Permission item: Allowed -->
+<div class="flex items-start gap-space-sm">
+<div class="w-5 h-5 rounded bg-primary/10 border border-primary/40 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-primary text-[14px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface leading-tight">Uvrstitev na lestvici (League-V4)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Rang, LP točke, divizija in serije za napredovanje.</span>
+</div>
+</div>
+</div>
+<div class="h-px bg-outline-variant/30 my-space-xs"></div>
+<div class="flex flex-col gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase text-secondary tracking-wider">Strogo prepovedano / Brez dostopa</span>
+<!-- Permission item: Forbidden -->
+<div class="flex items-start gap-space-sm">
+<div class="w-5 h-5 rounded bg-secondary-container/20 border border-secondary/40 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-secondary text-[14px]">close</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface leading-tight">Brez dostopa do gesel ali podatkov za prijavo</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">RiftSense nikoli ne vidi in ne hrani vaših poverilnic.</span>
+</div>
+</div>
+<!-- Permission item: Forbidden -->
+<div class="flex items-start gap-space-sm">
+<div class="w-5 h-5 rounded bg-secondary-container/20 border border-secondary/40 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-secondary text-[14px]">close</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface leading-tight">Brez spreminjanja računa, prijateljev ali nakupov</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Protokol je 100% pasiven in ne more izvajati nobenih transakcij.</span>
+</div>
+</div>
+</div>
+<!-- Security guarantee banner -->
+<div class="p-space-sm bg-surface-container-low border border-outline-variant/30 flex items-center gap-space-sm mt-space-xs">
+<span class="material-symbols-outlined text-tertiary text-[20px] shrink-0">lock</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-tight">
+            RiftSense deluje izključno v skladu z uradnimi smernicami <strong class="text-on-surface">Riot Games Developer Portal</strong>. Vsi prenosi podatkov so šifrirani s standardom TLS 1.3.
+          </p>
+</div>
+</div>
+<!-- Verification Status Toast (Simulated micro-interaction) -->
+<div class="hidden bg-surface-container-high border border-primary/50 p-space-md rounded flex items-center gap-space-md shadow-md animate-fade-in" id="status-toast">
+<div class="w-8 h-8 rounded bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface">Uspešno preverjeno!</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Summoner Luka#EUNE je povezan z vašim dosjejem.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Tactical Telemetry / FAQ Grid -->
+<div class="mt-space-xl pt-space-lg border-t border-outline-variant/30 grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Ali lahko račun kasneje odklopim?</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Da. V nastavitvah profila lahko kadarkoli z enim klikom prekličete avtorizacijo in izbrišete vse lokalno predpomnjene podatke.
+      </p>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Kaj če zamenjam Riot ID ali regijo?</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        RiftSense sledi vašemu trajnemu Riot PUUID identifikatorju. Sprememba prikaznega imena se avtomatsko posodobi ob naslednji prijavi.
+      </p>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Ali je to dovoljeno s strani Riot Games?</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Popolnoma. Uporabljamo izključno uradno odobrene API ključe, ki ne kršijo pogojev storitve (Terms of Service) in ne vplivajo na datoteke igre.
+      </p>
+</div>
+</div>
+<script>
+    // Copy code button interaction
+    const copyBtn = document.getElementById('btn-copy-code');
+    const copyLabel = document.getElementById('copy-label');
+    const tokenText = document.getElementById('verification-token');
+
+    if (copyBtn && tokenText) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(tokenText.innerText.trim()).then(() => {
+          copyLabel.innerText = 'Kopirano!';
+          copyBtn.classList.add('border-primary', 'text-primary');
+          setTimeout(() => {
+            copyLabel.innerText = 'Kopiraj kodo';
+            copyBtn.classList.remove('border-primary', 'text-primary');
+          }, 2500);
+        }).catch(() => {
+          copyLabel.innerText = 'RIFTSENSE-7482-VERIFY';
+        });
+      });
+    }
+
+    // Manual Form Verification Feedback interaction
+    const form = document.getElementById('manual-verify-form');
+    const toast = document.getElementById('status-toast');
+    if (form && toast) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalContent = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Preverjam odjemalec...</span>';
+        
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalContent;
+          toast.classList.remove('hidden');
+          toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          setTimeout(() => {
+            toast.classList.add('hidden');
+          }, 6000);
+        }, 1200);
+      });
+    }
+  </script>
+</div></main><footer class="w-full bg-surface-container-lowest mt-auto"><div class="max-w-[1440px] mx-auto px-margin py-space-lg"><p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl leading-relaxed opacity-75">RiftSense ni podprt s strani Riot Games in ne odraža stališč ali mnenj Riot Games ali kogarkoli, ki je uradno vključen v proizvodnjo ali upravljanje Riot Games lastnine. Riot Games in vse povezane lastnine so blagovne znamke ali registrirane blagovne znamke Riot Games, Inc.</p></div></footer><!-- Tactical Success Notification Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-surface-container-lowest/80 backdrop-blur-md transition-all duration-300 animate-fade-in" id="success-modal">
+<!-- Floating Success Toast Notification (Top Right) -->
+<div class="fixed top-20 right-4 sm:right-8 z-50 max-w-md w-full bg-surface-container-low/95 border border-primary/50 shadow-2xl p-space-md flex items-start gap-space-md animate-fade-in transition-all backdrop-blur-md">
+<div class="w-8 h-8 rounded bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0 mt-0.5 relative">
+<span class="material-symbols-outlined text-primary text-[20px]">verified</span>
+<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Riot API V4 Sinhronizacija</span>
+<span class="font-tabular-num text-[11px] text-on-surface-variant">Pravkar</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-0.5 leading-snug">
+        Riot račun <strong class="text-primary font-label-md">Luka#EUNE</strong> uspešno povezan. Vsi API protokoli delujejo.
+      </p>
+</div>
+<button aria-label="Zapri obvestilo" class="text-on-surface-variant hover:text-on-surface p-1 transition-colors" onclick="document.getElementById('success-modal').classList.add('hidden')">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Central Tactical Success Modal Dialog -->
+<div class="relative w-full max-w-xl bg-surface-container border border-primary/60 shadow-[0_12px_40px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-300">
+<!-- Top glowing accent bar -->
+<div class="h-1 bg-gradient-to-r from-primary via-primary-container to-primary w-full"></div>
+<!-- Tactical header stripe -->
+<div class="px-space-lg py-space-sm bg-surface-container-lowest border-b border-outline-variant/30 flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary">Protokol Verifikacije // Zaključeno</span>
+</div>
+<span class="font-tabular-num text-label-sm text-tertiary bg-tertiary/10 px-space-sm py-0.5 rounded border border-tertiary/30 uppercase">
+        Status: Potrjeno
+      </span>
+</div>
+<!-- Main Dialog Content -->
+<div class="p-space-lg flex flex-col gap-space-lg">
+<!-- Big Glowing Check Icon & Status Title -->
+<div class="flex flex-col items-center text-center pt-space-xs">
+<div class="relative mb-space-sm">
+<div class="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center shadow-[0_0_24px_rgba(134,208,240,0.5)] animate-pulse">
+<span class="material-symbols-outlined text-primary text-[36px]">check_circle</span>
+</div>
+<div class="absolute inset-0 rounded-full border border-primary/40 animate-ping pointer-events-none opacity-40"></div>
+</div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary mb-1">Riot API V4 Sinhronizacija Aktivna</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">
+          Povezava uspešno vzpostavljena
+        </h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mt-1">
+          Vaš Summoner dosje je avtoriziran in povezan s skavtskim modulom ter bazo ekipe.
+        </p>
+</div>
+<!-- Connected Summoner Profile Badge -->
+<div class="bg-surface-container-low border border-outline-variant/40 p-space-md flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-12 h-12 rounded border border-primary/60 bg-surface-container-high overflow-hidden relative shrink-0">
+<img class="w-full h-full object-cover" data-alt="Tactical avatar Jinx" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhxUgT_PoesKnIYZRkKaPL8TFWMySYphW836MSoA5bx6uisPT6auYm57Zi9NQYhywbTot4qsNp_b2DjbMddR4DIWC9NpiXJgqVI7Xc-sLo3arj4IZwu4mxtRrFOFV1QKa-bsdCMhzfNn5wznJL4MbjhovsTA2XpcgJA02wPIeco6I2JdUOkr5Ea3mMhmNmKv1B7dsB9A-NjNuPIWF7mEtBSEwA-x1Ys7eYRZZjlFzSl4OxvJLoaPTG"/>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold truncate">Luka</span>
+<span class="font-label-md text-label-md text-primary font-tabular-num">#EUNE</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<span class="text-tertiary font-label-sm">LVL 482</span>
+<span>•</span>
+<span class="text-on-surface font-label-sm">Gold II (64 LP)</span>
+<span>•</span>
+<span class="text-primary font-label-sm">FERI Esports B</span>
+</div>
+</div>
+</div>
+<div class="hidden sm:flex flex-col items-end text-right shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Integriteta</span>
+<span class="font-tabular-num text-label-sm text-primary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> 100% OK
+          </span>
+</div>
+</div>
+<!-- Permissions Granted Tactical Grid -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Aktivirani dostopi (Read-Only)</span>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-xs">
+<div class="bg-surface-container-lowest/80 p-space-sm border border-outline-variant/30 flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[16px]">check</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Zgodovina tekem</span>
+</div>
+<div class="bg-surface-container-lowest/80 p-space-sm border border-outline-variant/30 flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[16px]">check</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Telemetrija v živo</span>
+</div>
+<div class="bg-surface-container-lowest/80 p-space-sm border border-outline-variant/30 flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[16px]">check</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Lestvica in rang</span>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row items-center gap-space-sm pt-space-xs">
+<a class="w-full sm:flex-1 bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider py-2.5 px-space-md rounded flex items-center justify-center gap-space-xs transition-all border border-primary/40 active:scale-[0.99] text-center" data-path="live" href="#" onclick="document.getElementById('success-modal').classList.add('hidden')">
+<span>Pojdi na analizo v živo</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+<a class="w-full sm:w-auto px-space-lg py-2.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md uppercase tracking-wider rounded border border-outline-variant/50 transition-colors flex items-center justify-center gap-space-xs text-center" data-path="team" href="#" onclick="document.getElementById('success-modal').classList.add('hidden')">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>Odpri profil ekipe</span>
+</a>
+</div>
+</div>
+</div>
+</div></body></html>
