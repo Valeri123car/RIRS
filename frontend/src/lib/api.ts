@@ -1,5 +1,5 @@
 /** Osnovni naslov backend API; nastavi se v .env.local (NEXT_PUBLIC_API_URL). */
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8989";
 
 export class ApiError extends Error {
   constructor(

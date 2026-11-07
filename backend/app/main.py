@@ -1,4 +1,4 @@
-"""Vstopna točka FastAPI aplikacije. Zagon: uv run uvicorn app.main:app --reload"""
+"""Vstopna točka FastAPI aplikacije. Zagon: uv run uvicorn app.main:app --reload --port 8989"""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
