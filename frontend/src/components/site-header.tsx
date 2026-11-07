@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { ApiStatus } from "@/components/api-status";
+
 export function SiteHeader() {
   return (
     <header className="border-b border-border">
@@ -7,11 +9,14 @@ export function SiteHeader() {
         <Link href="/" className="font-semibold tracking-wide text-accent">
           RIFT_HELP
         </Link>
-        <nav className="flex gap-6 text-sm text-muted">
-          <Link href="/" className="hover:text-foreground">
-            Analiza
-          </Link>
-        </nav>
+        <div className="flex items-center gap-6">
+          <nav className="flex gap-6 text-sm text-muted">
+            <Link href="/" className="hover:text-foreground">
+              Analiza
+            </Link>
+          </nav>
+          <ApiStatus />
+        </div>
       </div>
     </header>
   );
