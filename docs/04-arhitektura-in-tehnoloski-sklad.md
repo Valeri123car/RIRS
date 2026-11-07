@@ -88,7 +88,7 @@ Frontend: `http://localhost:3000`, API dokumentacija: `http://localhost:8000/doc
 | ML | LightGBM, scikit-learn, Polars |
 | Podatkovna baza | PostgreSQL, Redis |
 | Avtentikacija | JWT, Argon2id |
-| Lokalni razvoj | Docker Compose, pnpm, uv, ESLint, Ruff |
+| Lokalni razvoj | Docker Compose, npm, uv, ESLint, Ruff |
 | Testiranje | Vitest, pytest, Playwright |
 | CI/CD | GitHub Actions (lint, testi, gradnja Docker slik), GitHub Container Registry |
 
