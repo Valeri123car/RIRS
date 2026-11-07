@@ -12,7 +12,7 @@ Podatki izključno iz uradnega **Riot Games API** in **Data Dragon**.
 | Backend | Python, FastAPI, SQLAlchemy, Alembic, Celery |
 | ML | LightGBM, scikit-learn |
 | Baza | PostgreSQL, Redis |
-| Razvoj | Docker Compose, pnpm, uv |
+| Razvoj | Docker Compose, npm, uv |
 
 ## Struktura
 
@@ -49,6 +49,18 @@ uv sync                                 # namesti odvisnosti
 uv run uvicorn app.main:app --reload    # API na http://localhost:8000
 uv run pytest                           # testi
 uv run ruff check .                     # linter
+```
+
+### Frontend brez Dockerja
+
+Predpogoj: Node.js 20+.
+
+```bash
+cd frontend
+cp .env.example .env.local    # naslov backend API
+npm install
+npm run dev                   # http://localhost:3000
+npm run lint
 ```
 
 ## Razvojni proces
