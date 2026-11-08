@@ -128,8 +128,11 @@ uv run python -m app.collector --platform eun1 --per-player 10 --no-timelines
 docker compose exec api python -m app.collector        # v Dockerju
 ```
 
-Samodejno se zažene enkrat na dan: storitev `beat` (Celery beat) ob `COLLECTOR_HOUR_UTC` pošlje
-nalogo `collector.run`, izvede jo `worker`. Lokalno: `uv run celery -A app.worker beat --loglevel=info`
+Zajem se privzeto sproži **ročno** (zgornji ukazi). Dnevni samodejni zagon je na voljo na zahtevo:
+storitev `beat` (Celery beat) je v Compose profilu `beat` in se z navadnim `docker compose up` ne
+zažene. Vklop: `docker compose --profile beat up -d` – ob `COLLECTOR_HOUR_UTC` pošlje nalogo
+`collector.run`, izvede jo `worker` (samo dokler računalnik in Docker tečeta). Izklop:
+`docker compose stop beat`. Lokalno brez Dockerja: `uv run celery -A app.worker beat --loglevel=info`
 poleg delavca. Velikost zagona omejujejo `COLLECTOR_MAX_PLAYERS`, `COLLECTOR_MATCHES_PER_PLAYER` in
 `COLLECTOR_MAX_NEW_MATCHES` (glej `.env.example`). Klici gredo skozi skupni Redis omejevalnik, zato
 privzeti zagon (do 100 novih tekem s časovnicami ≈ 220 klicev) z razvojnim ključem traja približno
