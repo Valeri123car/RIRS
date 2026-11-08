@@ -1,5 +1,9 @@
 from dataclasses import replace
 
+import httpx
+
+from app.ddragon.__main__ import run_import
+from app.ddragon.client import DataDragonClient
 from app.ddragon.importer import import_static_data
 from app.ddragon.parse import ChampionData, ItemData
 from app.models.champion import Champion, DamageProfile
@@ -59,3 +63,42 @@ def test_uvoz_ne_povozi_rocno_urejenih_ocen_in_oznak(db):
     assert result.champions.unchanged == result.items.unchanged == 1
     assert db.get(Champion, 9016).healing == 2
     assert db.get(Item, 9033).tags == ["anti_heal"]
+
+
+def fake_data_dragon() -> DataDragonClient:
+    champion_json = {
+        "TestAhri": {
+            "id": "TestAhri",
+            "key": "9103",
+            "name": "Ahri",
+            "info": {"attack": 3, "defense": 4, "magic": 8, "difficulty": 5},
+            "tags": ["Mage", "Assassin"],
+        }
+    }
+    item_json = {
+        "9075": {
+            "name": "Thornmail",
+            "description": "Wounds",
+            "tags": ["Armor"],
+            "gold": {"total": 2450, "purchasable": True},
+            "maps": {"11": True},
+        }
+    }
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/versions.json":
+            return httpx.Response(200, json=["16.22.1"])
+        name = request.url.path.rsplit("/", 1)[-1]
+        data = champion_json if name == "champion.json" else item_json
+        return httpx.Response(200, json={"data": data})
+
+    return DataDragonClient(http=httpx.Client(transport=httpx.MockTransport(handler)))
+
+
+def test_run_import_uvozi_zadnjo_verzijo(db):
+    version, result = run_import(db, fake_data_dragon())
+
+    assert version == "16.22.1"
+    assert (result.champions.created, result.items.created) == (1, 1)
+    assert db.get(Champion, 9103).damage_profile == DamageProfile.MAGIC
+    assert db.get(Item, 9075).tags == ["anti_heal", "armor"]
