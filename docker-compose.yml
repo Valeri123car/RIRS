@@ -42,6 +42,17 @@ services:
       redis:
         condition: service_healthy
 
+  # Celery delavec (ADR-0004): kliče Riot API in izvaja analize. Ista slika kot api.
+  worker:
+    build: ./backend
+    env_file: .env
+    command: ["celery", "-A", "app.worker", "worker", "--loglevel=info", "--concurrency=2"]
+    depends_on:
+      api:
+        condition: service_started  # api ob zagonu uveljavi migracije
+      redis:
+        condition: service_healthy
+
   frontend:
     build:
       context: ./frontend

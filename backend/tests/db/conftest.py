@@ -13,7 +13,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_riot_client
+from app.analysis.capture import capture_active_game
+from app.api.deps import get_analysis_queue, get_riot_client
 from app.core.config import Settings, get_settings
 from app.db.session import get_db
 from app.main import create_app
@@ -52,6 +53,10 @@ def api(db: Session) -> Iterator[TestClient]:
         _env_file=None, jwt_secret=TEST_JWT_SECRET
     )
     app.dependency_overrides[get_riot_client] = FixtureRiotClient
+    # Namesto Celery vrste se zajem izvede takoj, v testni seji.
+    app.dependency_overrides[get_analysis_queue] = lambda: (
+        lambda analysis_id: capture_active_game(db, FixtureRiotClient(), analysis_id)
+    )
     with TestClient(app) as client:
         yield client
 

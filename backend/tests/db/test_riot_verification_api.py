@@ -57,7 +57,8 @@ def test_racuna_verificiranega_pri_drugem_uporabniku_ni_mogoce_povezati(api, db)
     puuid = FixtureRiotClient().get_account("Luka", "EUNE", "eun1").puuid
     other = auth_headers(api, "drugi@example.com")
     other_id = api.get("/auth/me", headers=other).json()["id"]
-    db.add(
+    # merge: zapis za igralca že lahko obstaja (npr. iz tekem), samo brez lastnika.
+    db.merge(
         RiotAccount(
             puuid=puuid,
             game_name="Luka",

@@ -85,7 +85,8 @@ def test_racun_verificiran_pri_drugem_medtem_ko_je_tekla_verifikacija(api, db):
     verification = start(api, headers)
     api.post(f"{URL}/{verification['id']}/simulate-icon", headers=headers)
     other_id = api.get("/auth/me", headers=auth_headers(api, "drugi@example.com")).json()["id"]
-    db.add(
+    # merge: zapis za igralca že lahko obstaja (npr. iz tekem), samo brez lastnika.
+    db.merge(
         RiotAccount(
             puuid=verification["puuid"],
             game_name="Luka",
