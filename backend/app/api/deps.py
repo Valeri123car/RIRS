@@ -7,8 +7,10 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from redis import Redis
 from sqlalchemy.orm import Session
 
+from app.analysis.progress import PollingProgressWaiter, ProgressWaiter, RedisProgressWaiter
 from app.core.config import Settings, get_settings
 from app.core.security import InvalidTokenError, decode_token
 from app.db.session import get_db
@@ -87,3 +89,23 @@ def get_analysis_queue() -> AnalysisQueue:
 
 
 Queue = Annotated[AnalysisQueue, Depends(get_analysis_queue)]
+
+
+ProgressWaiterFactory = Callable[[uuid.UUID], ProgressWaiter]
+
+
+@lru_cache
+def _shared_redis() -> Redis | None:
+    url = get_settings().redis_url
+    return Redis.from_url(url.get_secret_value()) if url else None
+
+
+def get_progress_waiter_factory() -> ProgressWaiterFactory:
+    """Čakanje na napredek analize: prek Redis obvestil ali (brez Redis) s periodičnim branjem."""
+    redis = _shared_redis()
+    if redis is None:
+        return lambda analysis_id: PollingProgressWaiter()
+    return lambda analysis_id: RedisProgressWaiter(redis, analysis_id)
+
+
+WaiterFactory = Annotated[ProgressWaiterFactory, Depends(get_progress_waiter_factory)]
