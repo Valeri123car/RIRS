@@ -70,6 +70,19 @@ uv run ruff check .                                # linter
 
 V Dockerju API migracije uveljavi sam ob zagonu.
 
+**Uvoz šampionov in predmetov** iz Data Dragon (potrebna je internetna povezava, ključ ne):
+
+```bash
+uv run python -m app.ddragon                     # zadnji patch
+uv run python -m app.ddragon --version 16.22.1   # izbran patch
+docker compose exec api python -m app.ddragon    # v Dockerju
+```
+
+Ukaz izpiše število novih, spremenjenih in nespremenjenih zapisov. Uvozijo se samo predmeti za
+Summoner's Rift. Ocene šampionov (CC, zdravljenje, engage ...) se izpeljejo iz Riotovih oznak in
+ročnih popravkov v `backend/app/ddragon/champion_overrides.json`. Ponovni uvoz posodobi imena in
+cene, ne povozi pa ocen in oznak, ki jih ureja administrator.
+
 **Testi:** `uv run pytest`. Testi baze se izvedejo samo, če je nastavljen `TEST_DATABASE_URL` (migrirana baza; podatki se po vsakem testu razveljavijo):
 
 ```bash
