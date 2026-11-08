@@ -44,7 +44,16 @@ docker compose up -d --build
 Če je kateri od portov zaseden, ga spremeni v `.env` (`FRONTEND_PORT`, `API_PORT`, `POSTGRES_PORT`, `REDIS_PORT`).
 Ustavitev: `docker compose down` (z `-v` se izbriše tudi baza).
 
-`RIOT_API_MODE=fixtures` uporablja posnete Riot odgovore, zato aplikacija deluje tudi brez ključa.
+### Riot API
+
+Riot API kliče samo modul `backend/app/riot/` (Account-V1, Summoner-V4, Spectator-V5, Match-V5).
+
+- `RIOT_API_MODE=fixtures` (privzeto) vrača sintetične odgovore v obliki Riot API iz
+  `backend/app/riot/fixtures/`, zato aplikacija deluje brez ključa. Na voljo so igralci platforme
+  `eun1` (npr. `Luka#EUNE` je v aktivni tekmi, `Miha#EUNE` ni) in `Sara#EUW` na `euw1`.
+- `RIOT_API_MODE=live` kliče pravi Riot API in zahteva `RIOT_API_KEY` (razvojni ključ velja 24 ur)
+  ter `REDIS_URL`. Klici so omejeni prek Redis na 20 / 1 s in 100 / 2 min za vsako regijo, skupno
+  vsem procesom; ob `429` klient počaka `Retry-After` in poskusi znova.
 
 ### Backend brez Dockerja
 
@@ -65,6 +74,12 @@ V Dockerju API migracije uveljavi sam ob zagonu.
 
 ```bash
 TEST_DATABASE_URL=$DATABASE_URL uv run pytest
+```
+
+Podobno test omejevalnika klicev na pravem Redisu zahteva `TEST_REDIS_URL` (sicer se uporabi `fakeredis`):
+
+```bash
+TEST_REDIS_URL=redis://:rift-dev-geslo@127.0.0.1:6379/0 uv run pytest tests/riot
 ```
 
 **Nova migracija** po spremembi modelov: `uv run alembic revision --autogenerate -m "opis"`; preglej ustvarjeno datoteko v `alembic/versions/`.
