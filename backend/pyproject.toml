@@ -4,8 +4,11 @@ version = "0.1.0"
 description = "RIFT_HELP API in delavci"
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.14",
     "fastapi>=0.115",
+    "psycopg[binary]>=3.2",
     "pydantic-settings>=2.6",
+    "sqlalchemy>=2.0",
     "uvicorn[standard]>=0.32",
 ]
 
@@ -22,6 +25,11 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+# Mapa alembic/ so naše migracije, paket "alembic" pa je zunanja knjižnica.
+known-third-party = ["alembic"]
+known-first-party = ["app"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
