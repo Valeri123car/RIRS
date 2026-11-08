@@ -6,6 +6,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.analysis.progress import ProgressNotifier, no_notify
 from app.models.champion import Champion
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
 from app.riot.client import RiotClient
@@ -17,12 +18,28 @@ NOT_IN_GAME = "Igralec trenutno ni v tekmi"
 RIOT_UNAVAILABLE = "Riot API trenutno ni dosegljiv, poskusi kasneje."
 
 
-def capture_active_game(session: Session, riot: RiotClient, analysis_id: uuid.UUID) -> None:
-    """Izpolni analizo z udeleženci aktivne tekme ali jo označi z razlogom neuspeha."""
+def capture_active_game(
+    session: Session,
+    riot: RiotClient,
+    analysis_id: uuid.UUID,
+    notify: ProgressNotifier = no_notify,
+) -> None:
+    """Izpolni analizo z udeleženci aktivne tekme ali jo označi z razlogom neuspeha.
+
+    Po vsaki spremembi stanja pokliče notify, da SSE tok (GET /analyses/{id}/events) takoj
+    pošlje napredek.
+    """
     analysis = session.get(LiveAnalysis, analysis_id)
     if analysis is None:
         return
-    _set_status(session, analysis, AnalysisStatus.CAPTURING)
+
+    def set_status(status: AnalysisStatus, error: str | None = None) -> None:
+        analysis.status = status
+        analysis.error = error
+        session.commit()
+        notify(analysis.id)
+
+    set_status(AnalysisStatus.CAPTURING)
 
     try:
         account = riot.get_account(analysis.game_name, analysis.tag_line, analysis.platform)
@@ -32,21 +49,19 @@ def capture_active_game(session: Session, riot: RiotClient, analysis_id: uuid.UU
         game = riot.get_active_game(account.puuid, analysis.platform)
     except RiotNotFoundError:
         label = PLATFORM_LABELS.get(analysis.platform, analysis.platform)
-        _fail(
-            session, analysis, AnalysisStatus.FAILED, f"Igralca s tem Riot ID ni v regiji {label}"
-        )
+        set_status(AnalysisStatus.FAILED, f"Igralca s tem Riot ID ni v regiji {label}")
         return
     except RiotApiError:
-        _fail(session, analysis, AnalysisStatus.FAILED, RIOT_UNAVAILABLE)
+        set_status(AnalysisStatus.FAILED, RIOT_UNAVAILABLE)
         return
 
     if game is None:
-        _fail(session, analysis, AnalysisStatus.NOT_IN_GAME, NOT_IN_GAME)
+        set_status(AnalysisStatus.NOT_IN_GAME, NOT_IN_GAME)
         return
 
     analysis.game_id = game.game_id
     analysis.participants = _participants(session, game, account.puuid)
-    _set_status(session, analysis, AnalysisStatus.COMPLETED)
+    set_status(AnalysisStatus.COMPLETED)
 
 
 def _participants(session: Session, game: ActiveGame, target_puuid: str) -> list[dict[str, Any]]:
@@ -72,13 +87,3 @@ def _participants(session: Session, game: ActiveGame, target_puuid: str) -> list
             }
         )
     return result
-
-
-def _set_status(session: Session, analysis: LiveAnalysis, status: AnalysisStatus) -> None:
-    analysis.status = status
-    session.commit()
-
-
-def _fail(session: Session, analysis: LiveAnalysis, status: AnalysisStatus, message: str) -> None:
-    analysis.error = message
-    _set_status(session, analysis, status)

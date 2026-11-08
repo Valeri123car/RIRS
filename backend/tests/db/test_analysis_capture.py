@@ -63,3 +63,25 @@ def test_nedosegljiv_riot_api(db):
     db.refresh(analysis)
     assert analysis.status == AnalysisStatus.FAILED
     assert analysis.error == "Riot API trenutno ni dosegljiv, poskusi kasneje."
+
+
+def test_zajem_obvesti_o_vsaki_spremembi_stanja(db):
+    analysis = new_analysis(db)
+    statuses = []
+
+    capture_active_game(
+        db, FixtureRiotClient(), analysis.id, notify=lambda _id: statuses.append(analysis.status)
+    )
+
+    assert statuses == [AnalysisStatus.CAPTURING, AnalysisStatus.COMPLETED]
+
+
+def test_neuspeh_zajema_obvesti_s_koncnim_stanjem(db):
+    analysis = new_analysis(db, "Miha#EUNE")
+    statuses = []
+
+    capture_active_game(
+        db, FixtureRiotClient(), analysis.id, notify=lambda _id: statuses.append(analysis.status)
+    )
+
+    assert statuses == [AnalysisStatus.CAPTURING, AnalysisStatus.NOT_IN_GAME]

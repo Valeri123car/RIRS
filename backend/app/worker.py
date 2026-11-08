@@ -6,8 +6,10 @@ Zagon: uv run celery -A app.worker worker --loglevel=info
 import uuid
 
 from celery import Celery
+from redis import Redis
 
 from app.analysis.capture import capture_active_game
+from app.analysis.progress import ProgressNotifier, RedisProgressNotifier, no_notify
 from app.core.config import get_settings
 from app.db.session import get_session_factory
 from app.riot.factory import build_riot_client
@@ -36,7 +38,18 @@ def _riot():
     return _riot_client
 
 
+_notifier: ProgressNotifier | None = None
+
+
+def _notify() -> ProgressNotifier:
+    global _notifier
+    if _notifier is None:
+        url = _broker_url()
+        _notifier = RedisProgressNotifier(Redis.from_url(url)) if url else no_notify
+    return _notifier
+
+
 @celery_app.task(name="analysis.run")
 def run_analysis(analysis_id: str) -> None:
     with get_session_factory()() as session:
-        capture_active_game(session, _riot(), uuid.UUID(analysis_id))
+        capture_active_game(session, _riot(), uuid.UUID(analysis_id), _notify())
