@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 Match = dict[str, Any]
+MatchTimeline = dict[str, Any]
 
 
 class RiotModel(BaseModel):
@@ -50,3 +51,18 @@ class ActiveGame(RiotModel):
     game_queue_config_id: int | None = None
     game_start_time: int
     participants: list[ActiveGameParticipant]
+
+
+class LeagueEntry(RiotModel):
+    puuid: str
+    league_points: int
+    wins: int = 0
+    losses: int = 0
+
+
+class LeagueList(RiotModel):
+    """League-V4: liga (npr. challenger) z vsemi igralci v njej."""
+
+    tier: str
+    queue: str
+    entries: list[LeagueEntry] = Field(default_factory=list)

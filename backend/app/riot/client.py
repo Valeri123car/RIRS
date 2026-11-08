@@ -1,4 +1,4 @@
-"""Klient za Riot API (Account-V1, Summoner-V4, Spectator-V5, Match-V5)."""
+"""Klient za Riot API (Account-V1, Summoner-V4, Spectator-V5, League-V4, Match-V5)."""
 
 import time
 from collections.abc import Callable
@@ -8,11 +8,26 @@ from urllib.parse import quote
 import httpx
 
 from app.riot.errors import RiotApiError, RiotAuthError, RiotNotFoundError, RiotUnavailableError
-from app.riot.models import Account, ActiveGame, Match, Summoner
+from app.riot.models import Account, ActiveGame, LeagueList, Match, MatchTimeline, Summoner
 from app.riot.platforms import region_for
 
 MAX_ATTEMPTS = 3
 TIMEOUT_SECONDS = 10.0
+
+# Vrste, za katere ima League-V4 seznam challenger igralcev (druge vrednosti zavrnemo).
+RANKED_QUEUES = frozenset({"RANKED_SOLO_5x5", "RANKED_FLEX_SR"})
+# Match-V5 vrne največ 100 ID-jev naenkrat.
+MAX_MATCH_IDS = 100
+
+
+def check_ranked_queue(queue: str) -> None:
+    if queue not in RANKED_QUEUES:
+        raise ValueError(f"Nepodprta vrsta: {queue!r}")
+
+
+def check_match_count(count: int) -> None:
+    if not 1 <= count <= MAX_MATCH_IDS:
+        raise ValueError(f"count mora biti med 1 in {MAX_MATCH_IDS}")
 
 
 class RiotClient(Protocol):
@@ -29,6 +44,12 @@ class RiotClient(Protocol):
     ) -> list[str]: ...
 
     def get_match(self, match_id: str, platform: str) -> Match: ...
+
+    def get_match_timeline(self, match_id: str, platform: str) -> MatchTimeline: ...
+
+    def get_challenger_league(
+        self, platform: str, queue: str = "RANKED_SOLO_5x5"
+    ) -> LeagueList: ...
 
 
 class Limiter(Protocol):
@@ -77,6 +98,7 @@ class LiveRiotClient:
     def get_match_ids(
         self, puuid: str, platform: str, *, count: int = 20, queue: int | None = None
     ) -> list[str]:
+        check_match_count(count)
         params: dict[str, int] = {"count": count}
         if queue is not None:
             params["queue"] = queue
@@ -86,6 +108,16 @@ class LiveRiotClient:
     def get_match(self, match_id: str, platform: str) -> Match:
         path = f"/lol/match/v5/matches/{_segment(match_id)}"
         return self._get(region_for(platform), path)
+
+    def get_match_timeline(self, match_id: str, platform: str) -> MatchTimeline:
+        path = f"/lol/match/v5/matches/{_segment(match_id)}/timeline"
+        return self._get(region_for(platform), path)
+
+    def get_challenger_league(self, platform: str, queue: str = "RANKED_SOLO_5x5") -> LeagueList:
+        region_for(platform)
+        check_ranked_queue(queue)
+        path = f"/lol/league/v4/challengerleagues/by-queue/{queue}"
+        return LeagueList.model_validate(self._get(platform, path))
 
     def _get(self, routing: str, path: str, params: dict[str, Any] | None = None) -> Any:
         url = f"https://{routing}.api.riotgames.com{path}"
