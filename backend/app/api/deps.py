@@ -1,5 +1,6 @@
 """Skupne FastAPI odvisnosti (prijavljen uporabnik ...)."""
 
+from functools import lru_cache
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -10,6 +11,8 @@ from app.core.config import Settings, get_settings
 from app.core.security import InvalidTokenError, decode_token
 from app.db.session import get_db
 from app.models.user import User
+from app.riot.client import RiotClient
+from app.riot.factory import build_riot_client
 
 DbSession = Annotated[Session, Depends(get_db)]
 AppSettings = Annotated[Settings, Depends(get_settings)]
@@ -43,3 +46,16 @@ def get_current_user(
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+@lru_cache
+def _shared_riot_client() -> RiotClient:
+    # En klient na proces: ponovno uporabi HTTP in Redis povezave.
+    return build_riot_client(get_settings())
+
+
+def get_riot_client() -> RiotClient:
+    return _shared_riot_client()
+
+
+Riot = Annotated[RiotClient, Depends(get_riot_client)]
