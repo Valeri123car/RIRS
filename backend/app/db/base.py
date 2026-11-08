@@ -1,5 +1,6 @@
 """Skupni osnovni razred za vse SQLAlchemy modele."""
 
+import enum
 from datetime import datetime
 
 from sqlalchemy import DateTime, MetaData, func
@@ -13,6 +14,11 @@ NAMING_CONVENTION = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s",
 }
+
+
+def enum_values(enum_cls: type[enum.Enum]) -> list[str]:
+    """Za SQLAlchemy Enum: v bazo shranimo vrednosti ("player"), ne imen ("PLAYER")."""
+    return [member.value for member in enum_cls]
 
 
 class Base(DeclarativeBase):

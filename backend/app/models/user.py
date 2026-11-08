@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Enum, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base, TimestampMixin
+from app.db.base import Base, TimestampMixin, enum_values
 
 if TYPE_CHECKING:
     from app.models.riot_account import RiotAccount
@@ -24,11 +24,6 @@ class ExplanationLevel(enum.StrEnum):
     ADVANCED = "advanced"
 
 
-def _enum_values(enum_cls: type[enum.Enum]) -> list[str]:
-    """V bazo shranimo vrednosti ("player"), ne imen ("PLAYER")."""
-    return [member.value for member in enum_cls]
-
-
 class User(TimestampMixin, Base):
     __tablename__ = "users"
 
@@ -38,12 +33,12 @@ class User(TimestampMixin, Base):
     # Samo Argon2id zgostitev, nikoli gesla v čistopisu.
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole, name="user_role", values_callable=_enum_values),
+        Enum(UserRole, name="user_role", values_callable=enum_values),
         default=UserRole.PLAYER,
         server_default=UserRole.PLAYER.value,
     )
     explanation_level: Mapped[ExplanationLevel] = mapped_column(
-        Enum(ExplanationLevel, name="explanation_level", values_callable=_enum_values),
+        Enum(ExplanationLevel, name="explanation_level", values_callable=enum_values),
         default=ExplanationLevel.INTERMEDIATE,
         server_default=ExplanationLevel.INTERMEDIATE.value,
     )
