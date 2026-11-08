@@ -1,7 +1,9 @@
 """Nastavitve aplikacije, prebrane iz okoljskih spremenljivk (ali datoteke .env)."""
 
 from functools import lru_cache
+from typing import Literal
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,6 +16,11 @@ class Settings(BaseSettings):
 
     # Brez privzete vrednosti, da v kodi ni gesel; preveri se šele ob prvi uporabi baze.
     database_url: str | None = None
+    redis_url: SecretStr | None = None  # vsebuje geslo
+
+    # fixtures = sintetični odgovori brez ključa, live = pravi Riot API
+    riot_api_mode: Literal["live", "fixtures"] = "fixtures"
+    riot_api_key: SecretStr | None = None
 
 
 @lru_cache
