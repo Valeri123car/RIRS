@@ -5,7 +5,7 @@ from collections.abc import Callable
 from functools import lru_cache
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from redis import Redis
 from sqlalchemy.orm import Session
@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.analysis.guest_limit import GuestLimiter, NoGuestLimit, RedisGuestLimiter
 from app.analysis.progress import PollingProgressWaiter, ProgressWaiter, RedisProgressWaiter
 from app.core.config import Settings, get_settings
+from app.core.ip_limit import IpLimitRule, IpRateLimiter
 from app.core.security import InvalidTokenError, decode_token
 from app.db.session import get_db
 from app.models.user import User
@@ -119,3 +120,35 @@ def get_guest_limiter() -> GuestLimiter:
 
 
 GuestLimit = Annotated[GuestLimiter, Depends(get_guest_limiter)]
+
+
+def get_ip_limiter() -> IpRateLimiter | None:
+    """Omejevalnik zahtev po IP (None brez Redis, npr. lokalni razvoj brez REDIS_URL)."""
+    redis = _shared_redis()
+    return IpRateLimiter(redis) if redis is not None else None
+
+
+def client_ip(request: Request) -> str:
+    # IP neposredno iz povezave; glavi X-Forwarded-For ne zaupamo (odjemalec bi jo ponaredil).
+    return request.client.host if request.client else "unknown"
+
+
+def limit_by_ip(rule: IpLimitRule, message: str) -> Callable[..., None]:
+    """Odvisnost, ki po preseženi meji za ta IP vrne 429 z glavo Retry-After."""
+
+    def dependency(
+        request: Request,
+        limiter: Annotated[IpRateLimiter | None, Depends(get_ip_limiter)],
+    ) -> None:
+        if limiter is None:
+            return
+        result = limiter.hit(rule, client_ip(request))
+        if not result.allowed:
+            minutes = max(1, -(-result.retry_after // 60))
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                f"{message} Poskusi znova čez {minutes} min.",
+                headers={"Retry-After": str(result.retry_after)},
+            )
+
+    return dependency

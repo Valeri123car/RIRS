@@ -123,3 +123,26 @@ def test_odjava_preklice_prej_izdan_osvezilni_zeton(api):
     response = api.post("/auth/refresh")
 
     assert response.status_code == 401
+
+
+def test_enajsti_poskus_prijave_v_15_minutah_je_zavrnjen(api):
+    register(api)
+    for _ in range(10):
+        assert login(api, password="napacno-geslo").status_code == 401
+
+    # Omejitev velja tudi za pravilno geslo: napadalec ne izve, ali je uganil.
+    response = login(api)
+
+    assert response.status_code == 429
+    assert response.json()["detail"].startswith("Preveč poskusov prijave.")
+    assert 0 < int(response.headers["Retry-After"]) <= 15 * 60
+
+
+def test_sesta_registracija_v_uri_je_zavrnjena(api):
+    for n in range(5):
+        assert register(api, email=f"igralec{n}@example.com").status_code == 201
+
+    response = register(api, email="igralec9@example.com")
+
+    assert response.status_code == 429
+    assert response.json()["detail"].startswith("Preveč registracij")

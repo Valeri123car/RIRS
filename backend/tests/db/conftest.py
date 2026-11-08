@@ -16,8 +16,14 @@ from sqlalchemy.orm import Session
 
 from app.analysis.capture import capture_active_game
 from app.analysis.guest_limit import RedisGuestLimiter
-from app.api.deps import get_analysis_queue, get_guest_limiter, get_riot_client
+from app.api.deps import (
+    get_analysis_queue,
+    get_guest_limiter,
+    get_ip_limiter,
+    get_riot_client,
+)
 from app.core.config import Settings, get_settings
+from app.core.ip_limit import IpRateLimiter
 from app.db.session import get_db
 from app.main import create_app
 from app.riot.fixture_client import FixtureRiotClient
@@ -62,6 +68,8 @@ def api(db: Session) -> Iterator[TestClient]:
     # Vsak test ima svoj (prazen) števec analiz gostov.
     limiter = RedisGuestLimiter(fakeredis.FakeRedis())
     app.dependency_overrides[get_guest_limiter] = lambda: limiter
+    ip_limiter = IpRateLimiter(fakeredis.FakeRedis())
+    app.dependency_overrides[get_ip_limiter] = lambda: ip_limiter
     with TestClient(app) as client:
         yield client
 
