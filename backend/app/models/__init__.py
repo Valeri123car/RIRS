@@ -5,6 +5,7 @@ from app.models.collector_run import CollectorRun, CollectorStatus
 from app.models.item import Item
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
 from app.models.match import Match, MatchParticipant
+from app.models.ml_model import MlModel, ModelKind, ModelStatus
 from app.models.riot_account import RiotAccount
 from app.models.riot_verification import RiotVerification
 from app.models.user import ExplanationLevel, User, UserRole
@@ -20,6 +21,9 @@ __all__ = [
     "LiveAnalysis",
     "Match",
     "MatchParticipant",
+    "MlModel",
+    "ModelKind",
+    "ModelStatus",
     "RiotAccount",
     "RiotVerification",
     "User",
