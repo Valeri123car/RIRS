@@ -87,7 +87,8 @@ V Dockerju API migracije uveljavi sam ob zagonu.
 zaženeš z `uv run celery -A app.worker worker --loglevel=info` (potrebuje `REDIS_URL`). Analizo
 zažene `POST /analyses` (vrne 202 in ID), stanje vrne `GET /analyses/{id}`. Napredek v živo pošilja
 SSE tok `GET /analyses/{id}/events` (dogodek `progress` ob vsakem koraku, do končnega stanja), npr.
-`curl -N http://127.0.0.1:8989/analyses/<id>/events`.
+`curl -N http://127.0.0.1:8989/analyses/<id>/events`. Gost lahko zažene največ 3 analize na dan z
+istega IP naslova (četrta vrne 429); števec je v Redis, prijavljeni uporabniki omejitve nimajo.
 
 **Uvoz šampionov in predmetov** iz Data Dragon (potrebna je internetna povezava, ključ ne):
 
@@ -102,10 +103,13 @@ Summoner's Rift. Ocene šampionov (CC, zdravljenje, engage ...) se izpeljejo iz 
 ročnih popravkov v `backend/app/ddragon/champion_overrides.json`. Ponovni uvoz posodobi imena in
 cene, ne povozi pa ocen in oznak, ki jih ureja administrator.
 
-**Testi:** `uv run pytest`. Testi baze se izvedejo samo, če je nastavljen `TEST_DATABASE_URL` (migrirana baza; podatki se po vsakem testu razveljavijo):
+**Testi:** `uv run pytest`. Testi baze se izvedejo samo, če je nastavljen `TEST_DATABASE_URL` (migrirana baza; podatki se po vsakem testu razveljavijo). Uporabi ločeno bazo, da testi ne trčijo v podatke, ki jih ustvariš v aplikaciji (npr. povezan Riot račun):
 
 ```bash
-TEST_DATABASE_URL=$DATABASE_URL uv run pytest
+docker compose exec postgres psql -U rift -d rift_help -c "CREATE DATABASE rift_help_test OWNER rift;"
+export TEST_DATABASE_URL=postgresql+psycopg://rift:rift-dev-geslo@127.0.0.1:5432/rift_help_test
+DATABASE_URL=$TEST_DATABASE_URL uv run alembic upgrade head
+uv run pytest
 ```
 
 Podobno test omejevalnika klicev na pravem Redisu zahteva `TEST_REDIS_URL` (sicer se uporabi `fakeredis`):
