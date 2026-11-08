@@ -85,7 +85,9 @@ V Dockerju API migracije uveljavi sam ob zagonu.
 
 **Delavec (Celery)** izvaja analize (klici Riot API). V Dockerju je storitev `worker`; lokalno ga
 zaženeš z `uv run celery -A app.worker worker --loglevel=info` (potrebuje `REDIS_URL`). Analizo
-zažene `POST /analyses` (vrne 202 in ID), stanje vrne `GET /analyses/{id}`.
+zažene `POST /analyses` (vrne 202 in ID), stanje vrne `GET /analyses/{id}`. Napredek v živo pošilja
+SSE tok `GET /analyses/{id}/events` (dogodek `progress` ob vsakem koraku, do končnega stanja), npr.
+`curl -N http://127.0.0.1:8989/analyses/<id>/events`.
 
 **Uvoz šampionov in predmetov** iz Data Dragon (potrebna je internetna povezava, ključ ne):
 
