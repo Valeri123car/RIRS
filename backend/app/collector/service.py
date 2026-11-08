@@ -11,10 +11,10 @@ sproti, zato napaka sredi zagona ne izgubi že prenesenih tekem.
 
 import logging
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -29,6 +29,8 @@ from app.riot.errors import RiotApiError, RiotNotFoundError
 logger = logging.getLogger(__name__)
 
 RANKED_SOLO_QUEUE_ID = 420
+# Zagon, ki po tem času še "teče", je bil prekinjen (npr. ponovni zagon delavca).
+STALE_RUN_AFTER = timedelta(hours=6)
 
 
 @dataclass(frozen=True)
@@ -54,6 +56,7 @@ class CollectorConfig:
 
 def collect_matches(session: Session, riot: RiotClient, config: CollectorConfig) -> CollectorRun:
     """Izvede en zagon zbiralnika in vrne njegov zapis (status success ali error)."""
+    _close_interrupted_runs(session)
     run = CollectorRun(
         platform=config.platform,
         status=CollectorStatus.RUNNING,
@@ -77,6 +80,18 @@ def collect_matches(session: Session, riot: RiotClient, config: CollectorConfig)
     session.commit()
     session.refresh(run)  # po rollback so atributi potekli; zapis naj bo berljiv tudi po seji
     return run
+
+
+def _close_interrupted_runs(session: Session) -> None:
+    now = datetime.now(UTC)
+    session.execute(
+        update(CollectorRun)
+        .where(
+            CollectorRun.status == CollectorStatus.RUNNING,
+            CollectorRun.started_at < now - STALE_RUN_AFTER,
+        )
+        .values(status=CollectorStatus.ERROR, finished_at=now, error="Zagon je bil prekinjen.")
+    )
 
 
 def _collect(

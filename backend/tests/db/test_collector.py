@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -166,3 +166,22 @@ def test_nepricakovana_napaka_ne_zapise_podrobnosti(db: Session):
     assert run.status is CollectorStatus.ERROR
     assert run.error == "Nepričakovana napaka (RuntimeError)"
     assert run.new_matches == 0
+
+
+def test_prekinjen_zagon_se_ob_naslednjem_oznaci_kot_napaka(db: Session):
+    stale = CollectorRun(
+        platform="euw1",
+        status=CollectorStatus.RUNNING,
+        started_at=datetime.now(UTC) - timedelta(hours=7),
+    )
+    recent = CollectorRun(platform="euw1", status=CollectorStatus.RUNNING)
+    db.add_all([stale, recent])
+    db.commit()
+
+    collect_matches(db, FixtureRiotClient(), CONFIG)
+
+    db.refresh(stale)
+    db.refresh(recent)
+    assert (stale.status, stale.error) == (CollectorStatus.ERROR, "Zagon je bil prekinjen.")
+    assert stale.finished_at is not None
+    assert recent.status is CollectorStatus.RUNNING
