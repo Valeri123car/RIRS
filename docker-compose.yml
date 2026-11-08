@@ -56,7 +56,9 @@ services:
 
   # Celery beat: enkrat na dan pošlje nalogo zbiralnika tekem (US-07), izvede jo worker.
   # Ista slika (uporabnik app, uid 10001); datoteka urnika je v /tmp, ker /app ni zapisljiv.
+  # Samo na zahtevo (profil): docker compose --profile beat up -d; privzeto je zajem ročen.
   beat:
+    profiles: ["beat"]
     build: ./backend
     env_file: .env
     command: ["celery", "-A", "app.worker", "beat", "--loglevel=info", "--schedule=/tmp/celerybeat-schedule"]
