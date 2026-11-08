@@ -63,6 +63,11 @@ API ima `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout` in
 `HttpOnly` s potjo `/auth`. Potrebna je nastavitev `JWT_SECRET` (vsaj 32 znakov, glej `.env.example`);
 v produkciji nastavi še `COOKIE_SECURE=true`.
 
+**Preizkus povezave Riot računa (US-01) brez ključa:** registriraj se na `/registracija`, na
+`/profil` vpiši `Luka#EUNE` (regija EUNE) in klikni *Začni verifikacijo*. V načinu `fixtures` se
+pokaže gumb *Simuliraj zamenjavo ikone*, ki nadomesti zamenjavo ikone v odjemalcu igre; nato klikni
+*Preveri*. `Sara#EUW` na regiji EUNE pokaže sporočilo, da igralca ni v regiji.
+
 ### Backend brez Dockerja
 
 Predpogoj: [uv](https://docs.astral.sh/uv/). Baza teče v Dockerju (`docker compose up -d postgres redis`).
