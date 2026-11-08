@@ -19,6 +19,8 @@ COPY --from=build /app/package.json /app/package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
+# Nastavitve (npr. dovoljeni viri slik) potrebuje tudi "next start".
+COPY --from=build /app/next.config.ts ./
 
 EXPOSE 3000
 CMD ["npm", "start"]
