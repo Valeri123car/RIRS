@@ -26,6 +26,7 @@ Uporabljajo se samo tekme, dolge vsaj 15 minut (krajše so remake ali zgodnja pr
 | v1 | 2026-11-08 | 287 | 0,517 | 0,550 | neaktiven |
 | v2 | 2026-11-08 22:50 | 1107 | 0,526 | 0,564 | neaktiven |
 | v3 | 2026-11-08 23:01 | 1260 | 0,579 | 0,594 | neaktiven |
+| v4 | 2026-11-08 23:50 | 2544 (EUW + KR) | 0,582 | 0,570 | neaktiven (glej poskus 4) |
 
 Vrednotenje v1–v3: ena delitev 80/20 po tekmah (`GroupShuffleSplit`). Model: LightGBM, id šampiona in
 vloga kot kategoriji, surove vsote ocen sestave (0–15), 0/1 stolpec za vsak dokončan predmet
@@ -135,6 +136,33 @@ točk v win rateu (npr. MR predmet proti AP sestavi) zaznamo pri 2 σ šele pri 
 
 ---
 
+## Poskus 4 – več podatkov in druga regija (2026-11-08, ~23:50)
+
+**Podatki:** dodaten zajem 23:18–23:48, vzporedno EUW in **KR** (Riot omejuje klice po regionalnem
+usmerjevalniku: EUW → `europe`, KR → `asia`, zato dve regiji podvojita hitrost na ~2800 tekem/h).
+Skupaj 2578 tekem, uporabnih 2544 (EUW 1926, KR 618), patchi 16.20 (264), 16.21 (1345), 16.22 (935).
+
+**Model v4** (ena delitev 80/20, kot v kodi): AUC 0,582 > izhodišče 0,570 – prvič nad izhodiščem.
+
+**Preverjanje s 5-kratno `GroupKFold`:**
+
+| Značilke | S sestavo | Brez sestave | Prispevek sestave |
+|---|---|---|---|
+| kot v produkciji (v4) | 0,579 ± 0,012 | 0,578 | +0,0005 |
+| brez `completed_count` | 0,548 ± 0,009 | 0,563 | −0,015 |
+| nove značilke (poskus 1), regulariziran LightGBM | 0,574 ± 0,014 | 0,583 | −0,009 |
+| samo EUW (1926 tekem) | 0,567 ± 0,011 | 0,579 | −0,012 |
+| samo KR (618 tekem) | 0,537 ± 0,004 | 0,553 | −0,016 |
+
+**Zaključek:** zmaga v4 nad izhodiščem je posledica ugodne delitve (prispevek +0,0005 je znotraj
+šuma ±0,012). Model zato **ni aktiviran**. To pokaže slabost trenutnega pogoja za vklop: z
+`--activate` bi se v4 vklopil, čeprav ni boljši – zato je zamenjava ene delitve z `GroupKFold` v kodi
+(naslednji korak 4) potrebna, preden se kateri koli model aktivira. Dvig AUC na ~0,58 izvira iz
+`completed_count` (uhajanje stanja tekme, poskus 2), ne iz sestave. Mešanje regij in patchev ne pomaga:
+tudi ločeno po regijah sestava napoved poslabša.
+
+---
+
 ## Zakaj je napoved zmage tako težka (51 % win rate)
 
 Matchmaking sestavlja tekme tako, da ima vsaka ekipa ~50 % možnosti, igralci pa dolgoročno ~50–51 %
@@ -156,5 +184,7 @@ win rate. Posledice:
    iz poskusa 2.
 2. **Drugačen cilj:** namesto zmage napovedovati razliko v zlatu/škodi v naslednjih minutah po
    nakupu – bolj neposreden in manj šumen signal.
-3. **Več tekem:** reda 10.000+ (pri razvojnem ključu ~1300 tekem/h → več nočnih zajemov).
-4. **Vrednotenje v kodi:** zamenjati eno delitev s `GroupKFold` in v metrike zapisati povprečje ± odklon.
+3. **Več tekem:** reda 10.000+ (pri razvojnem ključu ~1300 tekem/h na regijo, z dvema regijama
+   ~2800/h → več nočnih zajemov). Pri mešanju regij in patchev dodati regijo in patch kot značilki.
+4. **Vrednotenje v kodi:** zamenjati eno delitev s `GroupKFold` in v metrike zapisati povprečje ± odklon;
+   pogoj za vklop naj zahteva, da je prispevek sestave večji od odklona (poskus 4 pokaže, zakaj).
