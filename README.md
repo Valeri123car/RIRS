@@ -55,6 +55,14 @@ Riot API kliče samo modul `backend/app/riot/` (Account-V1, Summoner-V4, Spectat
   ter `REDIS_URL`. Klici so omejeni prek Redis na 20 / 1 s in 100 / 2 min za vsako regijo, skupno
   vsem procesom; ob `429` klient počaka `Retry-After` in poskusi znova.
 
+### Prijava
+
+API ima `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout` in `GET /auth/me`
+(podrobnosti na `/docs`). Gesla so zgoščena z Argon2id. Prijava vrne kratkoživ dostopni žeton
+(JWT, 15 min, glava `Authorization: Bearer ...`), osvežilni žeton (14 dni) pa je v piškotku
+`HttpOnly` s potjo `/auth`. Potrebna je nastavitev `JWT_SECRET` (vsaj 32 znakov, glej `.env.example`);
+v produkciji nastavi še `COOKIE_SECURE=true`.
+
 ### Backend brez Dockerja
 
 Predpogoj: [uv](https://docs.astral.sh/uv/). Baza teče v Dockerju (`docker compose up -d postgres redis`).
