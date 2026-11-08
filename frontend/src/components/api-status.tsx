@@ -6,13 +6,13 @@ import { apiGet } from "@/lib/api";
 
 type Status = "preverjam" | "povezan" | "nedosegljiv";
 
-const STATUS_STYLE: Record<Status, string> = {
+const DOT_STYLE: Record<Status, string> = {
   preverjam: "bg-muted",
-  povezan: "bg-emerald-500",
-  nedosegljiv: "bg-red-500",
+  povezan: "bg-secondary shadow-[0_0_8px_var(--color-secondary)] animate-pulse",
+  nedosegljiv: "bg-error shadow-[0_0_8px_var(--color-error)]",
 };
 
-/** Majhen indikator v glavi, ki pokaže, ali je backend dosegljiv. */
+/** Indikator v glavi, ki pokaže, ali je backend dosegljiv. */
 export function ApiStatus() {
   const [status, setStatus] = useState<Status>("preverjam");
 
@@ -32,9 +32,12 @@ export function ApiStatus() {
   }, []);
 
   return (
-    <span className="flex items-center gap-2 text-xs text-muted" title="Stanje backend API">
-      <span className={`size-2 rounded-full ${STATUS_STYLE[status]}`} />
-      API {status}
+    <span
+      title="Stanje backend API"
+      className="flex items-center gap-2 rounded-sm border border-outline/60 bg-surface-container px-3.5 py-1.5 shadow-[inset_0_1px_4px_rgb(0_0_0/0.6)]"
+    >
+      <span className={`size-2 rounded-full ${DOT_STYLE[status]}`} />
+      <span className="font-label text-xs tracking-wider text-primary uppercase">API {status}</span>
     </span>
   );
 }
