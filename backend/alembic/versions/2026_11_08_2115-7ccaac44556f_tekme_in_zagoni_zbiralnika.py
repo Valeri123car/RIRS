@@ -1,7 +1,7 @@
 """tekme in zagoni zbiralnika
 
 Revision ID: 7ccaac44556f
-Revises: 65fc1bbae895
+Revises: 6ff1e62345d9
 Create Date: 2026-11-08 21:15:58.904427
 
 """
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = "7ccaac44556f"
-down_revision: str | Sequence[str] | None = "65fc1bbae895"
+down_revision: str | Sequence[str] | None = "6ff1e62345d9"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
