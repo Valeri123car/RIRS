@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    // Profilne ikone in slike šampionov iz Riot Data Dragon.
+    remotePatterns: [
+      { protocol: "https", hostname: "ddragon.leagueoflegends.com", pathname: "/cdn/**" },
+    ],
+  },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
