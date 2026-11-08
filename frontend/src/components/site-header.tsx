@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ApiStatus } from "@/components/api-status";
 import { MainNav } from "@/components/main-nav";
+import { UserMenu } from "@/components/user-menu";
 
 export function SiteHeader() {
   return (
@@ -18,7 +19,10 @@ export function SiteHeader() {
           </Link>
           <MainNav />
         </div>
-        <ApiStatus />
+        <div className="flex items-center gap-4">
+          <UserMenu />
+          <ApiStatus />
+        </div>
       </div>
     </header>
   );

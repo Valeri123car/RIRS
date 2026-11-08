@@ -3,6 +3,7 @@ import { Be_Vietnam_Pro, Cinzel, Space_Mono } from "next/font/google";
 
 import { AmbientGlow } from "@/components/ambient-glow";
 import { SiteHeader } from "@/components/site-header";
+import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
 /* Pisave iz konceptov: Cinzel za naslove, Be Vietnam Pro za besedilo, Space Mono za številke. */
@@ -36,11 +37,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${cinzel.variable} ${beVietnamPro.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="relative flex min-h-full flex-col overflow-x-hidden">
-        <AmbientGlow />
-        <SiteHeader />
-        <main className="relative z-10 mx-auto w-full max-w-[1440px] flex-1 px-4 py-10 md:px-8">
-          {children}
-        </main>
+        <AuthProvider>
+          <AmbientGlow />
+          <SiteHeader />
+          <main className="relative z-10 mx-auto w-full max-w-[1440px] flex-1 px-4 py-10 md:px-8">
+            {children}
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );
