@@ -48,15 +48,28 @@ Ustavitev: `docker compose down` (z `-v` se izbriše tudi baza).
 
 ### Backend brez Dockerja
 
-Predpogoj: [uv](https://docs.astral.sh/uv/).
+Predpogoj: [uv](https://docs.astral.sh/uv/). Baza teče v Dockerju (`docker compose up -d postgres redis`).
 
 ```bash
 cd backend
-uv sync                                 # namesti odvisnosti
-uv run uvicorn app.main:app --reload --port 8989    # API na http://localhost:8989
-uv run pytest                           # testi
-uv run ruff check .                     # linter
+uv sync                                            # namesti odvisnosti
+export DATABASE_URL=postgresql+psycopg://rift:rift-dev-geslo@127.0.0.1:5432/rift_help
+uv run alembic upgrade head                        # migracije
+uv run uvicorn app.main:app --reload --port 8989   # API na http://127.0.0.1:8989
+uv run ruff check .                                # linter
 ```
+
+V Dockerju API migracije uveljavi sam ob zagonu.
+
+**Testi:** `uv run pytest`. Testi baze se izvedejo samo, če je nastavljen `TEST_DATABASE_URL` (migrirana baza; podatki se po vsakem testu razveljavijo):
+
+```bash
+TEST_DATABASE_URL=$DATABASE_URL uv run pytest
+```
+
+**Nova migracija** po spremembi modelov: `uv run alembic revision --autogenerate -m "opis"`; preglej ustvarjeno datoteko v `alembic/versions/`.
+
+> Uporabi `127.0.0.1` namesto `localhost`: ta lahko kaže na IPv6 (`::1`), kjer baza ne posluša.
 
 ### Frontend brez Dockerja
 
