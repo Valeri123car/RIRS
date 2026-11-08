@@ -61,7 +61,8 @@ API ima `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout` in
 (podrobnosti na `/docs`). Gesla so zgoščena z Argon2id. Prijava vrne kratkoživ dostopni žeton
 (JWT, 15 min, glava `Authorization: Bearer ...`), osvežilni žeton (14 dni) pa je v piškotku
 `HttpOnly` s potjo `/auth`. Potrebna je nastavitev `JWT_SECRET` (vsaj 32 znakov, glej `.env.example`);
-v produkciji nastavi še `COOKIE_SECURE=true`.
+v produkciji nastavi še `COOKIE_SECURE=true`. Z istega IP naslova je dovoljenih največ 10 poskusov
+prijave v 15 minutah in 5 registracij na uro (nato 429 z glavo `Retry-After`; števci so v Redis).
 
 **Preizkus povezave Riot računa (US-01) brez ključa:** registriraj se na `/registracija`, na
 `/profil` vpiši `Luka#EUNE` (regija EUNE) in klikni *Začni verifikacijo*. V načinu `fixtures` se
