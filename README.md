@@ -46,11 +46,13 @@ Ustavitev: `docker compose down` (z `-v` se izbriše tudi baza).
 
 ### Riot API
 
-Riot API kliče samo modul `backend/app/riot/` (Account-V1, Summoner-V4, Spectator-V5, Match-V5).
+Riot API kliče samo modul `backend/app/riot/` (Account-V1, Summoner-V4, Spectator-V5, League-V4,
+Match-V5).
 
 - `RIOT_API_MODE=fixtures` (privzeto) vrača sintetične odgovore v obliki Riot API iz
   `backend/app/riot/fixtures/`, zato aplikacija deluje brez ključa. Na voljo so igralci platforme
-  `eun1` (npr. `Luka#EUNE` je v aktivni tekmi, `Miha#EUNE` ni) in `Sara#EUW` na `euw1`.
+  `eun1` (npr. `Luka#EUNE` je v aktivni tekmi, `Miha#EUNE` ni) in `Sara#EUW` na `euw1`. Za
+  zbiralnik tekem ima `euw1` challenger ligo s 4 igralci in 3 tekme s časovnicami.
 - `RIOT_API_MODE=live` kliče pravi Riot API in zahteva `RIOT_API_KEY` (razvojni ključ velja 24 ur)
   ter `REDIS_URL`. Klici so omejeni prek Redis na 20 / 1 s in 100 / 2 min za vsako regijo, skupno
   vsem procesom; ob `429` klient počaka `Retry-After` in poskusi znova.
@@ -110,6 +112,29 @@ saj priporočila builda potrebujejo razrede in dokončane predmete.
 (standardna, varna, agresivna) z runami, dokončanimi predmeti in vrstnim redom sposobnosti. Dokler
 model ni naučen, se uporabijo pravila v `backend/app/recommend/rules.py` (priporočilo je označeno
 z "Priporočilo na podlagi pravil").
+
+**Zbiralnik tekem (US-07)** prenaša rangirane tekme za učenje modelov, samo prek uradnega Riot API
+(ADR-0001): challenger liga platforme (League-V4) → zadnje rangirane solo tekme teh igralcev
+(Match-V5, `queue=420`) → tekma in časovnica. Tekme se trajno shranijo v `matches` (celoten odgovor
+v `raw`) in `match_participants` (statistika, predmeti in značilke zgodnje igre iz časovnice:
+`cs_at_10`, `xp_at_10`, `gold_at_15`, `deaths_before_14`); igralci se dodajo v `riot_accounts` brez
+uporabnika. Tekme, ki so že v bazi, se ne prenesejo znova (ADR-0005). Vsak zagon se zapiše v
+`collector_runs` (začetek, konec, število igralcev in novih tekem, `success`/`error` s sporočilom).
+
+```bash
+uv run python -m app.collector                         # z nastavitvami iz .env
+uv run python -m app.collector --players 2 --matches 5 # majhen preizkus
+uv run python -m app.collector --platform eun1 --per-player 10 --no-timelines
+docker compose exec api python -m app.collector        # v Dockerju
+```
+
+Samodejno se zažene enkrat na dan: storitev `beat` (Celery beat) ob `COLLECTOR_HOUR_UTC` pošlje
+nalogo `collector.run`, izvede jo `worker`. Lokalno: `uv run celery -A app.worker beat --loglevel=info`
+poleg delavca. Velikost zagona omejujejo `COLLECTOR_MAX_PLAYERS`, `COLLECTOR_MATCHES_PER_PLAYER` in
+`COLLECTOR_MAX_NEW_MATCHES` (glej `.env.example`). Klici gredo skozi skupni Redis omejevalnik, zato
+privzeti zagon (do 100 novih tekem s časovnicami ≈ 220 klicev) z razvojnim ključem traja približno
+5 minut. Zadnje zagone vidiš z
+`docker compose exec postgres psql -U rift -d rift_help -c "select * from collector_runs order by id desc limit 5"`.
 
 **Testi:** `uv run pytest`. Testi baze se izvedejo samo, če je nastavljen `TEST_DATABASE_URL` (migrirana baza; podatki se po vsakem testu razveljavijo). Uporabi ločeno bazo, da testi ne trčijo v podatke, ki jih ustvariš v aplikaciji (npr. povezan Riot račun):
 
