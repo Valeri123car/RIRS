@@ -14,8 +14,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from app.analysis.capture import capture_active_game
 from app.analysis.guest_limit import RedisGuestLimiter
+from app.analysis.pipeline import run_analysis
 from app.api.deps import (
     get_analysis_queue,
     get_guest_limiter,
@@ -63,7 +63,7 @@ def api(db: Session) -> Iterator[TestClient]:
     app.dependency_overrides[get_riot_client] = FixtureRiotClient
     # Namesto Celery vrste se zajem izvede takoj, v testni seji.
     app.dependency_overrides[get_analysis_queue] = lambda: (
-        lambda analysis_id: capture_active_game(db, FixtureRiotClient(), analysis_id)
+        lambda analysis_id: run_analysis(db, FixtureRiotClient(), analysis_id)
     )
     # Vsak test ima svoj (prazen) števec analiz gostov.
     limiter = RedisGuestLimiter(fakeredis.FakeRedis())

@@ -23,15 +23,16 @@ def capture_active_game(
     riot: RiotClient,
     analysis_id: uuid.UUID,
     notify: ProgressNotifier = no_notify,
-) -> None:
+) -> bool:
     """Izpolni analizo z udeleženci aktivne tekme ali jo označi z razlogom neuspeha.
 
-    Po vsaki spremembi stanja pokliče notify, da SSE tok (GET /analyses/{id}/events) takoj
-    pošlje napredek.
+    Vrne True, če je bila tekma zajeta (analiza ostane v stanju "capturing" za naslednji korak,
+    glej app.analysis.pipeline). Po vsaki spremembi stanja pokliče notify, da SSE tok
+    (GET /analyses/{id}/events) takoj pošlje napredek.
     """
     analysis = session.get(LiveAnalysis, analysis_id)
     if analysis is None:
-        return
+        return False
 
     def set_status(status: AnalysisStatus, error: str | None = None) -> None:
         analysis.status = status
@@ -50,18 +51,19 @@ def capture_active_game(
     except RiotNotFoundError:
         label = PLATFORM_LABELS.get(analysis.platform, analysis.platform)
         set_status(AnalysisStatus.FAILED, f"Igralca s tem Riot ID ni v regiji {label}")
-        return
+        return False
     except RiotApiError:
         set_status(AnalysisStatus.FAILED, RIOT_UNAVAILABLE)
-        return
+        return False
 
     if game is None:
         set_status(AnalysisStatus.NOT_IN_GAME, NOT_IN_GAME)
-        return
+        return False
 
     analysis.game_id = game.game_id
     analysis.participants = _participants(session, game, account.puuid)
-    set_status(AnalysisStatus.COMPLETED)
+    session.commit()
+    return True
 
 
 def _participants(session: Session, game: ActiveGame, target_puuid: str) -> list[dict[str, Any]]:

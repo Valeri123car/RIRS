@@ -1,4 +1,5 @@
 from app.analysis.capture import capture_active_game
+from app.analysis.pipeline import run_analysis
 from app.models.champion import Champion
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
 from app.riot.errors import RiotUnavailableError
@@ -17,7 +18,7 @@ def test_zajem_shrani_vseh_10_udelezencev_s_sampioni(db):
     db.merge(Champion(id=222, slug="Jinx", name="Jinx"))
     analysis = new_analysis(db)
 
-    capture_active_game(db, FixtureRiotClient(), analysis.id)
+    run_analysis(db, FixtureRiotClient(), analysis.id)
 
     db.refresh(analysis)
     assert analysis.status == AnalysisStatus.COMPLETED
@@ -65,15 +66,19 @@ def test_nedosegljiv_riot_api(db):
     assert analysis.error == "Riot API trenutno ni dosegljiv, poskusi kasneje."
 
 
-def test_zajem_obvesti_o_vsaki_spremembi_stanja(db):
+def test_analiza_obvesti_o_vsakem_koraku(db):
     analysis = new_analysis(db)
     statuses = []
 
-    capture_active_game(
+    run_analysis(
         db, FixtureRiotClient(), analysis.id, notify=lambda _id: statuses.append(analysis.status)
     )
 
-    assert statuses == [AnalysisStatus.CAPTURING, AnalysisStatus.COMPLETED]
+    assert statuses == [
+        AnalysisStatus.CAPTURING,
+        AnalysisStatus.PROFILING,
+        AnalysisStatus.COMPLETED,
+    ]
 
 
 def test_neuspeh_zajema_obvesti_s_koncnim_stanjem(db):
@@ -85,3 +90,26 @@ def test_neuspeh_zajema_obvesti_s_koncnim_stanjem(db):
     )
 
     assert statuses == [AnalysisStatus.CAPTURING, AnalysisStatus.NOT_IN_GAME]
+
+
+def test_analiza_izracuna_profil_nasprotne_ekipe(db):
+    analysis = new_analysis(db)
+
+    run_analysis(db, FixtureRiotClient(), analysis.id)
+
+    db.refresh(analysis)
+    comp = analysis.enemy_comp
+    assert comp is not None
+    assert comp["damage"]["physical"] + comp["damage"]["magic"] == 100
+    assert comp["champion_count"] + comp["missing_champions"] == 5
+    assert len(comp["threats"]) <= 5
+
+
+def test_neuspel_zajem_nima_profila(db):
+    analysis = new_analysis(db, "Miha#EUNE")
+
+    run_analysis(db, FixtureRiotClient(), analysis.id)
+
+    db.refresh(analysis)
+    assert analysis.status == AnalysisStatus.NOT_IN_GAME
+    assert analysis.enemy_comp is None
