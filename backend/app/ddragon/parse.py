@@ -37,6 +37,8 @@ ITEM_TAG_ALIASES = {"ArmorPenetration": "armor_pen", "MagicPenetration": "magic_
 ANTI_HEAL_PATTERN = re.compile(r"\bWounds\b")
 # Predmeti s temi oznakami niso del "dokončanega" builda (US-04).
 NOT_COMPLETED_TAGS = frozenset({"Boots", "Consumable", "Trinket"})
+# Cenejši "dokončani" predmeti so nadgradnje podpornih predmetov, čevlji in Mejai.
+LEGENDARY_MIN_COST = 2000
 
 
 @dataclass(frozen=True)
@@ -118,9 +120,10 @@ def parse_items(data: dict[str, dict[str, Any]]) -> list[ItemData]:
 
 
 def _is_completed(raw: dict[str, Any]) -> bool:
-    """Dokončan je predmet, ki je sestavljen iz drugih in se ne gradi naprej (brez čevljev)."""
+    """Dokončan je legendarni predmet: sestavljen iz drugih, se ne gradi naprej, ni čevelj."""
     return (
         bool(raw.get("from"))
+        and raw["gold"]["total"] >= LEGENDARY_MIN_COST
         and not raw.get("into")
         and not NOT_COMPLETED_TAGS.intersection(raw.get("tags", []))
     )

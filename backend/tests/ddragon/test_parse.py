@@ -126,6 +126,7 @@ def test_predmet_iz_sestavin_brez_nadgradnje_je_dokoncan():
         item("Last Whisper", total=1450, **{"from": ["1036"], "into": ["3033"]}),
         item("Berserker's Greaves", tags=("Boots",), **{"from": ["1001"]}),
         item("Elixir of Iron", tags=("Consumable",)),
+        item("Bloodsong", total=400, **{"from": ["3867"]}),
     ],
 )
 def test_sestavine_cevlji_in_potrosni_predmeti_niso_dokoncani(raw):
