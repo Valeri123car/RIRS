@@ -3,6 +3,7 @@
 from app.models.champion import Champion, DamageProfile
 from app.models.item import Item
 from app.models.riot_account import RiotAccount
+from app.models.riot_verification import RiotVerification
 from app.models.user import ExplanationLevel, User, UserRole
 
 __all__ = [
@@ -11,6 +12,7 @@ __all__ = [
     "ExplanationLevel",
     "Item",
     "RiotAccount",
+    "RiotVerification",
     "User",
     "UserRole",
 ]
