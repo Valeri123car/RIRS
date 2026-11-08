@@ -48,3 +48,5 @@ class LiveAnalysis(TimestampMixin, Base):
     )
     # Profil nasprotne sestave (US-03).
     enemy_comp: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    # Priporočilo builda (US-04): vir (model/pravila), variante z runami, predmeti in razlogi.
+    recommendation: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
