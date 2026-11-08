@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { BuildPanel } from "@/components/analysis/build-panel";
 import { EnemyCompPanel } from "@/components/analysis/enemy-comp-panel";
 import { StartError } from "@/components/analysis/start-error";
 import { useStartAnalysis } from "@/components/analysis/use-start-analysis";
@@ -195,11 +196,14 @@ export function AnalysisView({ id }: { id: string }) {
 
       {analysis.enemy_comp && <EnemyCompPanel comp={analysis.enemy_comp} />}
 
+      {analysis.status === "completed" && (
+        <BuildPanel recommendation={analysis.recommendation ?? null} version={version} />
+      )}
+
       {analysis.participants.length > 0 && <Teams analysis={analysis} version={version} />}
 
       {analysis.status === "completed" && (
         <p className="text-sm text-muted">
-          Priporočila builda in run bodo dodana v naslednji različici.{" "}
           <Link href="/" className="text-primary underline underline-offset-2">
             Nova analiza
           </Link>
