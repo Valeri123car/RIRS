@@ -10,6 +10,11 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 WORKDIR /app
 
+# LightGBM (model priporočil, ADR-0006) potrebuje OpenMP knjižnico, ki je slim slika nima.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Najprej samo odvisnosti, da Docker predpomni ta sloj, dokler se uv.lock ne spremeni.
 COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --frozen --no-dev --no-install-project
