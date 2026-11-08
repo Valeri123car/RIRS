@@ -8,7 +8,7 @@ import uuid
 from celery import Celery
 from redis import Redis
 
-from app.analysis.capture import capture_active_game
+from app.analysis.pipeline import run_analysis as run_pipeline
 from app.analysis.progress import ProgressNotifier, RedisProgressNotifier, no_notify
 from app.core.config import get_settings
 from app.db.session import get_session_factory
@@ -52,4 +52,4 @@ def _notify() -> ProgressNotifier:
 @celery_app.task(name="analysis.run")
 def run_analysis(analysis_id: str) -> None:
     with get_session_factory()() as session:
-        capture_active_game(session, _riot(), uuid.UUID(analysis_id), _notify())
+        run_pipeline(session, _riot(), uuid.UUID(analysis_id), _notify())

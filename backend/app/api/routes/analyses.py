@@ -35,6 +35,8 @@ class AnalysisOut(BaseModel):
     tag_line: str
     platform: str
     participants: list[dict[str, Any]]
+    # Profil nasprotne sestave (US-03); None, dokler korak profiliranja ni končan.
+    enemy_comp: dict[str, Any] | None
     created_at: datetime
 
 
