@@ -14,7 +14,10 @@ WORKDIR /app
 COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --frozen --no-dev --no-install-project
 
+COPY alembic.ini ./
+COPY alembic ./alembic
 COPY app ./app
 
 EXPOSE 8989
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8989"]
+# Ob zagonu najprej uveljavi migracije, nato zažene API.
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8989"]
