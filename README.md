@@ -109,9 +109,23 @@ oznak, ki jih ureja administrator. Po nadgradnji baze (`alembic upgrade head`) u
 saj priporočila builda potrebujejo razrede in dokončane predmete.
 
 **Priporočila builda (US-04):** analiza po profilu nasprotne sestave sestavi 3 variante builda
-(standardna, varna, agresivna) z runami, dokončanimi predmeti in vrstnim redom sposobnosti. Dokler
-model ni naučen, se uporabijo pravila v `backend/app/recommend/rules.py` (priporočilo je označeno
-z "Priporočilo na podlagi pravil").
+(standardna, varna, agresivna) z runami, dokončanimi predmeti in vrstnim redom sposobnosti.
+Kandidatne builde oceni model LightGBM (`backend/app/recommend/model.py`), razlog za predmet izhaja
+iz njegovega SHAP prispevka. Če aktivnega modela ni ali ima šampion v učnih podatkih manj kot 20
+tekem, se uporabijo pravila v `backend/app/recommend/rules.py` (priporočilo je označeno z
+"Priporočilo na podlagi pravil").
+
+Učenje modela iz zbranih tekem (glej zbiralnik spodaj):
+
+```bash
+uv run python -m app.ml              # nauči in shrani verzijo v ml_models (status trained)
+uv run python -m app.ml --activate   # ... in jo aktivira, če je boljša od izhodišča
+docker compose exec api python -m app.ml --activate
+```
+
+Ukaz izpiše AUC na testnih tekmah in AUC izhodiščnega modela brez značilk sestave. Aktivirati je
+mogoče samo model z višjim AUC (ADR-0006); prejšnja aktivna verzija dobi status `retired`. Za
+uporaben model je potrebnih več tisoč tekem.
 
 **Zbiralnik tekem (US-07)** prenaša rangirane tekme za učenje modelov, samo prek uradnega Riot API
 (ADR-0001): challenger liga platforme (League-V4) → zadnje rangirane solo tekme teh igralcev
