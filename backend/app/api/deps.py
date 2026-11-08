@@ -10,6 +10,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from redis import Redis
 from sqlalchemy.orm import Session
 
+from app.analysis.guest_limit import GuestLimiter, NoGuestLimit, RedisGuestLimiter
 from app.analysis.progress import PollingProgressWaiter, ProgressWaiter, RedisProgressWaiter
 from app.core.config import Settings, get_settings
 from app.core.security import InvalidTokenError, decode_token
@@ -109,3 +110,12 @@ def get_progress_waiter_factory() -> ProgressWaiterFactory:
 
 
 WaiterFactory = Annotated[ProgressWaiterFactory, Depends(get_progress_waiter_factory)]
+
+
+def get_guest_limiter() -> GuestLimiter:
+    """Dnevna omejitev analiz za goste (v testih se zamenja z omejevalnikom na fakeredis)."""
+    redis = _shared_redis()
+    return RedisGuestLimiter(redis) if redis is not None else NoGuestLimit()
+
+
+GuestLimit = Annotated[GuestLimiter, Depends(get_guest_limiter)]

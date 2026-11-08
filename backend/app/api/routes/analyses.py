@@ -6,11 +6,12 @@ from collections.abc import Iterator
 from datetime import datetime
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pydantic import BaseModel, ConfigDict
 
-from app.api.deps import DbSession, OptionalUser, Queue, WaiterFactory
+from app.analysis.guest_limit import GUEST_DAILY_LIMIT
+from app.api.deps import DbSession, GuestLimit, OptionalUser, Queue, WaiterFactory
 from app.api.schemas import RiotIdInput
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
 
@@ -30,10 +31,36 @@ class AnalysisOut(BaseModel):
     created_at: datetime
 
 
-@router.post("", response_model=AnalysisOut, status_code=status.HTTP_202_ACCEPTED)
+GUEST_LIMIT_MESSAGE = (
+    f"Kot gost lahko na dan zaženeš največ {GUEST_DAILY_LIMIT} analize. "
+    "Registriraj se brezplačno in analiziraj brez omejitve."
+)
+
+
+@router.post(
+    "",
+    response_model=AnalysisOut,
+    status_code=status.HTTP_202_ACCEPTED,
+    responses={429: {"description": GUEST_LIMIT_MESSAGE}},
+)
 def start_analysis(
-    body: RiotIdInput, user: OptionalUser, db: DbSession, queue: Queue
+    body: RiotIdInput,
+    request: Request,
+    user: OptionalUser,
+    db: DbSession,
+    queue: Queue,
+    guest_limit: GuestLimit,
 ) -> LiveAnalysis:
+    if user is None:
+        # IP neposredno iz povezave; glavi X-Forwarded-For ne zaupamo (gost bi jo lahko ponaredil).
+        ip = request.client.host if request.client else "unknown"
+        limit = guest_limit.hit(ip)
+        if not limit.allowed:
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                GUEST_LIMIT_MESSAGE,
+                headers={"Retry-After": str(limit.retry_after)},
+            )
     analysis = LiveAnalysis(
         user_id=user.id if user else None,
         game_name=body.game_name,

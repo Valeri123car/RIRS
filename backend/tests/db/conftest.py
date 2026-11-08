@@ -8,13 +8,15 @@ zato v bazi ne ostanejo podatki.
 import os
 from collections.abc import Iterator
 
+import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from app.analysis.capture import capture_active_game
-from app.api.deps import get_analysis_queue, get_riot_client
+from app.analysis.guest_limit import RedisGuestLimiter
+from app.api.deps import get_analysis_queue, get_guest_limiter, get_riot_client
 from app.core.config import Settings, get_settings
 from app.db.session import get_db
 from app.main import create_app
@@ -57,6 +59,9 @@ def api(db: Session) -> Iterator[TestClient]:
     app.dependency_overrides[get_analysis_queue] = lambda: (
         lambda analysis_id: capture_active_game(db, FixtureRiotClient(), analysis_id)
     )
+    # Vsak test ima svoj (prazen) števec analiz gostov.
+    limiter = RedisGuestLimiter(fakeredis.FakeRedis())
+    app.dependency_overrides[get_guest_limiter] = lambda: limiter
     with TestClient(app) as client:
         yield client
 

@@ -47,3 +47,28 @@ def test_neveljaven_vnos_je_zavrnjen(api):
 def test_neobstojeca_analiza(api):
     assert api.get(f"/analyses/{uuid.uuid4()}").status_code == 404
     assert api.get("/analyses/ni-uuid").status_code == 422
+
+
+def test_cetrta_analiza_gosta_v_dnevu_je_zavrnjena(api):
+    for _ in range(3):
+        assert start(api).status_code == 202
+
+    response = start(api)
+
+    assert response.status_code == 429
+    assert "največ 3 analize" in response.json()["detail"]
+    assert "Registriraj se" in response.json()["detail"]
+    assert int(response.headers["Retry-After"]) > 0
+
+
+def test_prijavljen_uporabnik_nima_omejitve_gostov(api):
+    headers = auth_headers(api)
+    for _ in range(5):
+        assert start(api, headers=headers).status_code == 202
+
+
+def test_neveljaven_vnos_ne_porabi_analize(api):
+    for _ in range(3):
+        start(api, riot_id="brez-oznake")
+
+    assert start(api).status_code == 202
