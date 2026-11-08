@@ -26,6 +26,11 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
+[tool.ruff.lint.isort]
+# Mapa alembic/ so naše migracije, paket "alembic" pa je zunanja knjižnica.
+known-third-party = ["alembic"]
+known-first-party = ["app"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
