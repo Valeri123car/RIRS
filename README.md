@@ -101,8 +101,15 @@ docker compose exec api python -m app.ddragon    # v Dockerju
 
 Ukaz izpiše število novih, spremenjenih in nespremenjenih zapisov. Uvozijo se samo predmeti za
 Summoner's Rift. Ocene šampionov (CC, zdravljenje, engage ...) se izpeljejo iz Riotovih oznak in
-ročnih popravkov v `backend/app/ddragon/champion_overrides.json`. Ponovni uvoz posodobi imena in
-cene, ne povozi pa ocen in oznak, ki jih ureja administrator.
+ročnih popravkov v `backend/app/ddragon/champion_overrides.json`. Ponovni uvoz posodobi imena,
+cene, razrede šampionov (Tank, Mage ...) in oznako dokončanih predmetov, ne povozi pa ocen in
+oznak, ki jih ureja administrator. Po nadgradnji baze (`alembic upgrade head`) uvoz poženi znova,
+saj priporočila builda potrebujejo razrede in dokončane predmete.
+
+**Priporočila builda (US-04):** analiza po profilu nasprotne sestave sestavi 3 variante builda
+(standardna, varna, agresivna) z runami, dokončanimi predmeti in vrstnim redom sposobnosti. Dokler
+model ni naučen, se uporabijo pravila v `backend/app/recommend/rules.py` (priporočilo je označeno
+z "Priporočilo na podlagi pravil").
 
 **Testi:** `uv run pytest`. Testi baze se izvedejo samo, če je nastavljen `TEST_DATABASE_URL` (migrirana baza; podatki se po vsakem testu razveljavijo). Uporabi ločeno bazo, da testi ne trčijo v podatke, ki jih ustvariš v aplikaciji (npr. povezan Riot račun):
 
