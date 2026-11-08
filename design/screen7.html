@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="sl"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Cinzel:wght@500;600;700;800;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>
+@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}
+::-webkit-scrollbar{display:none;}
+.font-arcane{font-family:'Cinzel', serif;}
+.hex-border{border:1px solid #785a28;box-shadow:inset 0 0 12px rgba(200,170,110,0.06), 0 4px 20px rgba(0,0,0,0.6);}
+.hex-glow-cyan{box-shadow:0 0 15px rgba(10,200,185,0.35), inset 0 0 8px rgba(10,200,185,0.2);}
+.hex-glow-gold{box-shadow:0 0 15px rgba(240,191,92,0.3), inset 0 0 10px rgba(200,170,110,0.15);}
+.hex-corner{position:relative;}
+.hex-corner::before{content:'';position:absolute;top:-1px;left:-1px;width:6px;height:6px;border-top:2px solid #f0bf5c;border-left:2px solid #f0bf5c;pointer-events:none;}
+.hex-corner::after{content:'';position:absolute;bottom:-1px;right:-1px;width:6px;height:6px;border-bottom:2px solid #f0bf5c;border-right:2px solid #f0bf5c;pointer-events:none;}
+</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary": "#43e2d2",
+          "tertiary-container": "#af8fff",
+          "outline-variant": "#4e4637",
+          "tertiary-fixed": "#e9ddff",
+          "on-error-container": "#ffdad6",
+          "inverse-on-surface": "#273140",
+          "on-surface": "#d9e3f7",
+          "on-background": "#d9e3f7",
+          "error-container": "#93000a",
+          "primary-fixed": "#ffdea4",
+          "surface-container-lowest": "#050b14",
+          "surface-dim": "#0a1422",
+          "primary-container": "#c89b3c",
+          "secondary-fixed": "#61f9e9",
+          "on-secondary": "#003732",
+          "surface-container-high": "#1b2536",
+          "inverse-surface": "#d9e3f7",
+          "on-secondary-container": "#004c46",
+          "on-primary-container": "#4b3500",
+          "on-tertiary-container": "#4500a5",
+          "on-secondary-fixed": "#00201d",
+          "surface-tint": "#f0bf5c",
+          "primary-fixed-dim": "#f0bf5c",
+          "inverse-primary": "#7b5900",
+          "on-tertiary-fixed": "#23005c",
+          "on-primary-fixed-variant": "#5d4200",
+          "on-surface-variant": "#c5b79e",
+          "on-primary": "#412d00",
+          "error": "#ff6b81",
+          "surface-bright": "#2c384c",
+          "tertiary": "#c084fc",
+          "on-tertiary": "#3c0091",
+          "surface-variant": "#1a2538",
+          "primary": "#f0bf5c",
+          "secondary-container": "#00c6b7",
+          "surface-container": "#0e1828",
+          "on-primary-fixed": "#261900",
+          "outline": "#785a28",
+          "on-secondary-fixed-variant": "#005049",
+          "tertiary-fixed-dim": "#d0bcff",
+          "secondary-fixed-dim": "#3bdccd",
+          "surface-container-highest": "#243248",
+          "on-tertiary-fixed-variant": "#5516be",
+          "surface": "#081220",
+          "surface-container-low": "#0b1524",
+          "background": "#050b14",
+          "on-error": "#690005"
+        },
+        "fontFamily": {
+          "headline-lg": ["Cinzel", "EB Garamond", "serif"],
+          "headline-sm": ["Cinzel", "EB Garamond", "serif"],
+          "body-lg": ["Be Vietnam Pro", "sans-serif"],
+          "body-md": ["Be Vietnam Pro", "sans-serif"],
+          "body-sm": ["Be Vietnam Pro", "sans-serif"],
+          "label-lg": ["Space Mono", "monospace"],
+          "label-sm": ["Space Mono", "monospace"],
+          "label-md": ["Space Mono", "monospace"],
+          "tabular-num": ["Space Mono", "monospace"]
+        }
+      }
+    }
+  }
+</script></head><body class="bg-surface-container-lowest font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container relative overflow-x-hidden">
+<!-- Ambient Hextech Arcane Mystic Glows -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-[#0ac8b9]/10 blur-[130px]"></div>
+<div class="absolute top-1/4 -right-40 w-[700px] h-[700px] rounded-full bg-[#8b5cf6]/10 blur-[150px]"></div>
+<div class="absolute bottom-10 left-1/3 w-[800px] h-[800px] rounded-full bg-[#f0bf5c]/5 blur-[160px]"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(14,28,48,0.7)_0%,transparent_75%)]"></div>
+</div>
+<!-- Piltover / Hextech Filigree Header -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#07101e]/95 backdrop-blur-md border-b border-[#785a28]/60 shadow-[0_4px_25px_rgba(0,0,0,0.7)]">
+<div class="h-16 max-w-[1440px] mx-auto px-4 md:px-8 flex items-center justify-between relative">
+<div class="flex items-center gap-6 lg:gap-10">
+<a class="flex items-center tracking-wider text-on-surface select-none group" data-path="live" href="#">
+<div class="w-7 h-7 rotate-45 border border-primary bg-primary/20 flex items-center justify-center mr-2.5 transition-transform group-hover:rotate-90 duration-500 shadow-[0_0_12px_rgba(240,191,92,0.4)]">
+<span class="material-symbols-outlined text-primary text-[15px] -rotate-45 group-hover:rotate-0 transition-transform">auto_awesome</span>
+</div>
+<span class="font-headline-lg text-xl uppercase tracking-[0.18em] text-primary font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">RiftSense</span>
+<span class="text-[10px] ml-1.5 px-1.5 py-0.5 rounded bg-primary/10 border border-primary/30 text-primary font-label-sm tracking-widest hidden sm:inline-block">HEXTECH</span>
+</a>
+<nav class="flex items-center gap-6" data-active-classes="text-primary border-b-2 border-primary">
+<a class="font-headline-sm text-sm uppercase tracking-widest text-[#a8987e] hover:text-primary transition-colors py-2" data-path="my-analyses" href="#">Moje analize</a>
+<a class="font-headline-sm text-sm uppercase tracking-widest text-[#a8987e] hover:text-primary transition-colors py-2" data-path="live" href="#">V živo</a>
+<a class="font-headline-sm text-sm uppercase tracking-widest text-[#a8987e] hover:text-primary transition-colors py-2" data-path="progress" href="#">Napredek</a>
+<a class="font-headline-sm text-sm uppercase tracking-widest text-[#a8987e] hover:text-primary transition-colors py-2" data-path="team" href="#">Ekipa</a>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-2 bg-[#0c182a] px-3.5 py-1.5 rounded-sm border border-[#785a28]/60 shadow-[inset_0_1px_4px_rgba(0,0,0,0.6)]">
+<span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#43e2d2] animate-pulse"></span>
+<span class="font-label-sm text-xs text-primary tracking-wider uppercase">Ranked Solo/Duo • EUNE</span>
+</div>
+<button aria-label="Filter and Settings" class="w-9 h-9 rounded-sm bg-[#0e1b2e] border border-[#785a28]/50 flex items-center justify-center text-primary hover:text-white hover:border-primary transition-all shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<div class="flex items-center gap-2.5 pl-2 border-l border-[#785a28]/40">
+<div class="flex flex-col text-right">
+<span class="font-headline-sm text-xs text-primary font-bold tracking-wider leading-tight">Luka#EUNE</span>
+<span class="font-label-sm text-[10px] text-[#c8aa6e]">Gold II • 58 LP</span>
+</div>
+<div class="w-8 h-8 rounded-sm bg-gradient-to-br from-primary to-[#8c6721] p-[1px] shadow-[0_0_10px_rgba(240,191,92,0.4)]">
+<div class="w-full h-full bg-[#0a1422] flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[17px]">shield</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="w-full pt-20 bg-transparent flex-1 max-w-[1440px] mx-auto px-4 md:px-8 py-6 relative z-10"><div class="flex flex-col w-full">
+<!-- SUB-BAR / MATCH ARCHIVE STATUS -->
+<div class="relative w-full mb-8 bg-surface-container-low/90 backdrop-blur-md rounded-lg shadow-xl p-4 sm:p-5">
+<div class="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+<div class="flex flex-wrap items-center gap-3">
+<div class="flex items-center gap-2 bg-surface-container-highest/80 px-3 py-1.5 rounded-sm shadow-inner">
+<span class="material-symbols-outlined text-primary text-sm">hub</span>
+<span class="font-label-sm text-primary tracking-widest text-xs uppercase">SEKTOR // SPODNJA LINIJA</span>
+<span class="text-on-surface-variant font-label-sm text-xs">•</span>
+<span class="font-label-sm text-secondary-fixed text-xs uppercase">JINX (TIER 2)</span>
+<span class="text-primary font-label-sm text-xs">VS</span>
+<span class="font-label-sm text-tertiary-fixed text-xs uppercase">CAITLYN (ENFORCER)</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container px-3.5 py-1.5 rounded-sm shadow-sm">
+<div class="relative flex items-center justify-center w-2.5 h-2.5">
+<span class="absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75 animate-ping"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</div>
+<span class="font-label-sm text-xs text-on-surface uppercase tracking-wider">Mistični Dvoboj v Živo — Dokumentacija Sukobitve</span>
+</div>
+</div>
+<div class="flex items-center flex-wrap gap-2.5">
+<button class="group flex items-center gap-1.5 px-3.5 py-1.5 bg-surface-container hover:bg-surface-container-high text-primary rounded-sm shadow-sm transition-all duration-300" type="button">
+<span class="material-symbols-outlined text-sm transition-transform group-hover:scale-110">auto_stories</span>
+<span class="font-label-sm text-xs uppercase tracking-wider">Izvozi zvitke</span>
+</button>
+<button class="group flex items-center gap-1.5 px-3.5 py-1.5 bg-surface-container hover:bg-surface-container-high text-secondary rounded-sm shadow-sm transition-all duration-300" type="button">
+<span class="material-symbols-outlined text-sm transition-transform group-hover:rotate-45">tune</span>
+<span class="font-label-sm text-xs uppercase tracking-wider">Primerjava run</span>
+</button>
+<button class="group flex items-center gap-1.5 px-3.5 py-1.5 bg-primary-container text-on-primary-container hover:bg-primary font-bold rounded-sm shadow-md transition-all duration-300" type="button">
+<span class="material-symbols-outlined text-sm text-on-primary-container">history_edu</span>
+<span class="font-label-sm text-xs uppercase tracking-wider">Zgodovina dvobojev</span>
+</button>
+</div>
+</div>
+</div>
+<!-- HERO SHOWDOWN: JINX VS CAITLYN -->
+<section class="relative w-full mb-12">
+<!-- Section Header Text Ribbon -->
+<div class="text-center mb-6">
+<div class="inline-flex items-center gap-3">
+<span class="h-[1px] w-12 bg-gradient-to-r from-transparent to-primary"></span>
+<span class="font-label-sm text-primary uppercase tracking-[0.25em] text-xs">Arhiv Bojišča Piltover &amp; Zaun</span>
+<span class="h-[1px] w-12 bg-gradient-to-l from-transparent to-primary"></span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-1 tracking-wide uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+        Odločilni Razcepnik Moči: Spodnja Linija
+      </h2>
+<p class="font-body-md text-on-surface-variant max-w-2xl mx-auto mt-1">
+        Primerjalna taktična simulacija trenutnega stanja med Nekontroliranim Kaosom in Piltoversko Ostrostrelko na 12. minuti igre.
+      </p>
+</div>
+<!-- Triple-Panel Showdown Arena Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+<!-- LEFT: JINX (ZAUN CHAOS) -->
+<div class="lg:col-span-5 bg-surface-container/95 rounded-lg shadow-2xl relative overflow-hidden flex flex-col justify-between group">
+<!-- Neon Zaun shimmer accent lighting -->
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-secondary/15 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -right-24 w-64 h-64 bg-tertiary-container/15 rounded-full blur-3xl pointer-events-none"></div>
+<div class="p-6 relative z-10 flex flex-col h-full">
+<!-- Champion Header Info -->
+<div class="flex items-center justify-between pb-4">
+<div>
+<span class="font-label-sm text-secondary uppercase tracking-widest text-xs flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Zavezniški Tabor // Zaun
+              </span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide font-bold mt-0.5">Jinx</h3>
+<p class="font-body-md text-on-surface-variant text-xs italic">Nekontrolirani Kaos</p>
+</div>
+<!-- Champion Level and Mastery Crest -->
+<div class="text-right flex flex-col items-end">
+<span class="font-label-lg text-primary text-base">LVL 9</span>
+<span class="font-label-sm text-xs text-secondary-fixed bg-surface-container-highest px-2 py-0.5 rounded-sm">Tier II Master</span>
+</div>
+</div>
+<!-- Champion Portrait & Spells Layout -->
+<div class="relative w-full h-56 rounded-md overflow-hidden my-4 shadow-xl">
+<img class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" data-alt="High fantasy official League of Legends style splash art of Jinx in Zaun neon atmospheric lighting, wild cyan braided twin pigtails, holding her shark rocket launcher Fishbones with sparks, mechanical steampunk brass details, arcane purple shimmer fog background, competitive dynamic esports hero composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzv1LYJ4_jqkISJ9HX54aLmtGbw5s-SLrqnedkbzattv9l7hsHd3bc9PM6CVLLZzSbCfidYQJziSh3qBwGzTZ27NAtc_SwtVKA9aVBh579mHS6pYUuMPXFLJMpQ5r_Ry-7rafGrBrPBni180XXa8LR2MHjPU2Bu4x6Oa0dEYCdhl7vtSi9P3rbmzrdG7EtozclfMV7X-tmKaNm6KOZ8daOceMDnNJMzwWVKNFEbPM6WefUH6YbxHt6"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/30 to-transparent"></div>
+<!-- Floating Keystones & Spells overlay -->
+<div class="absolute bottom-3 left-3 flex items-center gap-2">
+<div class="w-10 h-10 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-lg" title="Lethal Tempo">
+<span class="material-symbols-outlined text-primary text-xl">bolt</span>
+</div>
+<div class="w-8 h-8 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-md" title="Flash">
+<span class="material-symbols-outlined text-secondary-fixed text-sm">flash_on</span>
+</div>
+<div class="w-8 h-8 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-md" title="Heal">
+<span class="material-symbols-outlined text-secondary text-sm">favorite</span>
+</div>
+<span class="bg-surface-container-lowest/90 px-2 py-1 text-on-surface font-label-sm text-xs rounded-sm">Lethal Tempo (Ready)</span>
+</div>
+</div>
+<!-- Key Combat Statistics Table -->
+<div class="grid grid-cols-3 gap-2.5 my-3 text-center">
+<div class="bg-surface-container-low p-2.5 rounded-sm shadow-inner">
+<span class="font-label-sm text-xs text-on-surface-variant uppercase block">CS@10 min</span>
+<span class="font-label-lg text-sm text-secondary-fixed font-bold">74 <span class="text-xs text-secondary">(+6.8)</span></span>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-sm shadow-inner">
+<span class="font-label-sm text-xs text-on-surface-variant uppercase block">Zmage na liniji</span>
+<span class="font-label-lg text-sm text-primary font-bold">58.4%</span>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-sm shadow-inner">
+<span class="font-label-sm text-xs text-on-surface-variant uppercase block">KDA Indeks</span>
+<span class="font-label-lg text-sm text-on-surface font-bold">4.2 / 1.0</span>
+</div>
+</div>
+<!-- Active Arsenal and Spike Note -->
+<div class="mt-auto bg-surface-container-low p-3.5 rounded-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-xs text-primary uppercase font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs">rocket_launch</span>
+                Fishbones &amp; Pow-Pow
+              </span>
+<span class="font-label-sm text-xs text-secondary-fixed">Spike dosežen: 11:45</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+              Kraken Slayer zaključen ob 11:45 omogoča hitro čiščenje valov in prehod v napad na zunanji stolp spodnje linije.
+            </p>
+</div>
+</div>
+</div>
+<!-- CENTER: VS CORE & TACTICAL LIVE ARBITER -->
+<div class="lg:col-span-2 flex flex-col justify-between items-center gap-4 py-2">
+<!-- Runic Gem Hub / Hextech Reactor -->
+<div class="relative w-full flex flex-col items-center justify-center p-4 bg-surface-container-low/95 rounded-lg shadow-xl text-center">
+<!-- Ambient Runic Orbit Ring -->
+<div class="relative w-20 h-20 flex items-center justify-center my-2">
+<div class="absolute inset-0 rounded-full border border-primary/40 animate-spin" style="animation-duration: 20s;"></div>
+<div class="absolute inset-2 rounded-full border border-secondary/30 animate-spin" style="animation-duration: 12s; animation-direction: reverse;"></div>
+<div class="w-12 h-12 rotate-45 bg-surface-container flex items-center justify-center shadow-lg">
+<span class="font-headline-lg text-lg text-primary -rotate-45 font-bold">VS</span>
+</div>
+</div>
+<span class="font-label-sm text-xs text-on-surface-variant tracking-wider uppercase mt-1">Divergenca Moči</span>
+<div class="font-headline-sm text-sm text-primary font-bold uppercase mt-0.5">+640g Zlata</div>
+<span class="text-xs text-secondary font-label-sm">Prednost Zaveznikov</span>
+<!-- Wave Equilibrium Visualizer -->
+<div class="w-full mt-4">
+<div class="flex justify-between font-label-sm text-[10px] text-on-surface-variant mb-1">
+<span>JINX (56%)</span>
+<span>CAITLYN (44%)</span>
+</div>
+<div class="w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="bg-gradient-to-r from-secondary-container to-secondary h-full" style="width: 56%;"></div>
+<div class="bg-gradient-to-r from-primary to-primary-container h-full" style="width: 44%;"></div>
+</div>
+</div>
+</div>
+<!-- Live Tactical Flash Alert -->
+<div class="w-full bg-error-container/20 rounded-md p-3.5 shadow-lg text-left">
+<div class="flex items-center gap-2 mb-1.5 text-error">
+<span class="material-symbols-outlined text-base animate-pulse">crisis_alert</span>
+<span class="font-label-sm text-xs uppercase tracking-wider font-bold">Kritično Okno</span>
+</div>
+<p class="font-body-md text-xs text-on-surface leading-tight">
+            Caitlyn nima <strong class="text-secondary-fixed">Flash</strong> do <span class="font-label-sm text-primary">16:10</span>! Idealen čas za zavezniški all-in ob prihodu naslednjega 'cannon' vala.
+          </p>
+</div>
+<!-- Quick Synergy Gauge Card -->
+<div class="w-full bg-surface-container-low/95 rounded-md p-3 text-center shadow-md">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-wider block">Ocena Agresije</span>
+<div class="flex items-center justify-center gap-1 mt-1 text-primary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-outline-variant">star</span>
+</div>
+<span class="font-label-sm text-xs text-secondary-fixed block mt-0.5">Visoka Smrtnost (8.5/10)</span>
+</div>
+</div>
+<!-- RIGHT: CAITLYN (PILTOVER ENFORCER) -->
+<div class="lg:col-span-5 bg-surface-container/95 rounded-lg shadow-2xl relative overflow-hidden flex flex-col justify-between group">
+<!-- Piltover sapphire and gilded glow -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -left-24 w-64 h-64 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="p-6 relative z-10 flex flex-col h-full">
+<!-- Champion Header Info -->
+<div class="flex items-center justify-between pb-4">
+<div>
+<span class="font-label-sm text-primary uppercase tracking-widest text-xs flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Nasprotni Tabor // Piltover
+              </span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide font-bold mt-0.5">Caitlyn</h3>
+<p class="font-body-md text-on-surface-variant text-xs italic">Piltoverska Ostrostrelka</p>
+</div>
+<!-- Champion Level and Piltover Crest -->
+<div class="text-right flex flex-col items-end">
+<span class="font-label-lg text-primary text-base">LVL 10</span>
+<span class="font-label-sm text-xs text-primary-fixed bg-surface-container-highest px-2 py-0.5 rounded-sm">Enforcer Lead</span>
+</div>
+</div>
+<!-- Champion Portrait & Spells Layout -->
+<div class="relative w-full h-56 rounded-md overflow-hidden my-4 shadow-xl">
+<img class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" data-alt="Official League of Legends splash style art of Caitlyn the Sheriff of Piltover, refined aristocratic steampunk attire, high collar coat with gilded brass accents, holding her precision hextech sniper rifle, aiming with cyan optical lens sight, golden hour Piltover high towers background, crisp tactical MOBA champion art." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC85czQHOvuyDHTJG-LRfLKB3TMHpiDgNJi_HjENH92JlTbl17kWpNaX4uKmlThjhdzgIxSqGya8b3gzDMnA8r-VHrQ_0PTAnrzLCht071X9-K2lLiJWDel3GthDMPNtimHuV3JOvAUkqEbqh7EY2bGHU-CGav0MUqpSMK9Km012ihGY4WzggdRSHOgcnJIhIf3UZVSuN6HRaeEEYQPTTW43_mX8f0QUdqZ0CijTIfbWudDH8iesrL4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/30 to-transparent"></div>
+<!-- Floating Keystones & Spells overlay -->
+<div class="absolute bottom-3 left-3 flex items-center gap-2">
+<div class="w-10 h-10 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-lg" title="Fleet Footwork">
+<span class="material-symbols-outlined text-primary text-xl">directions_run</span>
+</div>
+<div class="w-8 h-8 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-md opacity-50" title="Flash - Na ohladitvi">
+<span class="material-symbols-outlined text-error text-sm">flash_off</span>
+</div>
+<div class="w-8 h-8 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-md" title="Cleanse">
+<span class="material-symbols-outlined text-secondary-fixed text-sm">flare</span>
+</div>
+<span class="bg-surface-container-lowest/90 px-2 py-1 text-error font-label-sm text-xs rounded-sm">Flash: CD (16:10)</span>
+</div>
+</div>
+<!-- Key Combat Statistics Table -->
+<div class="grid grid-cols-3 gap-2.5 my-3 text-center">
+<div class="bg-surface-container-low p-2.5 rounded-sm shadow-inner">
+<span class="font-label-sm text-xs text-on-surface-variant uppercase block">CS@10 min</span>
+<span class="font-label-lg text-sm text-on-surface font-bold">68 <span class="text-xs text-error">(-6.8)</span></span>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-sm shadow-inner">
+<span class="font-label-sm text-xs text-on-surface-variant uppercase block">Doseg Napada</span>
+<span class="font-label-lg text-sm text-primary font-bold">650 px</span>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-sm shadow-inner">
+<span class="font-label-sm text-xs text-on-surface-variant uppercase block">Oprema</span>
+<span class="font-label-lg text-sm text-on-surface font-bold">Stormrazor</span>
+</div>
+</div>
+<!-- Active Arsenal and Warning Note -->
+<div class="mt-auto bg-surface-container-low p-3.5 rounded-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-xs text-error uppercase font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs">warning</span>
+                Yordle Snap Trap Nevarnost
+              </span>
+<span class="font-label-sm text-xs text-primary">Doran's + Stormrazor</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+              Previdno pri premikanju v rečni grm; tri pasti tvorijo trikotno zaporo, ki onemogoča pobeg pred Piltover Peacemaker (Q).
+            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- DEEP MATCHUP BREAKDOWN (3 COLUMNS BENTO TILES) -->
+<section class="w-full mb-12">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rotate-45 bg-primary"></span>
+<h3 class="font-headline-sm text-headline-sm text-primary uppercase tracking-wide">
+          Analitični Razdelilnik Dvoboja
+        </h3>
+</div>
+<span class="font-label-sm text-xs text-on-surface-variant hidden sm:inline-block">PROTOKOL ŠT. 842-HEX</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- CARD 1: ČASOVNICA SKOKOV MOČI (POWER SPIKE TIMELINE) -->
+<div class="bg-surface-container rounded-lg p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-sm bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">timeline</span>
+</div>
+<h4 class="font-headline-sm text-title-md text-on-surface uppercase">Časovnica Skokov Moči</h4>
+</div>
+<span class="font-label-sm text-xs text-primary">30 MIN FOKUS</span>
+</div>
+<!-- Timeline Phases -->
+<div class="space-y-4 my-4">
+<div class="p-3 bg-surface-container-low rounded-sm">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-sm text-xs text-primary uppercase font-bold">Raven 1 - 3 // Caitlyn Nadzor</span>
+<span class="font-label-sm text-xs text-error font-bold">Nevarno</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Caitlyn dominira z dosegom 650. Ne trgujte na slepo. Uporabite Pow-Pow za hitro pospravljanje zavezniških minionov.
+            </p>
+</div>
+<div class="p-3 bg-surface-container-low rounded-sm">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-sm text-xs text-secondary-fixed uppercase font-bold">Raven 6 // Super Mega Raketa</span>
+<span class="font-label-sm text-xs text-secondary font-bold">Globalni Pritisk</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Jinx odklene zaključni udarec (R). Caitlyn z manj kot 35% zdravja je v neposredni življenjski nevarnosti tudi pod stolpom.
+            </p>
+</div>
+<div class="p-3 bg-surface-container-low rounded-sm">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-sm text-xs text-primary uppercase font-bold">Raven 9+ // Kraken Preobrat</span>
+<span class="font-label-sm text-xs text-primary font-bold">Premoč Jinx</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Z nakupom Kraken Slayerja in aktiviranim pasivnim 'Get Excited!' Jinx prevzame DPS dvoboj v odprtem terenu.
+            </p>
+</div>
+</div>
+<!-- Win Probability Sparkline Visualization -->
+<div class="mt-2 pt-3">
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase mb-2 block">Krivulja verjetnosti zmage Jinx (0 - 30 min)</span>
+<svg class="w-full h-12 text-secondary overflow-visible" fill="none" viewbox="0 0 300 60">
+<!-- Grid Lines -->
+<line stroke="#785a28" stroke-dasharray="3 3" stroke-opacity="0.3" x1="0" x2="300" y1="30" y2="30"></line>
+<!-- Arcane Curve -->
+<path d="M 0 50 Q 50 48, 100 45 T 180 32 T 240 18 T 300 10" stroke="currentColor" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Fill Gradient under curve -->
+<path d="M 0 50 Q 50 48, 100 45 T 180 32 T 240 18 T 300 10 L 300 60 L 0 60 Z" fill="currentColor" fill-opacity="0.08"></path>
+<!-- Checkpoints -->
+<circle cx="100" cy="45" fill="#c89b3c" r="3.5"></circle>
+<circle cx="180" cy="32" fill="#43e2d2" r="3.5"></circle>
+<circle class="animate-pulse" cx="300" cy="10" fill="#43e2d2" r="4.5"></circle>
+</svg>
+<div class="flex justify-between font-label-sm text-[10px] text-on-surface-variant mt-1">
+<span>0m (42%)</span>
+<span>15m (52%)</span>
+<span>30m+ (68%)</span>
+</div>
+</div>
+</div>
+<!-- CARD 2: TAKTIKA IZMENJAVE UDARCEV (TRADING PATTERNS) -->
+<div class="bg-surface-container rounded-lg p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-sm bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-lg">swords</span>
+</div>
+<h4 class="font-headline-sm text-title-md text-on-surface uppercase">Taktika Izmenjave</h4>
+</div>
+<span class="font-label-sm text-xs text-secondary-fixed">MEHANIKA</span>
+</div>
+<div class="space-y-3.5 my-3">
+<div class="bg-surface-container-low p-3 rounded-sm">
+<span class="font-label-sm text-xs text-primary uppercase font-bold flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-xs text-secondary">check_circle</span>
+              Izogibanje 90 Caliber Net (E)
+            </span>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Caitlyne-in E je njen edini pobeg. Ko ga sproži, steče 390 enot nazaj. Napadajte takoj po njeni zgrešeni mreži, saj ostane popolnoma brez mobilnosti za 16 sekund.
+            </p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-sm">
+<span class="font-label-sm text-xs text-primary uppercase font-bold flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-xs text-secondary">check_circle</span>
+              Zaščita z Minioni pred Piltover Peacemaker (Q)
+            </span>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Škoda izstrelka Q se zmanjša za do 40% po prehodu skozi tarče. Vedno stojte za 'melee' minioni za zmanjšanje prejete škode.
+            </p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-sm">
+<span class="font-label-sm text-xs text-tertiary-fixed uppercase font-bold flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-xs text-tertiary">alt_route</span>
+              Flame Chompers (E) Protinapad
+            </span>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Če Caitlyn uporabi svojo ultimatno sposobnost (Ace in the Hole), postavite Chompers tik pred njenega zaščitnika, da preprečite prekinitev zavezniškega ščita.
+            </p>
+</div>
+</div>
+<!-- Damage Ratio Pill -->
+<div class="mt-auto bg-surface-container-high/60 p-3 rounded-sm flex items-center justify-between">
+<span class="font-label-sm text-xs text-on-surface">Razmerje škode v 4s dvoboju:</span>
+<span class="font-label-lg text-xs text-primary font-bold">1,240 (J) vs 1,180 (C)</span>
+</div>
+</div>
+<!-- CARD 3: MREŽA PODPORNIKOV (SUPPORT SYNERGY) -->
+<div class="bg-surface-container rounded-lg p-6 shadow-xl flex flex-col justify-between relative overflow-hidden md:col-span-2 xl:col-span-1">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-sm bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-lg">supervisor_account</span>
+</div>
+<h4 class="font-headline-sm text-title-md text-on-surface uppercase">Mreža Podpornikov</h4>
+</div>
+<span class="font-label-sm text-xs text-tertiary-fixed">SINERGIJA</span>
+</div>
+<!-- Synergy Comparison Cards -->
+<div class="space-y-4 my-3">
+<div class="p-3 bg-surface-container-low rounded-sm">
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-sm text-xs text-secondary-fixed uppercase font-bold">Zavezništvo: Jinx + Lulu</span>
+<span class="font-label-sm text-[10px] bg-secondary/15 text-secondary px-2 py-0.5 rounded-sm">S-TIER HIPER</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant">
+<strong class="text-on-surface">Polymorph (W)</strong> popolnoma onemogoči Caitlyne-in doseg, medtem ko <strong class="text-on-surface">Wild Growth (R)</strong> odbije sovražnika in podvoji Jinxin preživetveni čas v boju.
+            </p>
+</div>
+<div class="p-3 bg-surface-container-low rounded-sm">
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-sm text-xs text-primary-fixed uppercase font-bold">Nevarnost: Caitlyn + Leona</span>
+<span class="font-label-sm text-[10px] bg-error/15 text-error px-2 py-0.5 rounded-sm">LETHAL ENGAGE</span>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Kombinacija Leoninega <strong class="text-on-surface">Zenith Blade</strong> z neposredno Caitlyn pastjo pod nogami pomeni 3.25 sekunde nepremičnosti in garantiran izpad.
+            </p>
+</div>
+<div class="p-3 bg-surface-container-low rounded-sm">
+<span class="font-label-sm text-xs text-primary uppercase font-bold block mb-1">Varnostni Warding Reke ob 02:45</span>
+<p class="font-body-md text-xs text-on-surface-variant">
+              Zaradi zgodnjega pritiska Caitlyn je nujno postaviti Control Ward v spodnji rečni tri-bush pred 3. minuto, ko sovražni džungler konča svojo pot.
+            </p>
+</div>
+</div>
+<div class="mt-auto bg-surface-container-high/60 p-3 rounded-sm flex items-center justify-between">
+<span class="font-label-sm text-xs text-on-surface">Vpliv Podpornika na Zmago:</span>
+<span class="font-label-lg text-xs text-secondary font-bold">+21.3% ob Lulu ščitu</span>
+</div>
+</div>
+</div>
+</section>
+<!-- HEXTECH KOVNICA OPREME (ITEMIZATION ADAPTATION) -->
+<section class="w-full mb-12 bg-surface-container rounded-lg p-6 sm:p-8 shadow-2xl relative">
+<div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-8 pb-4">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">hardware</span>
+<h3 class="font-headline-lg text-headline-sm text-primary uppercase tracking-wide">
+            Hextech Kovnica: Prilagoditev Opreme za Jinx
+          </h3>
+</div>
+<p class="font-body-md text-xs sm:text-sm text-on-surface-variant mt-1">
+          Optimizirana zaporedja nakupov v zavezniški bazi proti kompoziciji s Caitlyn in visokim dosegom.
+        </p>
+</div>
+<!-- Recall Reminder Pill -->
+<div class="bg-surface-container-lowest px-4 py-2 rounded-sm shadow-md flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-base animate-pulse">timer</span>
+<div>
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase block">Načrtovana vrnitev (Back Timing)</span>
+<span class="font-label-sm text-xs text-secondary-fixed font-bold">Naslednji nakup: Recurve Bow (700g) pred zmajem ob 13:00</span>
+</div>
+</div>
+</div>
+<!-- Item Slots Grid & Decision Logic -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Item 1: Kraken Slayer -->
+<div class="bg-surface-container-low p-4 rounded-sm flex flex-col justify-between">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-12 h-12 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-lg relative group">
+<span class="material-symbols-outlined text-secondary text-2xl">cyclone</span>
+<span class="absolute -top-1.5 -right-1.5 bg-primary text-on-primary font-label-sm text-[9px] px-1 rounded-sm font-bold">1. PREDMET</span>
+</div>
+<div>
+<h5 class="font-headline-sm text-sm text-on-surface uppercase font-bold">Kraken Slayer</h5>
+<span class="font-label-sm text-xs text-primary font-bold">3,000g • Končano</span>
+</div>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+          Ključni temelj za Jinx. Tretji zaporedni strel nanese masivno dodatno fizično škodo, kar izniči Caitlynino prednost v zgodnji izmenjavi udarcev.
+        </p>
+<div class="mt-3 pt-2">
+<span class="font-label-sm text-[10px] text-secondary-fixed uppercase">Stanje: V arzenalu</span>
+</div>
+</div>
+<!-- Item 2: Berserker's Greaves -->
+<div class="bg-surface-container-low p-4 rounded-sm flex flex-col justify-between">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-12 h-12 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-lg relative">
+<span class="material-symbols-outlined text-primary text-2xl">sprint</span>
+<span class="absolute -top-1.5 -right-1.5 bg-primary text-on-primary font-label-sm text-[9px] px-1 rounded-sm font-bold">ŠKORNJI</span>
+</div>
+<div>
+<h5 class="font-headline-sm text-sm text-on-surface uppercase font-bold">Berserker's</h5>
+<span class="font-label-sm text-xs text-primary font-bold">1,100g • Končano</span>
+</div>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+          +35% hitrosti napada in +45 hitrosti premikanja. Nujno potrebno za kiting in izmikanje Leoninim usmerjenim kletkam in pastem.
+        </p>
+<div class="mt-3 pt-2">
+<span class="font-label-sm text-[10px] text-secondary-fixed uppercase">Stanje: V arzenalu</span>
+</div>
+</div>
+<!-- Item 3: Infinity Edge vs Mortal Reminder -->
+<div class="bg-surface-container-low p-4 rounded-sm flex flex-col justify-between">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-12 h-12 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-lg relative">
+<span class="material-symbols-outlined text-primary text-2xl">colorize</span>
+<span class="absolute -top-1.5 -right-1.5 bg-secondary text-on-secondary font-label-sm text-[9px] px-1 rounded-sm font-bold">ODLOČITEV</span>
+</div>
+<div>
+<h5 class="font-headline-sm text-sm text-on-surface uppercase font-bold">Mortal Reminder</h5>
+<span class="font-label-sm text-xs text-primary font-bold">3,000g • V teku</span>
+</div>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+          Proti Leoninemu zdravljenju in Ocean Drakom izberite Mortal Reminder. Če nasprotniki nimajo regeneracije, nadaljujte neposredno v Infinity Edge.
+        </p>
+<div class="mt-3 pt-2">
+<span class="font-label-sm text-[10px] text-primary uppercase">Priporočeno: 70% tekem</span>
+</div>
+</div>
+<!-- Item 4: Rapid Firecannon -->
+<div class="bg-surface-container-low p-4 rounded-sm flex flex-col justify-between">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-12 h-12 rounded-sm bg-surface-container-lowest flex items-center justify-center shadow-lg relative">
+<span class="material-symbols-outlined text-secondary text-2xl">adjust</span>
+<span class="absolute -top-1.5 -right-1.5 bg-outline-variant text-on-surface font-label-sm text-[9px] px-1 rounded-sm font-bold">POZNA IGRA</span>
+</div>
+<div>
+<h5 class="font-headline-sm text-sm text-on-surface uppercase font-bold">Rapid Firecannon</h5>
+<span class="font-label-sm text-xs text-primary font-bold">3,000g • Načrtovano</span>
+</div>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant leading-relaxed">
+          Poveča doseg Fishbones za dodatnih 35%, s čimer Jinx preseže Caitlynin pasivni doseg in varno sproži prvi udarec v skupinskih bojih.
+        </p>
+<div class="mt-3 pt-2">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase">Rezervirano: 4. reža</span>
+</div>
+</div>
+</div>
+</section>
+<!-- PROTOCOL FOOTER SEAL -->
+<section class="w-full mt-4 mb-2 p-5 bg-surface-container-low/60 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">token</span>
+</div>
+<div>
+<span class="font-headline-sm text-xs text-primary uppercase tracking-widest font-bold">Hextech Arcana Arhivski Protokol</span>
+<p class="font-body-md text-[11px] text-on-surface-variant">Sinhronizirano z Riot Games API v4.12 • EUNE Regija • Podatki posodobljeni pred 3 minutami</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-1.5 bg-surface-container-highest hover:bg-surface-container text-primary font-label-sm text-xs uppercase rounded-sm transition-colors" type="button">
+        Naloži ponovitev dvoboja (.rofl)
+      </button>
+<button class="px-3.5 py-1.5 bg-primary text-on-primary font-label-sm text-xs uppercase font-bold rounded-sm shadow-md hover:bg-primary-container transition-colors" type="button">
+        Začni Vaje na Trening Poligonu
+      </button>
+</div>
+</section>
+</div></main>
+<!-- Piltover Archival Footer -->
+<footer class="w-full bg-[#03070e] border-t border-[#785a28]/40 mt-auto relative z-10">
+<div class="max-w-[1440px] mx-auto px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+<p class="font-body-sm text-xs text-[#8e826e] max-w-4xl leading-relaxed">
+      RiftSense ni podprt s strani Riot Games in ne odraža stališč ali mnenj Riot Games ali kogarkoli, ki je uradno vključen v proizvodnjo ali upravljanje Riot Games lastnine. Riot Games in vse povezane lastnine so blagovne znamke ali registrirane blagovne znamke Riot Games, Inc.
+    </p>
+<div class="flex items-center gap-2 text-primary/70 shrink-0">
+<span class="material-symbols-outlined text-[15px]">auto_awesome</span>
+<span class="font-headline-sm text-xs uppercase tracking-widest text-[#eed8ae]">Hextech Engine 4.2</span>
+</div>
+</div>
+</footer>
+</body></html>

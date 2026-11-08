@@ -20,6 +20,7 @@ Podatki izključno iz uradnega **Riot Games API** in **Data Dragon**.
 backend/    FastAPI API, Celery delavci, ML modul
 frontend/   Next.js aplikacija
 docs/       zasnova, uporabniške zgodbe, wireframes, ADR
+design/     HTML koncepti zaslonov (vizualni stil)
 ```
 
 ## Lokalni zagon
