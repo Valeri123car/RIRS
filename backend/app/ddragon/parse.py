@@ -7,7 +7,7 @@ champion_overrides.json. Administrator jih lahko kasneje ureja (US-14).
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -35,6 +35,8 @@ MAX_ITEM_ID = 10_000
 
 ITEM_TAG_ALIASES = {"ArmorPenetration": "armor_pen", "MagicPenetration": "magic_pen"}
 ANTI_HEAL_PATTERN = re.compile(r"\bWounds\b")
+# Predmeti s temi oznakami niso del "dokončanega" builda (US-04).
+NOT_COMPLETED_TAGS = frozenset({"Boots", "Consumable", "Trinket"})
 
 
 @dataclass(frozen=True)
@@ -44,6 +46,7 @@ class ChampionData:
     name: str
     damage_profile: DamageProfile
     ratings: dict[str, int]
+    classes: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -52,6 +55,7 @@ class ItemData:
     name: str
     cost: int
     tags: list[str]
+    completed: bool = False
 
 
 @cache
@@ -85,6 +89,7 @@ def _parse_champion(raw: dict[str, Any], override: dict[str, int]) -> ChampionDa
         name=raw["name"],
         damage_profile=_damage_profile(raw["info"]),
         ratings=ratings,
+        classes=list(raw.get("tags", [])),
     )
 
 
@@ -105,10 +110,20 @@ def parse_items(data: dict[str, dict[str, Any]]) -> list[ItemData]:
             name=raw["name"],
             cost=raw["gold"]["total"],
             tags=_item_tags(raw),
+            completed=_is_completed(raw),
         )
         for item_id, raw in data.items()
         if _is_summoners_rift_item(int(item_id), raw)
     ]
+
+
+def _is_completed(raw: dict[str, Any]) -> bool:
+    """Dokončan je predmet, ki je sestavljen iz drugih in se ne gradi naprej (brez čevljev)."""
+    return (
+        bool(raw.get("from"))
+        and not raw.get("into")
+        and not NOT_COMPLETED_TAGS.intersection(raw.get("tags", []))
+    )
 
 
 def _is_summoners_rift_item(item_id: int, raw: dict[str, Any]) -> bool:

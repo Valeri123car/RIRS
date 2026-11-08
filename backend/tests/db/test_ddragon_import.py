@@ -11,8 +11,10 @@ from app.models.item import Item
 
 # Visoki ID-ji, da se testi ne prekrivajo z morebiti že uvoženimi podatki.
 RATINGS = {"cc": 1, "healing": 3, "engage": 0, "burst": 1, "tank": 0, "poke": 0}
-SORAKA = ChampionData(9016, "TestSoraka", "Soraka", DamageProfile.MAGIC, RATINGS)
-REMINDER = ItemData(9033, "Mortal Reminder", 3000, ["anti_heal", "armor_pen"])
+SORAKA = ChampionData(
+    9016, "TestSoraka", "Soraka", DamageProfile.MAGIC, RATINGS, ["Support", "Mage"]
+)
+REMINDER = ItemData(9033, "Mortal Reminder", 3000, ["anti_heal", "armor_pen"], completed=True)
 
 
 def test_prvi_uvoz_ustvari_zapise_z_atributi(db):
@@ -63,6 +65,20 @@ def test_uvoz_ne_povozi_rocno_urejenih_ocen_in_oznak(db):
     assert result.champions.unchanged == result.items.unchanged == 1
     assert db.get(Champion, 9016).healing == 2
     assert db.get(Item, 9033).tags == ["anti_heal"]
+
+
+def test_uvoz_shrani_in_posodobi_razrede_in_dokoncanost(db):
+    import_static_data(db, [SORAKA], [REMINDER])
+    assert db.get(Champion, 9016).classes == ["Support", "Mage"]
+    assert db.get(Item, 9033).completed is True
+
+    result = import_static_data(
+        db, [replace(SORAKA, classes=["Support"])], [replace(REMINDER, completed=False)]
+    )
+
+    assert (result.champions.updated, result.items.updated) == (1, 1)
+    assert db.get(Champion, 9016).classes == ["Support"]
+    assert db.get(Item, 9033).completed is False
 
 
 def fake_data_dragon() -> DataDragonClient:

@@ -1,8 +1,8 @@
 """Vpis šampionov in predmetov v bazo (upsert) s štetjem novih in spremenjenih zapisov.
 
 Nov zapis dobi vse podatke, tudi izpeljane ocene in oznake. Pri obstoječem se posodobijo
-samo podatki, ki jih določa Riot (ime, cena ...); ocene šampionov in oznake predmetov ureja
-administrator (US-14), zato jih ponovni uvoz ne povozi.
+samo podatki, ki jih določa Riot (ime, cena, razredi, dokončanost); ocene šampionov in oznake
+predmetov ureja administrator (US-14), zato jih ponovni uvoz ne povozi.
 """
 
 from dataclasses import dataclass, field
@@ -44,21 +44,32 @@ def import_static_data(
                     slug=data.slug,
                     name=data.name,
                     damage_profile=data.damage_profile,
+                    classes=data.classes,
                     **data.ratings,
                 )
             )
             result.champions.created += 1
         else:
-            _count(result.champions, _apply(champion, slug=data.slug, name=data.name))
+            changed = _apply(champion, slug=data.slug, name=data.name, classes=data.classes)
+            _count(result.champions, changed)
 
     existing_items = _by_id(session, Item, [i.id for i in items])
     for data in items:
         item = existing_items.get(data.id)
         if item is None:
-            session.add(Item(id=data.id, name=data.name, cost=data.cost, tags=data.tags))
+            session.add(
+                Item(
+                    id=data.id,
+                    name=data.name,
+                    cost=data.cost,
+                    tags=data.tags,
+                    completed=data.completed,
+                )
+            )
             result.items.created += 1
         else:
-            _count(result.items, _apply(item, name=data.name, cost=data.cost))
+            changed = _apply(item, name=data.name, cost=data.cost, completed=data.completed)
+            _count(result.items, changed)
 
     session.flush()
     return result

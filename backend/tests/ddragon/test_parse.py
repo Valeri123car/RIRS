@@ -54,6 +54,14 @@ def test_glavna_oznaka_tank_da_visjo_oceno_kot_stranska():
     assert tank == {"Malphite": 3, "Darius": 2}
 
 
+def test_sampion_ohrani_riotove_razrede_po_vrsti():
+    [malphite] = parse_champions(
+        {"Malphite": champion("Malphite", "54", tags=("Tank", "Fighter"))}, overrides={}
+    )
+
+    assert malphite.classes == ["Tank", "Fighter"]
+
+
 def test_atentator_ima_visok_burst():
     [zed] = parse_champions({"Zed": champion("Zed", "238", tags=("Assassin",))}, overrides={})
 
@@ -103,6 +111,27 @@ def test_grievous_wounds_v_opisu_pomeni_anti_heal():
     [parsed] = parse_items({"3075": item("Thornmail", description=description)})
 
     assert "anti_heal" in parsed.tags
+
+
+def test_predmet_iz_sestavin_brez_nadgradnje_je_dokoncan():
+    [parsed] = parse_items({"3033": item(**{"from": ["3035", "1037"]})})
+
+    assert parsed.completed is True
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        item("Long Sword", total=350),
+        item("Last Whisper", total=1450, **{"from": ["1036"], "into": ["3033"]}),
+        item("Berserker's Greaves", tags=("Boots",), **{"from": ["1001"]}),
+        item("Elixir of Iron", tags=("Consumable",)),
+    ],
+)
+def test_sestavine_cevlji_in_potrosni_predmeti_niso_dokoncani(raw):
+    [parsed] = parse_items({"3001": raw})
+
+    assert parsed.completed is False
 
 
 @pytest.mark.parametrize(

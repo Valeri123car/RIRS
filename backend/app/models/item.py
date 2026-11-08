@@ -17,3 +17,5 @@ class Item(TimestampMixin, Base):
     cost: Mapped[int] = mapped_column(default=0, server_default="0")
     # Oznake, npr. ["anti_heal", "armor_pen"].
     tags: Mapped[list[str]] = mapped_column(ARRAY(String(32)), default=list, server_default="{}")
+    # Dokončan predmet (legendarni): sestavljen iz drugih in se ne nadgrajuje naprej.
+    completed: Mapped[bool] = mapped_column(default=False, server_default="false")
