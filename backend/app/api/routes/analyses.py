@@ -37,6 +37,8 @@ class AnalysisOut(BaseModel):
     participants: list[dict[str, Any]]
     # Profil nasprotne sestave (US-03); None, dokler korak profiliranja ni končan.
     enemy_comp: dict[str, Any] | None
+    # Priporočilo builda (US-04); None, dokler korak ni končan ali če šampiona ni v bazi.
+    recommendation: dict[str, Any] | None
     created_at: datetime
 
 

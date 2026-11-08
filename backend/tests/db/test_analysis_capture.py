@@ -1,6 +1,9 @@
+from sqlalchemy import delete
+
 from app.analysis.capture import capture_active_game
 from app.analysis.pipeline import run_analysis
 from app.models.champion import Champion
+from app.models.item import Item
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
 from app.riot.errors import RiotUnavailableError
 from app.riot.fixture_client import FixtureRiotClient
@@ -77,6 +80,7 @@ def test_analiza_obvesti_o_vsakem_koraku(db):
     assert statuses == [
         AnalysisStatus.CAPTURING,
         AnalysisStatus.PROFILING,
+        AnalysisStatus.RECOMMENDING,
         AnalysisStatus.COMPLETED,
     ]
 
@@ -113,3 +117,43 @@ def test_neuspel_zajem_nima_profila(db):
     db.refresh(analysis)
     assert analysis.status == AnalysisStatus.NOT_IN_GAME
     assert analysis.enemy_comp is None
+    assert analysis.recommendation is None
+
+
+def add_marksman_items(db):
+    # Visoki ID-ji, da se ne prekrivajo z uvoženimi predmeti Data Dragon.
+    for item_id, name, tags in [
+        (9031, "Test Infinity Edge", ["critical_strike", "damage"]),
+        (9072, "Test Bloodthirster", ["damage", "life_steal"]),
+        (9046, "Test Phantom Dancer", ["attack_speed", "critical_strike"]),
+        (9036, "Test Lord Dominik's", ["armor_pen", "critical_strike", "damage"]),
+        (9139, "Test Mercurial", ["damage", "spell_block", "tenacity"]),
+        (9026, "Test Guardian Angel", ["armor", "damage"]),
+    ]:
+        db.merge(Item(id=item_id, name=name, cost=3000, tags=tags, completed=True))
+
+
+def test_analiza_priporoci_build_po_pravilih(db):
+    db.merge(Champion(id=222, slug="Jinx", name="Jinx", classes=["Marksman"]))
+    add_marksman_items(db)
+    analysis = new_analysis(db)
+
+    run_analysis(db, FixtureRiotClient(), analysis.id)
+
+    db.refresh(analysis)
+    recommendation = analysis.recommendation
+    assert recommendation["source"] == "rules"
+    assert recommendation["label"] == "Priporočilo na podlagi pravil"
+    assert recommendation["champion"] == {"id": 222, "name": "Jinx"}
+    assert 2 <= len(recommendation["variants"]) <= 3
+
+
+def test_brez_sampiona_v_bazi_znanja_analiza_konca_brez_priporocila(db):
+    db.execute(delete(Champion).where(Champion.id == 222))
+    analysis = new_analysis(db)
+
+    run_analysis(db, FixtureRiotClient(), analysis.id)
+
+    db.refresh(analysis)
+    assert analysis.status == AnalysisStatus.COMPLETED
+    assert analysis.recommendation is None

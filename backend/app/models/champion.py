@@ -2,7 +2,7 @@ import enum
 from typing import Any
 
 from sqlalchemy import CheckConstraint, Enum, SmallInteger, String
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, TimestampMixin, enum_values
@@ -42,6 +42,8 @@ class Champion(TimestampMixin, Base):
         default=DamageProfile.MIXED,
         server_default=DamageProfile.MIXED.value,
     )
+    # Riotovi razredi po pomembnosti, npr. ["Tank", "Fighter"]; osnova za pravila builda.
+    classes: Mapped[list[str]] = mapped_column(ARRAY(String(16)), default=list, server_default="{}")
 
     cc: Mapped[int] = _rating_column()
     healing: Mapped[int] = _rating_column()
