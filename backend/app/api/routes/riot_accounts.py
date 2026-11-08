@@ -2,14 +2,14 @@
 
 import secrets
 from datetime import UTC, datetime, timedelta
-from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Response, status
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, DbSession, Riot
+from app.api.schemas import RiotIdInput
 from app.models.riot_account import RiotAccount
 from app.models.riot_verification import RiotVerification
 from app.models.user import User
@@ -24,29 +24,9 @@ VERIFICATION_TIME = timedelta(minutes=10)
 # Privzete profilne ikone, ki jih ima vsak račun (ID 0–28).
 DEFAULT_ICON_IDS = range(29)
 
-# Riot: ime 3–16 znakov, oznaka 3–5 znakov.
-GAME_NAME_LENGTH = (3, 16)
-TAG_LINE_LENGTH = (3, 5)
 
-Platform = Literal["eun1", "euw1", "tr1", "ru", "na1", "br1", "la1", "la2", "kr", "jp1"]
-
-
-class VerificationStart(BaseModel):
-    riot_id: str = Field(max_length=32, examples=["Luka#EUNE"])
-    platform: Platform
-
-    @field_validator("riot_id")
-    @classmethod
-    def validate_riot_id(cls, value: str) -> str:
-        game_name, separator, tag_line = value.strip().rpartition("#")
-        game_name, tag_line = game_name.strip(), tag_line.strip()
-        if not separator:
-            raise ValueError("Riot ID mora biti v obliki ime#oznaka.")
-        if not GAME_NAME_LENGTH[0] <= len(game_name) <= GAME_NAME_LENGTH[1]:
-            raise ValueError("Ime mora imeti 3–16 znakov.")
-        if not (TAG_LINE_LENGTH[0] <= len(tag_line) <= TAG_LINE_LENGTH[1] and tag_line.isalnum()):
-            raise ValueError("Oznaka mora imeti 3–5 črk ali številk.")
-        return f"{game_name}#{tag_line}"
+class VerificationStart(RiotIdInput):
+    pass
 
 
 class VerificationOut(BaseModel):
@@ -83,7 +63,7 @@ def riot_unavailable() -> HTTPException:
 def start_verification(
     body: VerificationStart, user: CurrentUser, db: DbSession, riot: Riot
 ) -> VerificationOut:
-    game_name, tag_line = body.riot_id.rsplit("#", 1)
+    game_name, tag_line = body.game_name, body.tag_line
     not_in_region = HTTPException(
         status.HTTP_404_NOT_FOUND,
         f"Igralca s tem Riot ID ni v regiji {PLATFORM_LABELS[body.platform]}",
