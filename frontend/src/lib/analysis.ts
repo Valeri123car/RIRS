@@ -25,6 +25,26 @@ export type Participant = {
   is_target: boolean;
 };
 
+export type ThreatLevel = "medium" | "high" | "very_high";
+
+export type Threat = {
+  key: "healing" | "engage" | "burst" | "cc" | "poke" | "tank";
+  label: string;
+  score: number;
+  level: ThreatLevel;
+  /** Šampioni, ki grožnjo povzročajo (najmočnejši najprej). */
+  champions: string[];
+};
+
+/** Profil nasprotne sestave (US-03). */
+export type EnemyComp = {
+  damage: { physical: number; magic: number };
+  /** Največ 5, razvrščene po moči. */
+  threats: Threat[];
+  champion_count: number;
+  missing_champions: number;
+};
+
 export type Analysis = {
   id: string;
   status: AnalysisStatus;
@@ -33,6 +53,7 @@ export type Analysis = {
   tag_line: string;
   platform: string;
   participants: Participant[];
+  enemy_comp: EnemyComp | null;
   created_at: string;
 };
 
@@ -41,8 +62,8 @@ export const FINAL_STATUSES: AnalysisStatus[] = ["completed", "not_in_game", "fa
 /** Koraki analize v vrstnem redu, kot jih prikazuje stran (US-02). */
 export const ANALYSIS_STEPS = [
   { status: "capturing", label: "Zajem tekme", available: true },
-  // Profiliranje (US-03) in priporočila (US-04) delavec še ne izvaja.
-  { status: "profiling", label: "Profiliranje nasprotnikov", available: false },
+  { status: "profiling", label: "Profiliranje nasprotnikov", available: true },
+  // Priporočil (US-04) delavec še ne izvaja.
   { status: "recommending", label: "Priporočila", available: false },
 ] as const satisfies readonly { status: AnalysisStatus; label: string; available: boolean }[];
 
