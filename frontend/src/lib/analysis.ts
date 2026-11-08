@@ -45,6 +45,28 @@ export type EnemyComp = {
   missing_champions: number;
 };
 
+export type BuildItem = { id: number; name: string; reason: string };
+
+export type BuildVariant = {
+  key: "standard" | "safe" | "aggressive";
+  label: string;
+  runes: { primary_tree: string; keystone: string; secondary_tree: string };
+  /** Dokončani predmeti po vrstnem redu nakupa. */
+  items: BuildItem[];
+  skill_order: { priority: string[]; levels: string[] };
+  /** Neobvezno (model); prikaz od njega ne sme biti odvisen. */
+  score?: number;
+};
+
+/** Priporočilo builda in run (US-04), iz pravil ali modela. */
+export type Recommendation = {
+  source: "rules" | "model";
+  label: string;
+  model_id: number | null;
+  champion: { id: number; name: string };
+  variants: BuildVariant[];
+};
+
 export type Analysis = {
   id: string;
   status: AnalysisStatus;
@@ -54,6 +76,7 @@ export type Analysis = {
   platform: string;
   participants: Participant[];
   enemy_comp: EnemyComp | null;
+  recommendation?: Recommendation | null;
   created_at: string;
 };
 
@@ -63,8 +86,7 @@ export const FINAL_STATUSES: AnalysisStatus[] = ["completed", "not_in_game", "fa
 export const ANALYSIS_STEPS = [
   { status: "capturing", label: "Zajem tekme", available: true },
   { status: "profiling", label: "Profiliranje nasprotnikov", available: true },
-  // Priporočil (US-04) delavec še ne izvaja.
-  { status: "recommending", label: "Priporočila", available: false },
+  { status: "recommending", label: "Priporočila", available: true },
 ] as const satisfies readonly { status: AnalysisStatus; label: string; available: boolean }[];
 
 export type StepState = "done" | "active" | "waiting" | "unavailable" | "stopped";
@@ -120,6 +142,10 @@ export function useAnalysisProgress(id: string): ProgressState {
   }, [id]);
 
   return state;
+}
+
+export function itemIconUrl(version: string, itemId: number): string {
+  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`;
 }
 
 export function championIconUrl(version: string, slug: string): string {
