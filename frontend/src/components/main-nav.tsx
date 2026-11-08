@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
 type NavItem = {
   label: string;
@@ -19,9 +20,23 @@ const NAV_ITEMS: NavItem[] = [
 
 const BASE = "py-2 font-headline text-sm uppercase tracking-widest transition-colors";
 
+/**
+ * Glavni meni. usePathname je pri dinamičnih poteh (npr. /analiza/[id]) znan šele ob zahtevi,
+ * zato je v Suspense; med predupodabljanjem se prikaže isti meni brez označene aktivne strani.
+ */
 export function MainNav() {
-  const pathname = usePathname();
+  return (
+    <Suspense fallback={<NavLinks pathname={null} />}>
+      <CurrentNav />
+    </Suspense>
+  );
+}
 
+function CurrentNav() {
+  return <NavLinks pathname={usePathname()} />;
+}
+
+function NavLinks({ pathname }: { pathname: string | null }) {
   return (
     <nav className="hidden items-center gap-6 md:flex">
       {NAV_ITEMS.map((item) => {

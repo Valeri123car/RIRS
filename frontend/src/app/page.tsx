@@ -1,3 +1,4 @@
+import { StartAnalysisForm } from "@/components/analysis/start-analysis-form";
 import { Panel } from "@/components/ui/panel";
 
 const FEATURES = [
@@ -33,6 +34,13 @@ export default function HomePage() {
           linijsko fazo.
         </p>
       </section>
+
+      <Panel title="Nova analiza" className="max-w-2xl">
+        <StartAnalysisForm />
+        <p className="text-xs text-muted">
+          Brez prijave lahko na dan zaženeš 3 analize. Igralec mora biti v aktivni tekmi.
+        </p>
+      </Panel>
 
       <div className="grid gap-5 md:grid-cols-3">
         {FEATURES.map((feature) => (
