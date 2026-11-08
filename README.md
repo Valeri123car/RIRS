@@ -30,13 +30,19 @@ Predpogoji: Docker + Docker Compose, (opcijsko) Riot API ključ z [developer.rio
 ```bash
 git clone https://github.com/Valeri123car/RIRS.git
 cd RIRS
-cp .env.example .env        # vpiši RIOT_API_KEY ali nastavi RIOT_API_MODE=fixtures
+cp .env.example .env        # po potrebi vpiši RIOT_API_KEY
 docker compose up -d --build
-docker compose exec api alembic upgrade head
 ```
 
-- Frontend: http://localhost:3000
-- API dokumentacija: http://localhost:8989/docs
+| Storitev | Naslov |
+|---|---|
+| Frontend | http://localhost:3000 |
+| API dokumentacija | http://localhost:8989/docs |
+| PostgreSQL | localhost:5432 |
+| Redis | localhost:6379 |
+
+Če je kateri od portov zaseden, ga spremeni v `.env` (`FRONTEND_PORT`, `API_PORT`, `POSTGRES_PORT`, `REDIS_PORT`).
+Ustavitev: `docker compose down` (z `-v` se izbriše tudi baza).
 
 `RIOT_API_MODE=fixtures` uporablja posnete Riot odgovore, zato aplikacija deluje tudi brez ključa.
 
