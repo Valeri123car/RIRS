@@ -13,9 +13,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_riot_client
 from app.core.config import Settings, get_settings
 from app.db.session import get_db
 from app.main import create_app
+from app.riot.fixture_client import FixtureRiotClient
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 
@@ -49,5 +51,14 @@ def api(db: Session) -> Iterator[TestClient]:
     app.dependency_overrides[get_settings] = lambda: Settings(
         _env_file=None, jwt_secret=TEST_JWT_SECRET
     )
+    app.dependency_overrides[get_riot_client] = FixtureRiotClient
     with TestClient(app) as client:
         yield client
+
+
+def auth_headers(api: TestClient, email: str = "igralec@example.com") -> dict[str, str]:
+    """Registrira in prijavi uporabnika; vrne glavo z dostopnim žetonom."""
+    credentials = {"email": email, "password": "dolgo-geslo-123"}
+    api.post("/auth/register", json=credentials)
+    token = api.post("/auth/login", json=credentials).json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}

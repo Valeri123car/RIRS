@@ -26,3 +26,18 @@ def region_for(platform: str) -> str:
         return PLATFORM_TO_REGION[platform]
     except KeyError:
         raise InvalidPlatformError(f"Nepodprta platforma: {platform!r}") from None
+
+
+# Ime regije, kot ga pozna igralec (prikaz v sporočilih in izbirniku).
+PLATFORM_LABELS: dict[str, str] = {
+    "eun1": "EUNE",
+    "euw1": "EUW",
+    "tr1": "TR",
+    "ru": "RU",
+    "na1": "NA",
+    "br1": "BR",
+    "la1": "LAN",
+    "la2": "LAS",
+    "kr": "KR",
+    "jp1": "JP",
+}
