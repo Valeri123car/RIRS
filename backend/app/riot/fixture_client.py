@@ -17,6 +17,14 @@ from app.riot.platforms import region_for
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
+# Ikone, "nastavljene" med razvojem (simulacija zamenjave ikone pri verifikaciji, US-01).
+# Na ravni modula, ker FastAPI odvisnost lahko ustvari več primerkov klienta.
+_profile_icons: dict[str, int] = {}
+
+
+def reset_profile_icons() -> None:
+    _profile_icons.clear()
+
 
 @cache
 def _load(name: str) -> Any:
@@ -40,7 +48,16 @@ class FixtureRiotClient:
         region_for(platform)
         if self._platform_of(puuid) != platform:
             raise RiotNotFoundError("Igralca ni na tej platformi")
-        return Summoner.model_validate(_load("summoners.json")[puuid])
+        summoner = Summoner.model_validate(_load("summoners.json")[puuid])
+        if puuid in _profile_icons:
+            summoner = summoner.model_copy(update={"profile_icon_id": _profile_icons[puuid]})
+        return summoner
+
+    def set_profile_icon(self, puuid: str, icon_id: int) -> None:
+        """Samo za način fixtures: simulira, da je igralec v odjemalcu zamenjal ikono."""
+        if self._platform_of(puuid) is None:
+            raise RiotNotFoundError("Ni igralca")
+        _profile_icons[puuid] = icon_id
 
     def get_active_game(self, puuid: str, platform: str) -> ActiveGame | None:
         region_for(platform)
