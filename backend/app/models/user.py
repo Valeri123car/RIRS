@@ -43,4 +43,7 @@ class User(TimestampMixin, Base):
         server_default=ExplanationLevel.INTERMEDIATE.value,
     )
 
+    # Povečanje (ob odjavi) prekliče vse prej izdane osvežilne žetone uporabnika.
+    token_version: Mapped[int] = mapped_column(default=0, server_default="0")
+
     riot_accounts: Mapped[list[RiotAccount]] = relationship(back_populates="user")

@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     riot_api_mode: Literal["live", "fixtures"] = "fixtures"
     riot_api_key: SecretStr | None = None
 
+    # Prijava: brez privzete skrivnosti, preveri se ob prvem izdajanju žetona.
+    jwt_secret: SecretStr | None = None
+    access_token_minutes: int = 15
+    refresh_token_days: int = 14
+    # V produkciji (HTTPS) mora biti True, da piškotek ne potuje po HTTP.
+    cookie_secure: bool = False
+
 
 @lru_cache
 def get_settings() -> Settings:

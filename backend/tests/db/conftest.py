@@ -9,8 +9,13 @@ import os
 from collections.abc import Iterator
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+
+from app.core.config import Settings, get_settings
+from app.db.session import get_db
+from app.main import create_app
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 
@@ -31,3 +36,18 @@ def db() -> Iterator[Session]:
             session.close()
             transaction.rollback()
     engine.dispose()
+
+
+TEST_JWT_SECRET = "testna-skrivnost-ki-je-dovolj-dolga-za-hs256"
+
+
+@pytest.fixture
+def api(db: Session) -> Iterator[TestClient]:
+    """Odjemalec API, ki uporablja testno sejo (transakcija se razveljavi) in testno skrivnost."""
+    app = create_app()
+    app.dependency_overrides[get_db] = lambda: db
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        _env_file=None, jwt_secret=TEST_JWT_SECRET
+    )
+    with TestClient(app) as client:
+        yield client
