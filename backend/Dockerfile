@@ -18,6 +18,10 @@ COPY alembic.ini ./
 COPY alembic ./alembic
 COPY app ./app
 
+# Aplikacija ne teče kot root; datoteke ostanejo v lasti roota in so samo za branje.
+RUN useradd --system --no-create-home --uid 10001 app
+USER app
+
 EXPOSE 8989
 # Ob zagonu najprej uveljavi migracije, nato zažene API.
 CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8989"]
