@@ -29,6 +29,8 @@ class RecommendationInput:
     champion: Champion
     enemy_comp: dict[str, Any]
     items: Sequence[Item]
+    # Nasprotni šampioni iz baze znanja (model iz njih izračuna vektor sestave).
+    enemy_champions: Sequence[Champion] = ()
 
 
 class Recommender(Protocol):
