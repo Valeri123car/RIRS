@@ -53,12 +53,18 @@ def token_lifetime(kind: TokenKind, settings: Settings) -> timedelta:
 
 
 def create_token(
-    user_id: int, kind: TokenKind, settings: Settings, *, now: datetime | None = None
+    user_id: int,
+    kind: TokenKind,
+    settings: Settings,
+    *,
+    version: int = 0,
+    now: datetime | None = None,
 ) -> str:
     issued = now or datetime.now(UTC)
     payload = {
         "sub": str(user_id),
         "type": kind,
+        "ver": version,
         "iat": issued,
         "exp": issued + token_lifetime(kind, settings),
     }
@@ -67,6 +73,11 @@ def create_token(
 
 def decode_token(token: str, kind: TokenKind, settings: Settings) -> int:
     """Vrne ID uporabnika ali sproži InvalidTokenError."""
+    return decode_token_with_version(token, kind, settings)[0]
+
+
+def decode_token_with_version(token: str, kind: TokenKind, settings: Settings) -> tuple[int, int]:
+    """Vrne (ID uporabnika, različica žetonov) ali sproži InvalidTokenError."""
     try:
         # algorithms=[ALGORITHM] zavrne nepodpisane žetone ("none") in zamenjavo algoritma.
         payload = jwt.decode(
@@ -77,6 +88,6 @@ def decode_token(token: str, kind: TokenKind, settings: Settings) -> int:
     if payload.get("type") != kind:
         raise InvalidTokenError("Napačna vrsta žetona")
     try:
-        return int(payload["sub"])
-    except ValueError as exc:
+        return int(payload["sub"]), int(payload.get("ver", 0))
+    except (TypeError, ValueError) as exc:
         raise InvalidTokenError("Neveljaven žeton") from exc

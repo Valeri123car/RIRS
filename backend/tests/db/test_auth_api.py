@@ -112,3 +112,14 @@ def test_odjava_izbrise_piskotek(api):
 
     assert response.status_code == 204
     assert api.post("/auth/refresh").status_code == 401
+
+
+def test_odjava_preklice_prej_izdan_osvezilni_zeton(api):
+    register(api)
+    stolen = login(api).cookies["refresh_token"]
+    api.post("/auth/logout")
+
+    api.cookies.set("refresh_token", stolen, path="/auth")
+    response = api.post("/auth/refresh")
+
+    assert response.status_code == 401

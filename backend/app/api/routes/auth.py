@@ -6,13 +6,14 @@ from fastapi import APIRouter, Cookie, HTTPException, Response, status
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from app.api.deps import AppSettings, CurrentUser, DbSession, unauthorized
 from app.core.config import Settings
 from app.core.security import (
     InvalidTokenError,
     create_token,
-    decode_token,
+    decode_token_with_version,
     hash_password,
     token_lifetime,
     verify_password,
@@ -60,7 +61,7 @@ class TokenOut(BaseModel):
 
 
 def _issue_tokens(response: Response, user: User, settings: Settings) -> TokenOut:
-    refresh = create_token(user.id, "refresh", settings)
+    refresh = create_token(user.id, "refresh", settings, version=user.token_version)
     response.set_cookie(
         REFRESH_COOKIE,
         refresh,
@@ -110,17 +111,36 @@ def refresh(
 ) -> TokenOut:
     if not refresh_token:
         raise unauthorized()
-    try:
-        user = db.get(User, decode_token(refresh_token, "refresh", settings))
-    except InvalidTokenError:
-        user = None
+    user = _user_from_refresh_token(db, refresh_token, settings)
     if user is None:
         raise unauthorized("Seja je potekla, prijavi se znova.")
     return _issue_tokens(response, user, settings)
 
 
+def _user_from_refresh_token(db: Session, token: str, settings: Settings) -> User | None:
+    """Uporabnik iz veljavnega osvežilnega žetona, ki ni bil preklican z odjavo."""
+    try:
+        user_id, version = decode_token_with_version(token, "refresh", settings)
+    except InvalidTokenError:
+        return None
+    user = db.get(User, user_id)
+    if user is None or user.token_version != version:
+        return None
+    return user
+
+
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-def logout(response: Response, settings: AppSettings) -> None:
+def logout(
+    response: Response,
+    db: DbSession,
+    settings: AppSettings,
+    refresh_token: Annotated[str | None, Cookie()] = None,
+) -> None:
+    # Prekliče vse osvežilne žetone uporabnika (tudi morebiti ukradene kopije piškotka).
+    user = _user_from_refresh_token(db, refresh_token, settings) if refresh_token else None
+    if user is not None:
+        user.token_version += 1
+        db.commit()
     response.delete_cookie(
         REFRESH_COOKIE,
         path=REFRESH_COOKIE_PATH,
