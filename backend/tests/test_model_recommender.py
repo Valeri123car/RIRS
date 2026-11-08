@@ -95,7 +95,8 @@ def test_model_proti_zdravljenju_izbere_anti_heal_z_razlogom_iz_shap(ranker):
     standard = recommend(ranker)["variants"][0]
 
     [anti_heal] = [i for i in standard["items"] if i["id"] == ANTI_HEAL]
-    assert "zdravljenju" in anti_heal["reason"]
+    assert "zdravljenje" in anti_heal["reason"]
+    assert anti_heal["reason"].startswith("Model ga priporoča")
     assert "Soraka" in anti_heal["reason"]
 
 

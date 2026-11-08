@@ -30,15 +30,17 @@ DEFENSIVE_TAGS = frozenset({"armor", "spell_block", "magic_resist", "health"})
 CONTRIBUTOR_MIN_RATING = 2
 MAX_NAMED_CHAMPIONS = 3
 
-# Lastnosti sestave za razloge: (orodnik/dajalnik za "proti ...", rodilnik za "malo ...").
+# Lastnosti sestave za razloge: (imenovalnik, rodilnik za "malo ...").
 COMP_PHRASES = {
-    "enemy_healing": ("zdravljenju", "zdravljenja"),
-    "enemy_cc": ("nadzoru (CC)", "nadzora (CC)"),
-    "enemy_engage": ("engage šampionom", "engage šampionov"),
-    "enemy_burst": ("burstu", "bursta"),
-    "enemy_tank": ("tankovskosti", "tankovskosti"),
-    "enemy_poke": ("poke napadom", "poke napadov"),
+    "enemy_healing": ("zdravljenje", "zdravljenja"),
+    "enemy_cc": ("nadzor (CC)", "nadzora (CC)"),
+    "enemy_engage": ("engage", "engagea"),
+    "enemy_burst": ("burst", "bursta"),
+    "enemy_tank": ("tankovskost", "tankovskosti"),
+    "enemy_poke": ("poke", "pokea"),
 }
+# Manjši vpliv (v odstotnih točkah) se prikaže kot 0,0 in ne šteje kot priporočilo.
+MIN_SHOWN_POINTS = 0.05
 RATING_SUM_MAX = 15
 
 
@@ -194,26 +196,32 @@ class _Explainer:
         return result
 
     def _reason(self, feature: str, helps: bool, points: float) -> str:
-        effect = f"{points:+.1f}".replace(".", ",")
-        phrase = self._phrase(feature)
-        if helps:
-            return f"Model ga priporoča {phrase} (vpliv na oceno {effect} %)."
+        """En stavek: "priporoča" samo, če predmet pomaga in to pomoč poveča sestava."""
+        effect = "0,0" if abs(points) < MIN_SHOWN_POINTS else f"{points:+.1f}".replace(".", ",")
+        prop = self._property(feature)
+        if helps and points >= MIN_SHOWN_POINTS:
+            return (
+                f"Model ga priporoča zaradi sestave nasprotnikov: {prop} "
+                f"(vpliv na oceno {effect} %)."
+            )
         return (
-            f"Pogost predmet za {self.champion.name}, model upošteva {phrase} (vpliv {effect} %)."
+            f"Pogost predmet tega šampiona; tudi {prop} nanj skoraj ne vpliva "
+            f"(vpliv na oceno {effect} %)."
         )
 
-    def _phrase(self, feature: str) -> str:
+    def _property(self, feature: str) -> str:
+        """Konkretna lastnost sestave, npr. "zdravljenje (Soraka)" ali "60 % fizične škode"."""
         if feature == "enemy_physical":
             shares = self.data.enemy_comp.get("damage", {})
             if self.comp[feature] >= self.ranker.spec.comp_mean.get(feature, 0.5):
-                return f"proti {shares.get('physical', 50)} % fizične škode nasprotnikov"
-            return f"proti {shares.get('magic', 50)} % magične škode nasprotnikov"
+                return f"{shares.get('physical', 50)} % fizične škode"
+            return f"{shares.get('magic', 50)} % magične škode"
         attribute = feature.removeprefix("enemy_")
-        towards, of = COMP_PHRASES[feature]
+        noun, of = COMP_PHRASES[feature]
         if self.comp[feature] >= self.ranker.spec.comp_mean.get(feature, 0.0):
-            return f"proti {towards} ({self._names(attribute)})"
+            return f"{noun} ({self._names(attribute)})"
         total = round(self.comp[feature])
-        return f"ker ima nasprotna ekipa malo {of} ({total} od {RATING_SUM_MAX})"
+        return f"malo {of} ({total} od {RATING_SUM_MAX})"
 
     def _names(self, attribute: str) -> str:
         enemies = sorted(self.data.enemy_champions, key=lambda c: (-getattr(c, attribute), c.name))
