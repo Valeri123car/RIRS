@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     environment: str = "development"
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    # Brez privzete vrednosti, da v kodi ni gesel; preveri se šele ob prvi uporabi baze.
+    database_url: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:
