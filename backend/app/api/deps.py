@@ -1,5 +1,7 @@
 """Skupne FastAPI odvisnosti (prijavljen uporabnik ...)."""
 
+import uuid
+from collections.abc import Callable
 from functools import lru_cache
 from typing import Annotated
 
@@ -59,3 +61,29 @@ def get_riot_client() -> RiotClient:
 
 
 Riot = Annotated[RiotClient, Depends(get_riot_client)]
+
+
+def get_optional_user(
+    db: DbSession,
+    settings: AppSettings,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
+) -> User | None:
+    """Prijavljen uporabnik ali None za gosta (npr. analiza je na voljo tudi gostom)."""
+    if credentials is None:
+        return None
+    return get_current_user(db, settings, credentials)
+
+
+OptionalUser = Annotated[User | None, Depends(get_optional_user)]
+
+AnalysisQueue = Callable[[uuid.UUID], None]
+
+
+def get_analysis_queue() -> AnalysisQueue:
+    """Pošlje analizo v Celery vrsto (v testih se zamenja s takojšnjim izvajanjem)."""
+    from app.worker import run_analysis  # uvoz šele ob uporabi: API ne potrebuje brokerja ob zagonu
+
+    return lambda analysis_id: run_analysis.delay(str(analysis_id))
+
+
+Queue = Annotated[AnalysisQueue, Depends(get_analysis_queue)]
