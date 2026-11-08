@@ -11,7 +11,14 @@ from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pydantic import BaseModel, ConfigDict
 
 from app.analysis.guest_limit import GUEST_DAILY_LIMIT
-from app.api.deps import DbSession, GuestLimit, OptionalUser, Queue, WaiterFactory
+from app.api.deps import (
+    DbSession,
+    GuestLimit,
+    OptionalUser,
+    Queue,
+    WaiterFactory,
+    client_ip,
+)
 from app.api.schemas import RiotIdInput
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
 
@@ -52,9 +59,7 @@ def start_analysis(
     guest_limit: GuestLimit,
 ) -> LiveAnalysis:
     if user is None:
-        # IP neposredno iz povezave; glavi X-Forwarded-For ne zaupamo (gost bi jo lahko ponaredil).
-        ip = request.client.host if request.client else "unknown"
-        limit = guest_limit.hit(ip)
+        limit = guest_limit.hit(client_ip(request))
         if not limit.allowed:
             raise HTTPException(
                 status.HTTP_429_TOO_MANY_REQUESTS,
