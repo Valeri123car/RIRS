@@ -159,3 +159,47 @@ def test_neveljaven_kljuc_se_ne_ponavlja_in_ne_razkrije_kljuca():
 def test_neznana_platforma_je_zavrnjena_brez_klica():
     with pytest.raises(InvalidPlatformError):
         make_client(lambda _: pytest.fail("ne sme klicati")).get_account("Luka", "EUNE", "xx9")
+
+
+def test_challenger_liga_se_klice_na_platformi():
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.host == "euw1.api.riotgames.com"
+        assert request.url.path == "/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5"
+        return httpx.Response(
+            200,
+            json={
+                "tier": "CHALLENGER",
+                "queue": "RANKED_SOLO_5x5",
+                "entries": [{"puuid": "p-1", "leaguePoints": 1500, "wins": 10, "losses": 5}],
+            },
+        )
+
+    limiter = RecordingLimiter()
+    league = make_client(handler, limiter).get_challenger_league("euw1")
+
+    assert [(e.puuid, e.league_points) for e in league.entries] == [("p-1", 1500)]
+    assert limiter.routings == ["euw1"]
+
+
+def test_neznana_vrsta_lige_je_zavrnjena_brez_klica():
+    with pytest.raises(ValueError):
+        make_client(lambda _: pytest.fail("ne sme klicati")).get_challenger_league(
+            "euw1", "../admin"
+        )
+
+
+def test_casovnica_tekme_se_klice_na_regiji():
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.host == "europe.api.riotgames.com"
+        assert request.url.path == "/lol/match/v5/matches/EUW1_1/timeline"
+        return httpx.Response(200, json={"info": {"frames": []}})
+
+    assert make_client(handler).get_match_timeline("EUW1_1", "euw1") == {"info": {"frames": []}}
+
+
+@pytest.mark.parametrize("count", [0, 101])
+def test_neveljavno_stevilo_tekem_je_zavrnjeno_brez_klica(count):
+    with pytest.raises(ValueError):
+        make_client(lambda _: pytest.fail("ne sme klicati")).get_match_ids(
+            "p-luka", "eun1", count=count
+        )

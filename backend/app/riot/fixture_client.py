@@ -11,8 +11,9 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+from app.riot.client import check_match_count, check_ranked_queue
 from app.riot.errors import RiotNotFoundError
-from app.riot.models import Account, ActiveGame, Match, Summoner
+from app.riot.models import Account, ActiveGame, LeagueList, Match, MatchTimeline, Summoner
 from app.riot.platforms import region_for
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -71,6 +72,7 @@ class FixtureRiotClient:
         self, puuid: str, platform: str, *, count: int = 20, queue: int | None = None
     ) -> list[str]:
         region_for(platform)
+        check_match_count(count)
         matches = [_load(f"matches/{path.name}") for path in self._match_files()]
         matches = [
             m
@@ -90,6 +92,22 @@ class FixtureRiotClient:
             raise RiotNotFoundError(f"Ni tekme {match_id}")
         # Kopija, da klicatelj ne more spremeniti predpomnjenih podatkov.
         return copy.deepcopy(_load(f"matches/{files[match_id]}"))
+
+    def get_match_timeline(self, match_id: str, platform: str) -> MatchTimeline:
+        region_for(platform)
+        files = {path.stem: path.name for path in (FIXTURES_DIR / "timelines").glob("*.json")}
+        if match_id not in files:
+            raise RiotNotFoundError(f"Ni časovnice tekme {match_id}")
+        return copy.deepcopy(_load(f"timelines/{files[match_id]}"))
+
+    def get_challenger_league(self, platform: str, queue: str = "RANKED_SOLO_5x5") -> LeagueList:
+        region_for(platform)
+        check_ranked_queue(queue)
+        league = _load("challenger_leagues.json").get(platform)
+        if league is None or league["queue"] != queue:
+            # Riot za platformo brez igralcev vrne prazen seznam.
+            return LeagueList(tier="CHALLENGER", queue=queue, entries=[])
+        return LeagueList.model_validate(league)
 
     @staticmethod
     def _match_files() -> list[Path]:

@@ -1,0 +1,38 @@
+{
+  "euw1": {
+    "tier": "CHALLENGER",
+    "leagueId": "fx-challenger-euw1",
+    "queue": "RANKED_SOLO_5x5",
+    "name": "Fixture Challengers",
+    "entries": [
+      {
+        "puuid": "fx-petra-d2bfbb716eec9e29eda06f8a0f6b2b2a522f1eaab71f2228f33aad493ce2eebdd2bfb",
+        "leaguePoints": 1520,
+        "rank": "I",
+        "wins": 310,
+        "losses": 250
+      },
+      {
+        "puuid": "fx-sara-53b1fb446230b347c3f6406cca4b1ddbac60905ba4ab1977179f44b8fb13444753b1fb",
+        "leaguePoints": 1204,
+        "rank": "I",
+        "wins": 280,
+        "losses": 240
+      },
+      {
+        "puuid": "fx-marko-48cf6c91c1d1eb864e1d7d6d38e65e6c02249083aca96740ba82f2f123a1817748cf6",
+        "leaguePoints": 1388,
+        "rank": "I",
+        "wins": 295,
+        "losses": 251
+      },
+      {
+        "puuid": "fx-brez-93fa1a951f52958740425a8f8b0d61da861f6bc6f374d988890ba0404b19f90e93fa1a",
+        "leaguePoints": 950,
+        "rank": "I",
+        "wins": 150,
+        "losses": 140
+      }
+    ]
+  }
+}

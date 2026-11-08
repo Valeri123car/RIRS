@@ -66,3 +66,32 @@ def test_neznana_tekma_sprozi_not_found(client):
 def test_neznana_platforma_je_zavrnjena(client):
     with pytest.raises(InvalidPlatformError):
         client.get_account("Luka", "EUNE", "xx9")
+
+
+def test_challenger_liga_euw_vsebuje_igralce_s_tekmami(client):
+    league = client.get_challenger_league("euw1")
+
+    assert league.tier == "CHALLENGER"
+    assert len(league.entries) >= 2
+    sara = client.get_account("Sara", "EUW", "euw1").puuid
+    assert sara in {e.puuid for e in league.entries}
+    assert client.get_match_ids(sara, "euw1", queue=420)
+
+
+def test_platforma_brez_challenger_igralcev_vrne_prazno_ligo(client):
+    assert client.get_challenger_league("kr").entries == []
+
+
+def test_casovnica_tekme_ima_okvirje_in_udelezence(client):
+    match_id = client.get_match_ids(client.get_account("Sara", "EUW", "euw1").puuid, "euw1")[0]
+
+    timeline = client.get_match_timeline(match_id, "euw1")
+
+    assert timeline["metadata"]["matchId"] == match_id
+    assert len(timeline["info"]["participants"]) == 10
+    assert len(timeline["info"]["frames"]) > 15
+
+
+def test_neznana_casovnica_sprozi_not_found(client):
+    with pytest.raises(RiotNotFoundError):
+        client.get_match_timeline("EUW1_0", "euw1")
