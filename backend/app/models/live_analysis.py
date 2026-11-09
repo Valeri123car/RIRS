@@ -50,3 +50,5 @@ class LiveAnalysis(TimestampMixin, Base):
     enemy_comp: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     # Priporočilo builda (US-04): vir (model/pravila), variante z runami, predmeti in razlogi.
     recommendation: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    # Matchup kartica za linijo (US-05): nasprotnik, časovnica moči, sposobnosti, nasveti.
+    matchup: Mapped[dict[str, Any] | None] = mapped_column(JSONB)

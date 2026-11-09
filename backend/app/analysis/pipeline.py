@@ -8,6 +8,9 @@ from sqlalchemy.orm import Session
 from app.analysis.capture import capture_active_game
 from app.analysis.enemy_comp import build_enemy_comp
 from app.analysis.progress import ProgressNotifier, no_notify
+from app.matchup.card import build_matchup_card
+from app.matchup.power import phase_strength
+from app.matchup.roles import role_distribution
 from app.ml.build_ranker import load_active_build_ranker
 from app.models.champion import Champion
 from app.models.item import Item
@@ -35,7 +38,24 @@ def run_analysis(
     analysis.recommendation = recommend_build(
         session, analysis, recommender or default_recommender(session)
     )
+    analysis.matchup = build_matchup(session, analysis)
     _set_status(session, analysis, AnalysisStatus.COMPLETED, notify)
+
+
+def build_matchup(session: Session, analysis: LiveAnalysis, opponent_id: int | None = None) -> dict:
+    """Matchup kartica za igralca; opponent_id je nasprotnik, ki ga je izbral igralec.
+
+    ValueError, če izbrani šampion ni v nasprotni ekipi.
+    """
+    ids = [p["champion_id"] for p in analysis.participants]
+    champions = {c.id: c for c in session.scalars(select(Champion).where(Champion.id.in_(ids)))}
+    return build_matchup_card(
+        analysis.participants,
+        champions,
+        role_distribution(session),
+        opponent_id=opponent_id,
+        phases=phase_strength(session),
+    )
 
 
 def profile_enemy_team(session: Session, analysis: LiveAnalysis) -> dict:

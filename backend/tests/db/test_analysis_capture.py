@@ -157,3 +157,33 @@ def test_brez_sampiona_v_bazi_znanja_analiza_konca_brez_priporocila(db):
     db.refresh(analysis)
     assert analysis.status == AnalysisStatus.COMPLETED
     assert analysis.recommendation is None
+
+
+ENEMY_IDS = [54, 254, 238, 51, 89]
+STATS = {
+    "hp": 630,
+    "hpperlevel": 100,
+    "armor": 26,
+    "armorperlevel": 4.2,
+    "spellblock": 30,
+    "spellblockperlevel": 1.3,
+    "attackdamage": 60,
+    "attackdamageperlevel": 2.5,
+    "attackspeed": 0.625,
+    "attackspeedperlevel": 1.4,
+    "attackrange": 525,
+}
+
+
+def test_analiza_doda_matchup_kartico_z_izbiro_nasprotnika(db):
+    db.merge(Champion(id=222, slug="Jinx", name="Jinx", classes=["Marksman"], stats=STATS))
+    analysis = new_analysis(db)
+
+    run_analysis(db, FixtureRiotClient(), analysis.id)
+
+    db.refresh(analysis)
+    matchup = analysis.matchup
+    assert matchup["champion"] == {"id": 222, "name": "Jinx"}
+    assert [c["id"] for c in matchup["candidates"]] == ENEMY_IDS
+    # Brez zbranih tekem linij ni mogoče zanesljivo določiti: igralec izbere nasprotnika.
+    assert matchup["opponent"] is None and matchup["levels"] == []
