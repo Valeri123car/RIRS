@@ -103,6 +103,21 @@ export type Matchup = {
   tips: string[];
 };
 
+export type StyleIndicatorKey = "aggression" | "roaming" | "farming" | "early_deaths" | "vision";
+
+/** Kazalnik sloga: povprečje zadnjih tekem in odstopanje od mediane iste vloge (0 = mediana). */
+export type StyleIndicator = { value: number; vs_median: number };
+
+/** Profil igralnega sloga enega nasprotnika (US-06). archetype se pojavi šele z modelom GMM. */
+export type StyleProfile = {
+  /** Število analiziranih tekem (največ 20). */
+  matches: number;
+  low_confidence: boolean;
+  role: "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY" | null;
+  indicators: Partial<Record<StyleIndicatorKey, StyleIndicator>>;
+  archetype?: { name: string; probability: number } | null;
+};
+
 export type Analysis = {
   id: string;
   status: AnalysisStatus;
@@ -114,6 +129,8 @@ export type Analysis = {
   enemy_comp: EnemyComp | null;
   recommendation?: Recommendation | null;
   matchup?: Matchup | null;
+  /** Profil sloga nasprotnikov po puuid (US-06). */
+  style?: Record<string, StyleProfile> | null;
   created_at: string;
 };
 
