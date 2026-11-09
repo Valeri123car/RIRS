@@ -68,3 +68,23 @@ def test_arhetipi_se_shranijo_aktivirajo_in_zamenjajo(db: Session):
         )
         == 1
     )
+
+
+def test_statistika_buildov_sampiona_iz_baze(db: Session, monkeypatch):
+    from app.models.item import Item
+    from app.models.match import MatchParticipant
+    from app.recommend import champion_stats
+
+    build_style_profile(db, FixtureRiotClient(), ROK, "eun1", BASELINES)
+    row = db.scalars(select(MatchParticipant).where(MatchParticipant.items != [])).first()
+    db.add(Item(id=row.items[0], name="Testni predmet", cost=3000, tags=[], completed=True))
+    db.flush()
+
+    # Fixture tekme imajo premalo iger šampiona: pod pragom ni statistike.
+    assert champion_stats.load_build_stats(db, row.champion_id) is None
+
+    monkeypatch.setattr(champion_stats, "MIN_GAMES", 1)
+    stats = champion_stats.load_build_stats(db, row.champion_id)
+    assert stats is not None
+    assert stats.items[row.items[0]][0] >= 1
+    assert stats.pick_rate(row.items[0]) > 0
