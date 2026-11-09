@@ -406,3 +406,53 @@ win rate. Posledice:
    ~2800/h → več nočnih zajemov). Pri mešanju regij in patchev dodati regijo in patch kot značilki.
 4. **Vrednotenje v kodi:** zamenjati eno delitev s `GroupKFold` in v metrike zapisati povprečje ± odklon;
    pogoj za vklop naj zahteva, da je prispevek sestave večji od odklona (poskus 4 pokaže, zakaj).
+
+## Poskus 8 – ali igralci prilagajajo build sestavi nasprotnika (2026-11-09, #77)
+
+**Vprašanje:** uporabnik želi, da novinec že v nalagalnem zaslonu ve, kaj kupiti proti sestavi
+nasprotnikov (prvi predmet, drugi predmet, zakaj). Ali podatki kažejo, (A) da dobri igralci build
+res prilagajajo sestavi in (B) da se to izplača?
+
+**Metoda** (skripta `.claude/scripts/analiza/poskus8.py`): 70.004 igralcev iz 8.680 tekem (v3
+časovnice, znana vloga, ≥ 2 končana predmeta do 25. min). Prvi trije končani predmeti (po vrstnem
+redu nakupa) → deleži oznak armor / spell_block+magic_resist / anti_heal / tenacity. Grožnje iz
+nasprotne sestave: delež fizične/magične škode (`damage_profile`), vsota healinga in CC. (A) OLS
+deleža predmeta ~ grožnja + vloga; (B) logistična regresija zmage ~ stanje ob 10. min (zlato
+ekipe, zlato igralca) + vloga + predmet + grožnja + interakcija. Robustne napake po tekmi.
+
+### A) Prilagajanje: obstaja, a je majhno
+
+| grožnja → predmet | nizka grožnja | visoka grožnja | koeficient |
+|---|---|---|---|
+| AD delež → armor | 13,0 % | 14,8 % | +0,068 (p < 0,001) |
+| AP delež → MR | 6,1 % | 7,0 % | +0,040 (p < 0,001) |
+| healing → anti-heal | 0,5 % | 1,0 % | +0,002 (p < 0,001) |
+| CC → tenacity | 2,6 % | 3,1 % | +0,002 (p < 0,001) |
+
+Tudi najboljši igralci (challenger) se sestavi prilagajajo le za ~1–2 odstotni točki, anti-heal in
+tenacity skoraj nikoli med prvimi tremi predmeti. Smer je povsod pravilna.
+
+### B) Izplača se? Podatki tega ne dokažejo
+
+- Interakcija armor × AD delež nasprotnikov: +0,29 v logit (p = 0,145) – smer pravilna, ni značilna.
+- Interakcija MR × AP delež: −0,05 (p = 0,87); anti-heal × healing: −0,06 (p = 0,53).
+- Glavni učinek armor (+0,36) in MR (+0,30) je zmeden: te predmete kupijo tanki in igralci, ki
+  preživijo, zato ne pomenita, da je armor sam po sebi koristen.
+
+### Zaključek za RIFT_HELP
+
+1. **Z obstoječimi podatki »kupi X proti sestavi Y« ni mogoče utemeljiti z zmagami.** Učinek
+   prilagajanja je manjši od šuma pri ~9.000 tekmah, prilagodljivi predmeti so redki, build pa je
+   hkrati posledica stanja tekme (poskusa 2 in 7).
+2. **Utemeljitev »zakaj« mora priti iz podatkov o igri, ne iz zmag:** delež fizične/magične škode in
+   CC/healing v sestavi (že imamo v `enemy_comp`) + učinek predmeta (armor, MR, anti-heal – oznake
+   predmetov). Pravila v `RuleBasedRecommender` to že počnejo; model ostane neaktiven.
+3. **Kaj manjka (kandidati za značilke):** (a) dejanska škoda nasprotnikov po tipu (iz `raw`:
+   `physicalDamageDealtToChampions`/`magicDamageDealtToChampions`) namesto grobe oznake
+   šampiona; (b) kdo je nasprotni »carry« (največ zlata/škode) – gradi se proti njemu, ne proti
+   povprečju ekipe; (c) fed/behind stanje ob nakupu (razlika zlata ob 10. min kot kontrola) – že
+   uporabljeno tukaj; (d) večja podatkovna množica z več nakupi prilagodljivih predmetov (patch,
+   regija kot kontrola); (e) cilj »razlika zlata/škode po nakupu« namesto zmage (korak 2 zgoraj).
+4. **Za novinca je najbolj uporabna vsebina izpeljana iz pravil:** prvi predmet = osnovni build
+   šampiona, drugi = prilagoditev z največjo oceno proti grožnji sestave, z razlago iz profila
+   sestave. To je pošteno označiti kot »na podlagi pravil«, ne kot napoved zmage.
