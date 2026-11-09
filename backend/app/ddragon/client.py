@@ -25,7 +25,8 @@ class DataDragonClient:
         return self._get("/api/versions.json")[0]
 
     def champions(self, version: str) -> dict[str, dict[str, Any]]:
-        return self._get(self._data_path(version, "champion.json"))["data"]
+        # championFull ima poleg povzetka še statistike po levelu in sposobnosti (US-05).
+        return self._get(self._data_path(version, "championFull.json"))["data"]
 
     def items(self, version: str) -> dict[str, dict[str, Any]]:
         return self._get(self._data_path(version, "item.json"))["data"]

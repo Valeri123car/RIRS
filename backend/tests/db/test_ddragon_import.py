@@ -89,6 +89,8 @@ def fake_data_dragon() -> DataDragonClient:
             "name": "Ahri",
             "info": {"attack": 3, "defense": 4, "magic": 8, "difficulty": 5},
             "tags": ["Mage", "Assassin"],
+            "stats": {"hp": 590, "hpperlevel": 104, "armor": 21, "armorperlevel": 4.2},
+            "spells": [{"name": "Orb of Deception", "description": "Throws.", "cooldown": [7]}],
         }
     }
     item_json = {
@@ -105,7 +107,7 @@ def fake_data_dragon() -> DataDragonClient:
         if request.url.path == "/api/versions.json":
             return httpx.Response(200, json=["16.22.1"])
         name = request.url.path.rsplit("/", 1)[-1]
-        data = champion_json if name == "champion.json" else item_json
+        data = champion_json if name == "championFull.json" else item_json
         return httpx.Response(200, json={"data": data})
 
     return DataDragonClient(http=httpx.Client(transport=httpx.MockTransport(handler)))
@@ -118,3 +120,8 @@ def test_run_import_uvozi_zadnjo_verzijo(db):
     assert (result.champions.created, result.items.created) == (1, 1)
     assert db.get(Champion, 9103).damage_profile == DamageProfile.MAGIC
     assert db.get(Item, 9075).tags == ["anti_heal", "armor"]
+    ahri = db.get(Champion, 9103)
+    assert ahri.stats["hpperlevel"] == 104
+    assert ahri.spells == [
+        {"key": "Q", "name": "Orb of Deception", "description": "Throws.", "cooldown": [7]}
+    ]

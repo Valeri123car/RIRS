@@ -26,6 +26,27 @@ TAG_RATINGS: dict[str, dict[str, int]] = {
     "Support": {"cc": 1},
 }
 
+# Osnovne statistike za izračun moči po levelu (US-05); mana ni pomembna za primerjavo.
+CHAMPION_STATS = (
+    "hp",
+    "hpperlevel",
+    "armor",
+    "armorperlevel",
+    "spellblock",
+    "spellblockperlevel",
+    "attackdamage",
+    "attackdamageperlevel",
+    "attackspeed",
+    "attackspeedperlevel",
+    "attackrange",
+    "movespeed",
+    "hpregen",
+    "hpregenperlevel",
+)
+SPELL_KEYS = ("Q", "W", "E", "R")
+HTML_TAG = re.compile(r"<[^>]+>")
+MAX_SPELL_DESCRIPTION = 400
+
 # Razlika med info.attack in info.magic, od katere velja šampion za fizičnega/magičnega.
 DAMAGE_PROFILE_MARGIN = 3
 
@@ -49,6 +70,8 @@ class ChampionData:
     damage_profile: DamageProfile
     ratings: dict[str, int]
     classes: list[str] = field(default_factory=list)
+    stats: dict[str, float] = field(default_factory=dict)
+    spells: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -92,7 +115,23 @@ def _parse_champion(raw: dict[str, Any], override: dict[str, int]) -> ChampionDa
         damage_profile=_damage_profile(raw["info"]),
         ratings=ratings,
         classes=list(raw.get("tags", [])),
+        stats={k: float(v) for k, v in (raw.get("stats") or {}).items() if k in CHAMPION_STATS},
+        spells=[
+            _parse_spell(key, spell)
+            for key, spell in zip(SPELL_KEYS, raw.get("spells") or [], strict=False)
+        ],
     )
+
+
+def _parse_spell(key: str, raw: dict[str, Any]) -> dict[str, Any]:
+    """Sposobnost s tipko; opis brez HTML oznak (<br> postane presledek)."""
+    text = HTML_TAG.sub(" ", str(raw.get("description", "")))
+    return {
+        "key": key,
+        "name": str(raw["name"]),
+        "description": " ".join(text.split())[:MAX_SPELL_DESCRIPTION],
+        "cooldown": [float(c) if c % 1 else int(c) for c in raw.get("cooldown") or []],
+    }
 
 
 def _damage_profile(info: dict[str, int]) -> DamageProfile:
