@@ -39,6 +39,7 @@ export function MyAnalyses() {
   const { user, loading, authRequest } = useAuth();
   const [items, setItems] = useState<AnalysisSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -54,6 +55,21 @@ export function MyAnalyses() {
       active = false;
     };
   }, [user, authRequest]);
+
+  async function remove(item: AnalysisSummary) {
+    const label = `${item.champion_name ?? "?"} · ${item.game_name}#${item.tag_line}`;
+    if (!window.confirm(`Izbrišem analizo ${label}?`)) return;
+    setDeleting(item.id);
+    setError(null);
+    try {
+      await authRequest<void>(`/analyses/${item.id}`, { method: "DELETE" });
+      setItems((current) => current?.filter((i) => i.id !== item.id) ?? null);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Analize ni bilo mogoče izbrisati.");
+    } finally {
+      setDeleting(null);
+    }
+  }
 
   if (loading) return <p className="text-on-surface-variant">Nalagam ...</p>;
 
@@ -93,10 +109,10 @@ export function MyAnalyses() {
         )}
         <ul className="flex flex-col gap-2">
           {items?.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className="flex items-stretch gap-2">
               <Link
                 href={`/analiza/${item.id}`}
-                className="flex flex-col gap-1 rounded-sm border border-outline/50 bg-surface-container px-3 py-2 transition-colors hover:border-primary sm:flex-row sm:items-center sm:justify-between"
+                className="flex min-w-0 flex-1 flex-col gap-1 rounded-sm border border-outline/50 bg-surface-container px-3 py-2 transition-colors hover:border-primary sm:flex-row sm:items-center sm:justify-between"
               >
                 <span className="flex flex-col">
                   <span className="font-headline text-on-surface">
@@ -114,6 +130,15 @@ export function MyAnalyses() {
                   <span className="text-muted">{formatDate(item.created_at)}</span>
                 </span>
               </Link>
+              <button
+                type="button"
+                onClick={() => remove(item)}
+                disabled={deleting === item.id}
+                aria-label={`Izbriši analizo ${item.game_name}#${item.tag_line}`}
+                className="rounded-sm border border-outline/50 px-3 font-label text-xs tracking-wider text-error uppercase transition-colors hover:border-error disabled:opacity-50"
+              >
+                {deleting === item.id ? "..." : "Izbriši"}
+              </button>
             </li>
           ))}
         </ul>
