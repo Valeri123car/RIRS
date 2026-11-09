@@ -7,6 +7,7 @@ import { BuildPanel } from "@/components/analysis/build-panel";
 import { EnemyCompPanel } from "@/components/analysis/enemy-comp-panel";
 import { MatchupPanel } from "@/components/analysis/matchup-panel";
 import { StartError } from "@/components/analysis/start-error";
+import { StylePanel } from "@/components/analysis/style-panel";
 import { useStartAnalysis } from "@/components/analysis/use-start-analysis";
 import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/ui/field";
@@ -208,6 +209,10 @@ export function AnalysisView({ id }: { id: string }) {
           participants={analysis.participants}
           version={version}
         />
+      )}
+
+      {analysis.status === "completed" && analysis.style && (
+        <StylePanel style={analysis.style} participants={analysis.participants} version={version} />
       )}
 
       {analysis.participants.length > 0 && <Teams analysis={analysis} version={version} />}
