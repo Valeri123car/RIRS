@@ -54,9 +54,31 @@ def test_aktivacija_umakne_prejsnjo_verzijo_in_model_se_nalozi(db, trained):
 
 
 def test_model_slabsi_od_izhodisca_ni_mogoce_aktivirati(db, trained):
-    worse = replace(trained, metrics={**trained.metrics, "auc": 0.5, "baseline_auc": 0.55})
+    worse = replace(
+        trained,
+        metrics={**trained.metrics, "auc": 0.5, "baseline_auc": 0.55, "contribution": -0.05},
+    )
     model = save_build_ranker(db, worse)
 
     with pytest.raises(ActivationRefusedError):
         activate_build_ranker(db, model)
     assert model.status == ModelStatus.TRAINED
+
+
+def test_prispevek_sestave_znotraj_odklona_ni_dovolj_za_aktivacijo(db, trained):
+    noisy = replace(
+        trained,
+        metrics={**trained.metrics, "contribution": 0.004, "contribution_std": 0.01},
+    )
+    model = save_build_ranker(db, noisy)
+
+    with pytest.raises(ActivationRefusedError, match="odklon"):
+        activate_build_ranker(db, model)
+    assert model.status == ModelStatus.TRAINED
+
+
+def test_starejsa_verzija_brez_cv_metrik_se_presoja_po_auc(db, trained):
+    legacy_metrics = {"auc": 0.6, "baseline_auc": 0.55}
+    model = save_build_ranker(db, replace(trained, metrics=legacy_metrics), activate=True)
+
+    assert model.status == ModelStatus.ACTIVE
