@@ -319,6 +319,68 @@ poraženci se tu skoraj ne razlikujejo (Flash 3,86 proti 3,78, CC 24,0 proti 22,
 
 ---
 
+## Poskus 7 – stanje tekme ob 10.–40. minuti (2026-11-09, ~17:10)
+
+Po backfillu časovnic (`timeline_v` 3, #72) imamo za **8974 tekem** (89.740 igralcev; EUW, KR, NA)
+stanje igralca in ekipe ob 10, 15, 20, 25, 30 in 40 min. Cilj: zmaga igralčeve ekipe. Vrednotenje:
+GroupKFold (5) po `match_id`, AUC povprečje ± odklon; LightGBM (200 dreves, 15 listov) in
+logistična regresija (StandardScaler). Skript: `.claude/scripts/analiza/poskus7.py`, rezultati
+`docs/slike/p7_auc.csv`, `p7_auc_po_minutah.png`, `p7_korelacije_15.png`.
+
+Skupine značilk: *ekipa* (razlika zlata in xp, kili, zmaji/grubi/heraldi/baroni/stolpi/plošče),
+*igralec* (zlato, xp, CS, raven, škoda, KDA), *linija* (razlika zlata/xp/CS z nasprotnikom iste vloge),
+*interakcije* (zlato × stolpi, zlato × zmaji, razlika kilov, delež zlata).
+
+### AUC po minutah (GroupKFold 5, logistična regresija; LightGBM je pri 10.–30. min 0,002–0,011 slabši, ob 40. min boljši)
+
+| Minuta | Tekem | Samo razlika zlata ekipe | Ekipa | Igralec | Vse + interakcije |
+|---|---|---|---|---|---|
+| 10 | 8875 | 0,775 ± 0,010 | 0,788 ± 0,012 | 0,652 ± 0,007 | 0,788 ± 0,012 |
+| 15 | 8862 | 0,843 ± 0,013 | 0,854 ± 0,010 | 0,713 ± 0,007 | 0,854 ± 0,010 |
+| 20 | 7333 | 0,863 ± 0,010 | 0,878 ± 0,011 | 0,724 ± 0,003 | 0,878 ± 0,011 |
+| 25 | 5169 | 0,877 ± 0,009 | 0,895 ± 0,007 | 0,737 ± 0,004 | 0,895 ± 0,007 |
+| 30 | 2307 | 0,845 ± 0,007 | 0,870 ± 0,006 | 0,688 ± 0,004 | 0,870 ± 0,006 |
+| 40 | 140 | 0,667 ± 0,043 | 0,745 ± 0,062 | 0,601 ± 0,040 | 0,743 ± 0,058 |
+
+(Za primerjavo: model buildov iz poskusa 5 ima AUC 0,57.)
+
+### Ugotovitve
+
+1. **Napovedna moč zelo hitro naraste:** ob 10. min 0,79, ob 15. min 0,85, ob 25. min 0,90. Skoraj vse
+   prinese **razlika zlata ekipe** (0,843 sama ob 15. min); ostalo ekipa doda +0,01–0,02, kar je
+   primerljivo z odklonom čez delitve (±0,01); delitve so za vse skupine iste, zato je razlika verjetno
+   resnična, a majhna.
+2. **Interakcije in linija ne pomagajo:** skupina »ekipa + igralec + linija« in »vse + interakcije« se
+   od skupine »ekipa« razlikujeta za manj kot 0,001 (LightGBM ob 20. min +0,0016). Odvisnost med
+   spremenljivkami je večinoma linearna in jo že pokrije razlika zlata.
+3. **Logistična regresija ≥ LightGBM** pri 10.–30. min (ob 30. min +0,011; ob 40. min je LightGBM
+   boljši, a le 140 tekem) → nelinearen model ne prinese nič; zadošča preprost linearen. Nevronska mreža ni smiselna (kot v poskusih 1–2).
+4. **Stanje samega igralca (brez ekipe) je slabše:** 0,65–0,74; zmaga je ekipna.
+5. **Ob 30. in 40. min AUC pade** zaradi izbire tekem: dolge tekme so po naravi izenačene
+   (preživelstvo), ob 40. min je samo 140 tekem → zanesljivo ni.
+6. **Korelacije (15. min):** `team_gold_diff` ↔ `team_xp_diff` r = 0,93, ↔ `kill_diff` 0,91,
+   `xp` ↔ `level` 0,98, `team_grubs` ↔ `enemy_grubs` −0,995 (grubi so 3 na ekipo → skoraj ena spremenljivka),
+   plošče ↔ stolpi 0,85. Največ medsebojne informacije z zmago: `team_gold_diff` 0,47, `team_xp_diff` 0,45,
+   `gold_share` 0,20, `kill_diff` 0,18; razlika zlata v liniji 0,06.
+   Odvečne (močno korelirane) spremenljivke bi lahko opustili brez izgube AUC.
+
+### Preverjanje hevristike moči (US-05) z razliko zlata v liniji
+
+Razlika zlata proti nasprotniku iste vloge napoveduje zmago: ob 10. min točnost znaka 0,60 (AUC 0,639),
+ob 15. min 0,64 (AUC 0,693), ob 20. min 0,64 (AUC 0,691). Po vlogah ob 15. min: BOTTOM 0,721, JUNGLE 0,718,
+MIDDLE 0,706, UTILITY 0,695, **TOP 0,642** (top je najbolj izoliran in najmanj odloča).
+Zaključek: prednost v liniji res nosi signal o izidu, vendar je omejen (~0,64–0,72). To je **podatkovna
+podlaga**, ki potrjuje, da je smiselno kazati prednost v liniji ob 10.–15. min; formula moči v
+`app/matchup/power.py` (Riotova rast + faza igre) še ni neposredno primerjana s temi podatki.
+
+### Opozorilo
+
+Gre za napoved izida iz **stanja** tekme, ne za učinek izbire predmetov. Visok AUC (0,85) je zato
+pričakovan in ne pomeni boljšega priporočila buildov: zlato je posledica dobre igre (enak vzorec kot
+v poskusu 2, kjer je build posledica stanja). Kot vir signala je uporaben za (a) prikaz prednosti v
+liniji v matchup kartici, (b) kasnejši cilj »razlika zlata po nakupu« (korak 2 spodaj), kjer
+značilke ob 10.–15. min služijo kot kontrola za stanje tekme.
+
 ## Zakaj je napoved zmage tako težka (51 % win rate)
 
 Matchmaking sestavlja tekme tako, da ima vsaka ekipa ~50 % možnosti, igralci pa dolgoročno ~50–51 %
