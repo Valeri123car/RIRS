@@ -486,3 +486,27 @@ razdeliti v jasne ločene skupine; gre bolj za zvezno razporeditev kazalnikov z 
 neprimerljivi med vlogami le deloma – odstopanje je že merjeno proti mediani vloge; (3) igralci v
 bazi so večinoma challenger/grandmaster, zato »povprečen« ni povprečen igralec lige;
 (4) arhetip se prikaže z verjetnostjo, pri nizki verjetnosti je treba biti previden.
+
+## Poskus 10 – GroupKFold v učenju modela buildov (2026-11-09, #28)
+
+**Sprememba:** `train_build_ranker` ne uporablja več ene delitve (`GroupShuffleSplit`), ampak
+`GroupKFold` (5, celotne tekme v isti skupini). V metrike se zapišejo povprečje in odklon po
+delitvah (`auc`, `auc_std`, `baseline_auc`, `baseline_auc_std`, `log_loss`), prispevek značilk
+sestave (`contribution` = povprečje AUC modela − AUC izhodišča po delitvah) in njegov odklon
+(`contribution_std`). Končni model se nauči na vseh podatkih.
+
+**Pogoj aktivacije:** prispevek sestave mora biti večji od odklona (poskusa 4–5: ena delitev je
+dajala »boljši« model, ki ga CV ni potrdil). Starejše verzije brez teh metrik se še presojajo po AUC.
+
+**Rezultat na pravih podatkih** (verzija 6, 8885 tekem, 105 predmetov, patch 16.22):
+
+| Metrika | Vrednost |
+|---|---|
+| AUC modela | 0,5836 ± 0,0042 |
+| AUC izhodišča brez sestave | 0,5860 ± 0,0019 |
+| Prispevek sestave | −0,0023 (odklon 0,0025) |
+| Log loss | 0,6821 |
+
+Prispevek je negativen, zato model **ni aktiviran** (pravilno). Trend iz poskusa 5 se nadaljuje:
+z več podatki se negativni prispevek manjša (−0,036 → −0,0036 → −0,0023), a sestava še vedno
+ne pomaga. Aktivno ostane priporočilo po pravilih.
