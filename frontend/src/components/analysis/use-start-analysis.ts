@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import type { Analysis } from "@/lib/analysis";
@@ -19,6 +19,15 @@ export function useStartAnalysis() {
   const { authRequest } = useAuth();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<StartError | null>(null);
+
+  // Next ob vrnitvi (»nazaj«) ohrani stanje strani, zato bi gumb ostal v »Zaganjam ...«.
+  // Ob vsaki spremembi poti (odhod na analizo in vrnitev) se zato ponastavi.
+  const pathname = usePathname();
+  const [seenPath, setSeenPath] = useState(pathname);
+  if (seenPath !== pathname) {
+    setSeenPath(pathname);
+    setPending(false);
+  }
 
   async function start(riotId: string, platform: string) {
     setPending(true);
