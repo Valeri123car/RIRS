@@ -456,3 +456,33 @@ tenacity skoraj nikoli med prvimi tremi predmeti. Smer je povsod pravilna.
 4. **Za novinca je najbolj uporabna vsebina izpeljana iz pravil:** prvi predmet = osnovni build
    šampiona, drugi = prilagoditev z največjo oceno proti grožnji sestave, z razlago iz profila
    sestave. To je pošteno označiti kot »na podlagi pravil«, ne kot napoved zmage.
+
+## Poskus 9 – arhetipi igralnega sloga z GMM (2026-11-09, #25)
+
+**Cilj:** US-06 – nasprotnika razvrstiti v arhetip (npr. »Agresiven v linijski fazi«).
+
+**Metoda** (`app/profiling/archetypes.py`): vektor igralca = povprečno odstopanje petih kazalnikov
+od mediane vloge čez zadnjih ≤ 20 tekem (profil iz #24); učni podatki so igralci z ≥ 5 tekemi v bazi
+(**2998 igralcev**). `StandardScaler` → `GaussianMixture` z diagonalnimi kovariancami (n_init = 5,
+seed 7), število komponent 2–8 po BIC. Gruče se poimenujejo po kazalnikih z največjim odstopanjem
+od povprečja (prag 0,4 σ, drugi kazalnik od 0,7 σ). Model je shranjen kot JSON v `ml_models`
+(`playstyle_clusters`, verzija 1 = id 6 po zaporedju) in se aktivira ob učenju; napoved je numpy.
+
+**Rezultat:** BIC 2: 41821, 3: 41644, 4: 41257, 5: 41241, 6: 41282, **7: 41236**, 8: 41287.
+Izbrano 7 komponent, a je krivulja od 5 do 8 ravna (razlika 5 točk BIC) → sloga ni mogoče
+razdeliti v jasne ločene skupine; gre bolj za zvezno razporeditev kazalnikov z rahlimi zgostitvami.
+
+| Gruča | Igralcev |
+|---|---|
+| Agresiven v linijski fazi | 173 |
+| Pasiven v linijski fazi | 348 |
+| Tvegan (zgodnje smrti) | 446 |
+| Vizijski igralec | 628 |
+| Roamer + Agresiven v linijski fazi | 228 |
+| Ostaja v svoji liniji | 441 |
+| Malo vizije | 734 |
+
+**Omejitve:** (1) imena so naša razlaga povprečja gruče, ne objektivna kategorija; (2) kazalniki so
+neprimerljivi med vlogami le deloma – odstopanje je že merjeno proti mediani vloge; (3) igralci v
+bazi so večinoma challenger/grandmaster, zato »povprečen« ni povprečen igralec lige;
+(4) arhetip se prikaže z verjetnostjo, pri nizki verjetnosti je treba biti previden.
