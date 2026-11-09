@@ -35,3 +35,36 @@ def test_mediane_se_shranijo_in_preberejo(db: Session):
     store_baselines(db, medians, sizes)
 
     assert load_baselines(db) == medians
+
+
+def test_arhetipi_se_shranijo_aktivirajo_in_zamenjajo(db: Session):
+    import numpy as np
+
+    from app.models.ml_model import MlModel, ModelKind, ModelStatus
+    from app.profiling.archetypes import (
+        load_active_archetypes,
+        save_archetypes,
+        train_archetypes,
+    )
+
+    rng = np.random.default_rng(3)
+    trained = train_archetypes(rng.normal(0, 1, size=(120, len(INDICATORS))), "16.22")
+
+    first = save_archetypes(db, trained)
+    assert first.status is ModelStatus.ACTIVE
+    assert load_active_archetypes(db) == trained["spec"]
+
+    second = save_archetypes(db, trained)
+    db.refresh(first)
+    assert (first.status, second.status) == (ModelStatus.RETIRED, ModelStatus.ACTIVE)
+    assert second.version == first.version + 1
+    assert (
+        db.scalar(
+            select(func.count())
+            .select_from(MlModel)
+            .where(
+                MlModel.kind == ModelKind.PLAYSTYLE_CLUSTERS, MlModel.status == ModelStatus.ACTIVE
+            )
+        )
+        == 1
+    )

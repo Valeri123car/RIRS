@@ -29,7 +29,7 @@ Baselines = dict[str, dict[str, float]]
 # Iz JSON-a vzamemo samo potrebna polja; zgodnje smrti so v match_participants.features.
 _SQL = text(
     """
-    SELECT p AS participant, m.duration_s,
+    SELECT x.puuid, p AS participant, m.duration_s, m.game_start,
            (mp.features->>'deaths_before_14')::int AS deaths14
     FROM matches m
     CROSS JOIN LATERAL (
@@ -48,11 +48,15 @@ _SQL = text(
 )
 
 
+def iter_participants(session: Session):
+    """(puuid, zmanjšan udeleženec, trajanje, začetek, zgodnje smrti) za vse tekme v bazi."""
+    yield from session.execute(_SQL, {"min_s": MIN_GAME_S}).yield_per(2000)
+
+
 def compute_baselines(session: Session) -> tuple[Baselines, dict[str, int]]:
     """({vloga: {kazalnik: mediana}}, {vloga: število igralcev}) iz vseh tekem v bazi."""
     values: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
-    rows = session.execute(_SQL, {"min_s": MIN_GAME_S}).yield_per(2000)
-    for participant, duration_s, deaths14 in rows:
+    for _puuid, participant, duration_s, _start, deaths14 in iter_participants(session):
         position = participant.get("teamPosition")
         if position not in POSITIONS:
             continue
