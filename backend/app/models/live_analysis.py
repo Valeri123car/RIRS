@@ -52,3 +52,5 @@ class LiveAnalysis(TimestampMixin, Base):
     recommendation: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     # Matchup kartica za linijo (US-05): nasprotnik, časovnica moči, sposobnosti, nasveti.
     matchup: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    # Profil igralnega sloga nasprotnikov (US-06): kazalniki proti mediani vloge, število tekem.
+    style: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
