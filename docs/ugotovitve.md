@@ -27,6 +27,7 @@ Uporabljajo se samo tekme, dolge vsaj 15 minut (krajše so remake ali zgodnja pr
 | v2 | 2026-11-08 22:50 | 1107 | 0,526 | 0,564 | neaktiven |
 | v3 | 2026-11-08 23:01 | 1260 | 0,579 | 0,594 | neaktiven |
 | v4 | 2026-11-08 23:50 | 2544 (EUW + KR) | 0,582 | 0,570 | neaktiven (glej poskus 4) |
+| v5 | 2026-11-09 14:20 | 6588 (EUW + KR + NA) | 0,573 | 0,579 | neaktiven (glej poskus 5) |
 
 Vrednotenje v1–v3: ena delitev 80/20 po tekmah (`GroupShuffleSplit`). Model: LightGBM, id šampiona in
 vloga kot kategoriji, surove vsote ocen sestave (0–15), 0/1 stolpec za vsak dokončan predmet
@@ -160,6 +161,77 @@ Skupaj 2578 tekem, uporabnih 2544 (EUW 1926, KR 618), patchi 16.20 (264), 16.21 
 (naslednji korak 4) potrebna, preden se kateri koli model aktivira. Dvig AUC na ~0,58 izvira iz
 `completed_count` (uhajanje stanja tekme, poskus 2), ne iz sestave. Mešanje regij in patchev ne pomaga:
 tudi ločeno po regijah sestava napoved poslabša.
+
+---
+
+## Poskus 5 – 6588 tekem iz treh regij, celotne metrike (2026-11-09, ~14:20)
+
+**Podatki:** zajem 2026-11-09 13:05–14:00 vzporedno na treh regionalnih usmerjevalnikih
+(EUW → `europe`, KR → `asia`, NA → `americas`; ~75 tekem/min). EUNE deli `europe` z EUW, zato
+zajema ne pospeši in je bil po nekaj minutah zamenjan z NA. Skupaj 6669 tekem, uporabnih (≥ 15 min)
+**6588** = 65.880 igralcev (EUW 3276, KR 1974, NA 1315, EUNE 23), patchi 16.14–16.22. Delež zmag
+je točno 0,500 (vsaka tekma ima 5 zmagovalcev in 5 poražencev).
+
+**Model v5** (`python -m app.ml`, ena delitev 80/20): AUC 0,5725 < izhodišče 0,5785 → **neaktiven**.
+
+**Vrednotenje:** 5-kratna `GroupKFold` po tekmah (igralci iste tekme so vedno v isti delitvi), iste
+značilke in parametri LightGBM kot v produkciji. Napovedi vseh delitev so združene; prag za
+razred je 0,5. Naivni model (vedno 0,5) ima AUC 0,500, log loss 0,6931 in Brier 0,2500.
+
+| Značilke | AUC (± odklon) | Log loss | Brier | Točnost | Preciznost | Priklic | F1 |
+|---|---|---|---|---|---|---|---|
+| vse (v5) | 0,5811 ± 0,0057 | 0,6841 | 0,2455 | 0,559 | 0,555 | 0,597 | 0,575 |
+| brez sestave (izhodišče) | **0,5846 ± 0,0035** | **0,6818** | **0,2444** | **0,562** | 0,557 | 0,608 | 0,581 |
+| brez `completed_count` | 0,5638 ± 0,0060 | 0,6878 | 0,2473 | 0,548 | 0,549 | 0,537 | 0,543 |
+| brez `completed_count` in sestave | 0,5727 ± 0,0022 | 0,6851 | 0,2460 | 0,551 | 0,553 | 0,538 | 0,545 |
+| samo šampion + položaj | 0,5148 ± 0,0048 | 0,6950 | 0,2509 | 0,510 | 0,510 | 0,507 | 0,509 |
+
+**Matrika zmede** (65.880 igralcev, prag 0,5; vrstice = dejansko, stolpci = napovedano):
+
+| v5 (vse značilke) | napoved poraz | napoved zmaga |
+|---|---|---|
+| **poraz** (32.940) | TN 17.176 | FP 15.764 |
+| **zmaga** (32.940) | FN 13.264 | TP 19.676 |
+
+| Izhodišče brez sestave | napoved poraz | napoved zmaga |
+|---|---|---|
+| **poraz** (32.940) | TN 16.972 | FP 15.968 |
+| **zmaga** (32.940) | FN 12.898 | TP 20.042 |
+
+Oba modela pravilno uvrstita le ~56 % igralcev. Napaki sta skoraj simetrični, z rahlim nagibom k
+napovedi zmage (priklic 0,60 > preciznost 0,56).
+
+**Po regijah** (vsaka regija posebej, 5-kratna GroupKFold):
+
+| Regija | Igralcev | AUC vse | AUC brez sestave | Prispevek sestave |
+|---|---|---|---|---|
+| EUW | 32.760 | 0,5773 | 0,5828 | −0,0055 |
+| KR | 19.740 | 0,5624 | 0,5670 | −0,0047 |
+| NA | 13.150 | 0,5441 | 0,5601 | −0,0160 |
+
+**Učna krivulja** (naključni podvzorci tekem, seme 7):
+
+| Tekem | AUC vse | AUC brez sestave | Prispevek sestave |
+|---|---|---|---|
+| 1000 | 0,5517 ± 0,0127 | 0,5610 | −0,0093 |
+| 2500 | 0,5606 ± 0,0061 | 0,5722 | −0,0116 |
+| 4000 | 0,5769 ± 0,0105 | 0,5803 | −0,0034 |
+| 6588 | 0,5811 ± 0,0057 | 0,5846 | −0,0036 |
+
+**Zaključek:**
+
+- Sestava nasprotnikov napoved še vedno rahlo **poslabša** (−0,0036 pri odklonu ±0,0057). Pri vseh
+  metrikah je izhodišče brez sestave enako dobro ali boljše, zato v5 **ni aktiviran** in priporočilo
+  ostane po pravilih.
+- Več podatkov pomaga obema modeloma (AUC 0,55 → 0,58), negativni prispevek sestave pa se z več
+  podatki manjša (−0,012 → −0,004). To pomeni, da 7 značilk sestave pri manj podatkih povzroča
+  prekomerno prilagajanje, ne pa, da sestava ni pomembna. Pozitivnega učinka tudi pri 6588 tekmah ni.
+- Napovedna moč prihaja skoraj v celoti iz builda: samo šampion in položaj dasta 0,515, predmeti
+  dvignejo AUC na ~0,57, `completed_count` pa še za ~0,01–0,02 (uhajanje stanja tekme, poskus 2).
+- Odklon med delitvami se je s 6588 tekmami zmanjšal na ±0,004–0,006 (pri 2544 tekmah ±0,012), zato
+  so primerjave zdaj zanesljivejše kot v poskusih 1–4.
+- Regije se ne smejo kar mešati: NA je pri enakem modelu precej slabša (0,544). Pri skupnem učenju
+  je smiselno dodati regijo kot značilko.
 
 ---
 
