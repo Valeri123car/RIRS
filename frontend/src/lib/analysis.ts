@@ -67,6 +67,42 @@ export type Recommendation = {
   variants: BuildVariant[];
 };
 
+export type PowerState = "advantage" | "even" | "disadvantage";
+
+/** Delež moči obeh šampionov na levelu (you + enemy = 100; 50 = izenačeno). */
+export type PowerPoint = { level: number; you: number; enemy: number; state: PowerState };
+
+export type PowerWindow = {
+  from: number;
+  to: number;
+  state: Exclude<PowerState, "even">;
+  reason: string;
+};
+
+export type DangerousAbility = {
+  key: "Q" | "W" | "E" | "R";
+  name: string;
+  reason: string;
+  cooldown: number | null;
+};
+
+export type ChampionRef = { id: number; name: string };
+
+/** Matchup kartica za linijo (US-05). opponent je null, če ga sistem ni mogel določiti. */
+export type Matchup = {
+  champion: ChampionRef;
+  role: "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY" | null;
+  opponent: ChampionRef | null;
+  opponent_source: "auto" | "choice" | null;
+  confidence: number | null;
+  /** Pet nasprotnih šampionov za ročno izbiro. */
+  candidates: ChampionRef[];
+  levels: PowerPoint[];
+  windows: PowerWindow[];
+  dangerous_abilities: DangerousAbility[];
+  tips: string[];
+};
+
 export type Analysis = {
   id: string;
   status: AnalysisStatus;
@@ -77,6 +113,7 @@ export type Analysis = {
   participants: Participant[];
   enemy_comp: EnemyComp | null;
   recommendation?: Recommendation | null;
+  matchup?: Matchup | null;
   created_at: string;
 };
 
@@ -142,6 +179,13 @@ export function useAnalysisProgress(id: string): ProgressState {
   }, [id]);
 
   return state;
+}
+
+/** Matchup kartica proti nasprotniku, ki ga je izbral igralec (eden izmed petih). */
+export function fetchMatchup(analysisId: string, opponentId: number): Promise<Matchup> {
+  return apiGet<Matchup>(
+    `/analyses/${encodeURIComponent(analysisId)}/matchup?opponent=${encodeURIComponent(opponentId)}`,
+  );
 }
 
 export function itemIconUrl(version: string, itemId: number): string {

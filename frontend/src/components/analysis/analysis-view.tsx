@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { BuildPanel } from "@/components/analysis/build-panel";
 import { EnemyCompPanel } from "@/components/analysis/enemy-comp-panel";
+import { MatchupPanel } from "@/components/analysis/matchup-panel";
 import { StartError } from "@/components/analysis/start-error";
 import { useStartAnalysis } from "@/components/analysis/use-start-analysis";
 import { Button } from "@/components/ui/button";
@@ -198,6 +199,15 @@ export function AnalysisView({ id }: { id: string }) {
 
       {analysis.status === "completed" && (
         <BuildPanel recommendation={analysis.recommendation ?? null} version={version} />
+      )}
+
+      {analysis.status === "completed" && analysis.matchup && (
+        <MatchupPanel
+          analysisId={analysis.id}
+          matchup={analysis.matchup}
+          participants={analysis.participants}
+          version={version}
+        />
       )}
 
       {analysis.participants.length > 0 && <Teams analysis={analysis} version={version} />}
