@@ -138,6 +138,16 @@ def list_my_analyses(user: CurrentUser, db: DbSession) -> list[AnalysisSummary]:
     return summaries
 
 
+@router.delete("/{analysis_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_my_analysis(analysis_id: uuid.UUID, user: CurrentUser, db: DbSession) -> None:
+    """Izbriše analizo, ki pripada prijavljenemu uporabniku (tuja ali neobstoječa: 404)."""
+    analysis = db.get(LiveAnalysis, analysis_id)
+    if analysis is None or analysis.user_id != user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Analiza ne obstaja.")
+    db.delete(analysis)
+    db.commit()
+
+
 def _existing_analysis(analysis_id: uuid.UUID, db: DbSession) -> uuid.UUID:
     if db.get(LiveAnalysis, analysis_id) is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Analiza ne obstaja.")

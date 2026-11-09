@@ -25,7 +25,10 @@ type AuthState = {
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   /** Zahteva z dostopnim žetonom; ob poteku ga enkrat osveži in poskusi znova. */
-  authRequest: <T>(path: string, options?: { method?: "GET" | "POST"; body?: unknown }) => Promise<T>;
+  authRequest: <T>(
+    path: string,
+    options?: { method?: "GET" | "POST" | "DELETE"; body?: unknown },
+  ) => Promise<T>;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -103,7 +106,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const authRequest = useCallback(
-    async <T,>(path: string, options: { method?: "GET" | "POST"; body?: unknown } = {}) => {
+    async <T,>(
+      path: string,
+      options: { method?: "GET" | "POST" | "DELETE"; body?: unknown } = {},
+    ) => {
       try {
         return await apiRequest<T>(path, { ...options, token: tokenRef.current });
       } catch (error) {

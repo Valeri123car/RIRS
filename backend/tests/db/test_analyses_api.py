@@ -126,3 +126,30 @@ def test_seznam_analiz_vrne_samo_analize_prijavljenega_uporabnika(api):
 
 def test_seznam_analiz_zahteva_prijavo(api):
     assert api.get("/analyses").status_code == 401
+
+
+def test_uporabnik_izbrise_svojo_analizo(api, db):
+    headers = auth_headers(api, "brisi@example.com")
+    analysis_id = start(api, headers=headers).json()["id"]
+
+    assert api.delete(f"/analyses/{analysis_id}", headers=headers).status_code == 204
+
+    assert db.get(LiveAnalysis, uuid.UUID(analysis_id)) is None
+    assert api.get("/analyses", headers=headers).json() == []
+
+
+def test_tuje_analize_ni_mogoce_izbrisati(api, db):
+    mine = auth_headers(api, "moja2@example.com")
+    other = auth_headers(api, "tvoja2@example.com")
+    analysis_id = start(api, headers=mine).json()["id"]
+
+    assert api.delete(f"/analyses/{analysis_id}", headers=other).status_code == 404
+
+    assert db.get(LiveAnalysis, uuid.UUID(analysis_id)) is not None
+
+
+def test_brisanje_zahteva_prijavo_in_analiza_gosta_ni_brisljiva(api):
+    analysis_id = start(api).json()["id"]
+
+    assert api.delete(f"/analyses/{analysis_id}").status_code == 401
+    assert api.delete(f"/analyses/{analysis_id}", headers=auth_headers(api)).status_code == 404
