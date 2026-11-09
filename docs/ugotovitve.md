@@ -510,3 +510,30 @@ dajala »boljši« model, ki ga CV ni potrdil). Starejše verzije brez teh metri
 Prispevek je negativen, zato model **ni aktiviran** (pravilno). Trend iz poskusa 5 se nadaljuje:
 z več podatki se negativni prispevek manjša (−0,036 → −0,0036 → −0,0023), a sestava še vedno
 ne pomaga. Aktivno ostane priporočilo po pravilih.
+
+## Poskus 11 – napaka priporočila za šampione, ki odstopajo od razreda (2026-11-09, #82)
+
+**Opažanje (uporabnik, Pyke):** priporočilo je dalo Mikael's Blessing, Moonstone Renewer, Echoes of Helia
+in Imperial Mandate (enchanter) ter rune Summon Aery in sposobnosti E > Q > W. Pravi Pykeovi
+igralci v naših podatkih (642 iger, večinoma vloga UTILITY) kupujejo Umbral Glaive (76 %), Edge of
+Night (41 %) in Youmuu's Ghostblade (27 %).
+
+**Vzrok:** `profile_for` je uporabil samo prvi Riotov razred (Pyke: Support) in predmete točkoval
+samo po oznakah; dejanskih nakupov šampiona ni upošteval. To je tudi neposredna posledica
+poskusa 8: build določa šampion, zato razred in oznake za izjeme ne zadoščajo.
+
+**Popravek:** kandidati so predmeti, ki jih ima ≥ 5 % igralcev šampiona v njegovi najpogostejši
+vlogi (`app/recommend/champion_stats.py`, vsaj 30 iger); točke = pogostost + zmage (z Bayesovim
+krčenjem); protiukrepi (anti-heal, armor/MR glede na delež škode, odpornost proti CC ...)
+dodajo točke in lahko zamenjajo predmet z razlago. Profil run in sposobnosti se izbere po
+oznakah dejanskega builda, ne po razredu. Pri < 30 igrah ali < 3 kandidatih ostane prejšnja
+rezerva po oznakah.
+
+**Rezultat (pravi podatki):** Pyke → Umbral Glaive, Edge of Night, Frozen Heart / Youmuu's
+(Electrocute, QEW); Janna ostane enchanter (Moonstone, Mikael's, Locket, Redemption); Jinx
+dobi kritične predmete (Infinity Edge, Runaan's, Mortal Reminder proti tankom).
+
+**Omejitve:** (1) vrstni red predmetov je po točkah, ne po času nakupa (časovnice so za večino
+tekem, a ga še ne uporabljamo); (2) rune in sposobnosti so še vedno iz profila, ne iz podatkov
+(Riotove rune iz `raw` niso preslikane v imena); (3) priporočilo ne ve, ali igralcu gre dobro –
+to je predlog stikala »gre mi dobro / slabo«.
