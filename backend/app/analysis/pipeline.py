@@ -1,6 +1,7 @@
 """Potek analize aktivne tekme (ADR-0004): zajem → profiliranje → priporočila."""
 
 import uuid
+from dataclasses import asdict
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,6 +16,7 @@ from app.ml.build_ranker import load_active_build_ranker
 from app.models.champion import Champion
 from app.models.item import Item
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
+from app.profiling.archetypes import classify, load_active_archetypes
 from app.profiling.baselines import load_baselines
 from app.profiling.style import build_style_profile
 from app.recommend.base import RecommendationInput, Recommender
@@ -73,11 +75,17 @@ def profile_enemy_styles(session: Session, riot: RiotClient, analysis: LiveAnaly
     if not baselines:
         return {}
     target_team = next((p["team_id"] for p in analysis.participants if p["is_target"]), None)
-    return {
-        p["puuid"]: build_style_profile(session, riot, p["puuid"], analysis.platform, baselines)
-        for p in analysis.participants
-        if p["team_id"] != target_team and p.get("puuid")
-    }
+    spec = load_active_archetypes(session)
+    profiles = {}
+    for p in analysis.participants:
+        if p["team_id"] == target_team or not p.get("puuid"):
+            continue
+        profile = build_style_profile(session, riot, p["puuid"], analysis.platform, baselines)
+        if spec is not None and profile["matches"]:
+            vs_median = {n: v["vs_median"] for n, v in profile["indicators"].items()}
+            profile["archetype"] = asdict(classify(spec, vs_median))
+        profiles[p["puuid"]] = profile
+    return profiles
 
 
 def _enemy_champions(session: Session, analysis: LiveAnalysis) -> tuple[list[Champion], list[int]]:
