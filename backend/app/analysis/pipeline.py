@@ -20,6 +20,7 @@ from app.profiling.archetypes import classify, load_active_archetypes
 from app.profiling.baselines import load_baselines
 from app.profiling.style import build_style_profile
 from app.recommend.base import RecommendationInput, Recommender
+from app.recommend.champion_stats import load_build_stats
 from app.recommend.model import ModelRecommender
 from app.recommend.rules import RuleBasedRecommender
 from app.riot.client import RiotClient
@@ -117,6 +118,7 @@ def recommend_build(
             enemy_comp=analysis.enemy_comp,
             items=items,
             enemy_champions=enemies,
+            build_stats=load_build_stats(session, champion.id),
         )
     )
 

@@ -17,10 +17,17 @@ from typing import Any
 from app.models.champion import Champion, DamageProfile
 from app.models.item import Item
 from app.recommend.base import RULES_LABEL, VARIANTS, RecommendationInput
+from app.recommend.champion_stats import BuildStats
 
 ITEMS_PER_VARIANT = 4
 MIN_ITEMS = 3
 MAX_NAMED_CHAMPIONS = 3
+
+# Priporočilo iz pravih buildov šampiona (champion_stats): točke za pogostost in zmage.
+POPULARITY_WEIGHT = 4.0
+WIN_RATE_WEIGHT = 4.0
+# Predmeti, ki jih ima manj kot ta delež igralcev šampiona, niso kandidati.
+MIN_PICK_RATE = 0.05
 
 SKILLS = ("Q", "W", "E")
 R_LEVELS = (6, 11, 16)
@@ -280,6 +287,7 @@ class _Context:
     threats: dict[str, dict[str, Any]]
     shares: dict[str, int]  # {"physical": 60, "magic": 40}
     counter_tags: dict[str, frozenset[str]] = field(default_factory=dict)
+    build_stats: BuildStats | None = None
 
     def __post_init__(self) -> None:
         for key, counter in COUNTERS.items():
@@ -288,10 +296,18 @@ class _Context:
 
     def score(self, item: Item, mix: Mix, consumed: set[str]) -> dict[str, float]:
         tags = set(item.tags)
-        offense = sum(self.profile.offense.get(tag, 0) for tag in tags) * mix.offense
-        if self.profile.penetration in tags:
-            offense += mix.penetration
-        parts = {"offense": offense}
+        if self.build_stats is not None:
+            # Jedro builda določajo pravi nakupi šampiona; oznake dodajo samo prilagoditev.
+            stats = self.build_stats
+            parts = {
+                "popularity": POPULARITY_WEIGHT * stats.pick_rate(item.id)
+                + WIN_RATE_WEIGHT * (stats.win_rate(item.id) - 0.5)
+            }
+        else:
+            offense = sum(self.profile.offense.get(tag, 0) for tag in tags) * mix.offense
+            if self.profile.penetration in tags:
+                offense += mix.penetration
+            parts = {"offense": offense}
 
         if "armor" in tags:
             parts["defense:physical"] = self._defense("physical", mix)
@@ -313,15 +329,24 @@ class _Context:
         tags = set(item.tags)
         return {key for key, counter_tags in self.counter_tags.items() if tags & counter_tags}
 
-    def reason(self, parts: dict[str, float]) -> str:
-        situational = {k: v for k, v in parts.items() if k != "offense" and v > 0}
+    def reason(self, parts: dict[str, float], item: Item | None = None) -> str:
+        situational = {k: v for k, v in parts.items() if k not in BASE_PARTS and v > 0}
         if situational:
             category = max(situational, key=lambda k: (situational[k], k))
             kind, _, key = category.partition(":")
             if kind == "counter":
                 return COUNTERS[key].reason.format(champions=self._names(self.threats[key]))
             return DEFENSE_REASONS[key].format(share=self.shares[key])
+        if self.build_stats is not None and item is not None:
+            return self._popularity_reason(item)
         return self._offense_reason()
+
+    def _popularity_reason(self, item: Item) -> str:
+        stats = self.build_stats
+        assert stats is not None
+        pick = round(100 * stats.pick_rate(item.id))
+        wins = round(100 * stats.win_rate(item.id))
+        return f"Pogost predmet tega šampiona ({pick} % iger, {wins} % zmag z njim)."
 
     def _offense_reason(self) -> str:
         physical, magic = self.shares["physical"], self.shares["magic"]
@@ -352,11 +377,19 @@ class RuleBasedRecommender:
     """Rezervni Recommender (ADR-0006); vedno vrne vir "rules" brez model_id."""
 
     def recommend(self, data: RecommendationInput) -> dict[str, Any] | None:
-        profile = profile_for(data.champion)
-        items = sorted(
-            (i for i in data.items if i.completed and _allowed(profile, i)),
-            key=lambda i: i.id,
-        )
+        stats = _usable_stats(data)
+        if stats is not None:
+            profile = profile_from_builds(stats, data.items, data.champion)
+            items = sorted(
+                (i for i in data.items if i.completed and stats.pick_rate(i.id) >= MIN_PICK_RATE),
+                key=lambda i: i.id,
+            )
+        else:
+            profile = profile_for(data.champion)
+            items = sorted(
+                (i for i in data.items if i.completed and _allowed(profile, i)),
+                key=lambda i: i.id,
+            )
         if len(items) < MIN_ITEMS:
             return None
 
@@ -366,6 +399,7 @@ class RuleBasedRecommender:
             # Grožnje so v profilu že razvrščene po moči; prva je najnevarnejša.
             threats={t["key"]: t for t in data.enemy_comp.get("threats", [])},
             shares=data.enemy_comp.get("damage", {"physical": 50, "magic": 50}),
+            build_stats=stats,
         )
         variants = _variants(context)
         if not variants:
@@ -377,6 +411,42 @@ class RuleBasedRecommender:
             "champion": {"id": data.champion.id, "name": data.champion.name},
             "variants": variants,
         }
+
+
+BASE_PARTS = frozenset({"offense", "popularity"})
+ALL_PROFILES = (MARKSMAN, MAGE, ASSASSIN, MAGIC_ASSASSIN, FIGHTER, MAGIC_FIGHTER, TANK, SUPPORT)
+
+
+def _usable_stats(data: RecommendationInput) -> BuildStats | None:
+    stats = data.build_stats
+    if stats is None:
+        return None
+    candidates = [i for i in data.items if i.completed and stats.pick_rate(i.id) >= MIN_PICK_RATE]
+    return stats if len(candidates) >= MIN_ITEMS else None
+
+
+def profile_from_builds(stats: BuildStats, items: Sequence[Item], champion: Champion) -> Profile:
+    """Profil (rune, sposobnosti, razlogi), ki se najbolj ujema z dejanskim buildom šampiona.
+
+    Razred šampiona ne zadošča (Pyke je »Support«, a gradi smrtonosnost); zato profil, katerega
+    oznake pridobijo največ točk pri pogostih predmetih. Pri izenačenju velja razred.
+    """
+    fallback = profile_for(champion)
+
+    def fit(profile: Profile) -> float:
+        total = 0.0
+        for item in items:
+            rate = stats.pick_rate(item.id)
+            tags = set(item.tags)
+            if not item.completed or rate < MIN_PICK_RATE:
+                continue
+            if tags & profile.forbids or not tags & profile.requires:
+                continue
+            total += rate * sum(profile.offense.get(tag, 0) for tag in tags)
+        return total
+
+    best = max(ALL_PROFILES, key=fit)
+    return best if fit(best) > fit(fallback) else fallback
 
 
 def _allowed(profile: Profile, item: Item) -> bool:
@@ -410,7 +480,11 @@ def _variants(context: _Context) -> list[dict[str, Any]]:
                     "secondary_tree": secondary_tree,
                 },
                 "items": [
-                    {"id": p.item.id, "name": p.item.name, "reason": context.reason(p.parts)}
+                    {
+                        "id": p.item.id,
+                        "name": p.item.name,
+                        "reason": context.reason(p.parts, p.item),
+                    }
                     for p in picks
                 ],
                 "skill_order": {

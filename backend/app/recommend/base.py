@@ -10,6 +10,7 @@ from typing import Any, Protocol
 
 from app.models.champion import Champion
 from app.models.item import Item
+from app.recommend.champion_stats import BuildStats
 
 RULES_LABEL = "Priporočilo na podlagi pravil"
 MODEL_LABEL = "Priporočilo modela"
@@ -31,6 +32,8 @@ class RecommendationInput:
     items: Sequence[Item]
     # Nasprotni šampioni iz baze znanja (model iz njih izračuna vektor sestave).
     enemy_champions: Sequence[Champion] = ()
+    # Kaj šampion v zbranih tekemah res kupuje (None: premalo iger → pravila po oznakah).
+    build_stats: BuildStats | None = None
 
 
 class Recommender(Protocol):
