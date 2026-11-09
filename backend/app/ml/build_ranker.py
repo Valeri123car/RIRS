@@ -12,7 +12,7 @@ from typing import Any
 import lightgbm as lgb
 import numpy as np
 from sklearn.metrics import log_loss, roc_auc_score
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import GroupKFold
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
@@ -27,7 +27,7 @@ from app.ml.build_features import (
 from app.models.ml_model import MlModel, ModelKind, ModelStatus
 
 MIN_TRAINING_ROWS = 200
-TEST_SHARE = 0.2
+CV_FOLDS = 5
 SEED = 7
 NUM_ROUNDS = 200
 PARAMS: dict[str, Any] = {
@@ -75,25 +75,38 @@ def train_build_ranker(rows: Sequence[TrainingRow], patch: str) -> TrainedRanker
     spec = build_spec(rows)
     features, labels = encode_rows(spec, rows)
     groups = [row.match_id for row in rows]
-    split = GroupShuffleSplit(n_splits=1, test_size=TEST_SHARE, random_state=SEED)
-    train_idx, test_idx = next(split.split(features, labels, groups))
-
     columns = spec.columns
-    booster = _fit(features[train_idx], labels[train_idx], columns)
-    predicted = booster.predict(features[test_idx])
-
     comp_columns = {columns.index(name) for name in COMP_FEATURES}
     keep = [i for i in range(len(columns)) if i not in comp_columns]
-    baseline = _fit(features[train_idx][:, keep], labels[train_idx], [columns[i] for i in keep])
-    baseline_predicted = baseline.predict(features[test_idx][:, keep])
+    keep_columns = [columns[i] for i in keep]
 
-    test_labels = labels[test_idx]
+    # Ena delitev je šumna (poskusi 4–5: odklon ±0,01–0,02), zato metrike povprečimo čez
+    # GroupKFold; cele tekme so v isti skupini, da isti dogodek ni na obeh straneh.
+    aucs, baseline_aucs, losses = [], [], []
+    for train_idx, test_idx in GroupKFold(n_splits=CV_FOLDS).split(features, labels, groups):
+        test_labels = labels[test_idx]
+        model = _fit(features[train_idx], labels[train_idx], columns)
+        predicted = model.predict(features[test_idx])
+        baseline = _fit(features[train_idx][:, keep], labels[train_idx], keep_columns)
+        baseline_predicted = baseline.predict(features[test_idx][:, keep])
+        aucs.append(roc_auc_score(test_labels, predicted))
+        baseline_aucs.append(roc_auc_score(test_labels, baseline_predicted))
+        losses.append(log_loss(test_labels, predicted))
+    gains = np.array(aucs) - np.array(baseline_aucs)
+
+    # Končni model se nauči na vseh podatkih; metrike zgoraj ocenjujejo ta postopek.
+    booster = _fit(features, labels, columns)
     metrics = {
-        "auc": round(float(roc_auc_score(test_labels, predicted)), 4),
-        "log_loss": round(float(log_loss(test_labels, predicted)), 4),
-        "baseline_auc": round(float(roc_auc_score(test_labels, baseline_predicted)), 4),
-        "train_rows": len(train_idx),
-        "test_rows": len(test_idx),
+        "auc": round(float(np.mean(aucs)), 4),
+        "auc_std": round(float(np.std(aucs)), 4),
+        "baseline_auc": round(float(np.mean(baseline_aucs)), 4),
+        "baseline_auc_std": round(float(np.std(baseline_aucs)), 4),
+        # Prispevek značilk sestave po delitvah in njegov odklon: pogoj aktivacije.
+        "contribution": round(float(gains.mean()), 4),
+        "contribution_std": round(float(gains.std()), 4),
+        "log_loss": round(float(np.mean(losses)), 4),
+        "folds": CV_FOLDS,
+        "rows": len(rows),
         "matches": len(set(groups)),
         "items": len(spec.item_ids),
     }
@@ -130,11 +143,22 @@ def save_build_ranker(session: Session, trained: TrainedRanker, activate: bool =
 
 
 def activate_build_ranker(session: Session, model: MlModel) -> None:
-    """Aktivira verzijo, če je boljša od izhodiščnega modela; prejšnja aktivna je umaknjena."""
-    if model.metrics.get("auc", 0) <= model.metrics.get("baseline_auc", 1):
+    """Aktivira verzijo, če sestava dokazljivo pomaga; prejšnja aktivna je umaknjena (ADR-0006).
+
+    Pogoj: povprečni prispevek značilk sestave čez delitve je večji od njegovega odklona
+    (drugače je razlika šum). Starejše verzije brez CV metrik: AUC višji od izhodiščnega.
+    """
+    metrics = model.metrics
+    if "contribution" in metrics:
+        if metrics["contribution"] <= metrics.get("contribution_std", 0):
+            raise ActivationRefusedError(
+                f"Prispevek sestave {metrics['contribution']} ni večji od odklona "
+                f"{metrics.get('contribution_std')}; model ostane neaktiven."
+            )
+    elif metrics.get("auc", 0) <= metrics.get("baseline_auc", 1):
         raise ActivationRefusedError(
-            f"AUC {model.metrics.get('auc')} ni višji od izhodiščnega "
-            f"{model.metrics.get('baseline_auc')}; model ostane neaktiven."
+            f"AUC {metrics.get('auc')} ni višji od izhodiščnega "
+            f"{metrics.get('baseline_auc')}; model ostane neaktiven."
         )
     session.execute(
         update(MlModel)

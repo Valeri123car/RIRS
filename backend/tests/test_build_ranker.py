@@ -58,9 +58,18 @@ def test_model_z_znacilkami_sestave_premaga_izhodisce():
     trained = train_build_ranker(synthetic_rows(), patch="16.22")
 
     metrics = trained.metrics
-    assert set(metrics) >= {"auc", "log_loss", "baseline_auc", "train_rows", "test_rows"}
+    assert set(metrics) >= {"auc", "auc_std", "log_loss", "baseline_auc", "baseline_auc_std"}
     assert metrics["auc"] > metrics["baseline_auc"]
-    assert metrics["train_rows"] + metrics["test_rows"] == 4000
+    # Prispevek sestave mora biti večji od odklona med delitvami (pogoj aktivacije).
+    assert metrics["contribution"] > metrics["contribution_std"] >= 0
+    assert (metrics["folds"], metrics["rows"]) == (5, 4000)
+
+
+def test_ucenje_je_ponovljivo():
+    first = train_build_ranker(synthetic_rows(), patch="16.22").metrics
+    second = train_build_ranker(synthetic_rows(), patch="16.22").metrics
+
+    assert first == second
 
 
 def test_premalo_podatkov_za_ucenje():
