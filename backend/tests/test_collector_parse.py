@@ -206,7 +206,7 @@ def events_timeline(timeline) -> dict:
 def test_casovnica_dobi_razlicico_znacilk(timeline):
     features = timeline_features(timeline)
 
-    assert all(f["timeline_v"] == 2 for f in features.values())
+    assert all(f["timeline_v"] == 3 for f in features.values())
 
 
 def test_stanje_igralca_ob_15_minuti(timeline):
@@ -276,3 +276,37 @@ def test_kratka_tekma_nima_stanja_ob_15(timeline):
     assert "gold_15" not in features and "team_gold_diff_15" not in features
     assert "kills_15" not in features and "team_dragons_15" not in features
     assert features["purchases"] == []
+
+
+def _extended(timeline: dict, minutes: int) -> dict:
+    """Časovnica z okvirji vsako minuto do `minutes` (zadnji okvir se kopira, zlato raste)."""
+    frames = timeline["info"]["frames"]
+    while len(frames) <= minutes:
+        frame = copy.deepcopy(frames[-1])
+        frame["timestamp"] = len(frames) * 60_000
+        frame["events"] = []
+        for state in frame["participantFrames"].values():
+            state["totalGold"] += 100
+        frames.append(frame)
+    return timeline
+
+
+@pytest.mark.parametrize("minute", [10, 15, 20, 25, 30, 40])
+def test_stanje_ob_vseh_minutah(timeline, minute):
+    timeline = _extended(timeline, 41)
+    state = timeline["info"]["frames"][minute]["participantFrames"]["1"]
+
+    features = timeline_features(timeline)[_puuid(timeline, 1)]
+
+    assert features[f"gold_{minute}"] == state["totalGold"]
+    assert f"team_gold_diff_{minute}" in features and f"enemy_towers_{minute}" in features
+
+
+def test_tekma_do_22_minute_nima_stanja_ob_25_in_40(timeline):
+    timeline = _extended(timeline, 22)
+    timeline["info"]["frames"] = timeline["info"]["frames"][:23]
+
+    features = timeline_features(timeline)[_puuid(timeline, 1)]
+
+    assert "gold_20" in features
+    assert "gold_25" not in features and "gold_40" not in features

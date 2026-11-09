@@ -16,13 +16,16 @@ GOLD_MINUTE = 15
 EARLY_DEATHS_MINUTE = 14
 # Stanje igralca in ekipe za model buildov: samo podatki, znani do te minute (brez izida).
 STATE_MINUTE = 15
-TIMELINE_VERSION = 2
+# Minute posnetkov stanja (v3); ključi imajo pripono _<minuta>, npr. gold_20.
+STATE_MINUTES = (10, 15, 20, 25, 30, 40)
+TIMELINE_VERSION = 3
 MONSTER_COUNTERS = {
     "DRAGON": "dragons",
     "HORDE": "grubs",
     "RIFTHERALD": "heralds",
     "BARON_NASHOR": "barons",
 }
+COUNT_FIELDS = ("kills", "deaths", "assists", "shutdown_gold", "shutdowns_given")
 TEAM_COUNTERS = ("deaths", "dragons", "grubs", "heralds", "barons", "towers", "plates")
 
 
@@ -126,7 +129,8 @@ def timeline_features(timeline: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
     Kratka tekma (npr. predaja pred 15. minuto) nima vseh okvirjev; manjkajoča značilka
     se izpusti. Nepopolna časovnica vrne prazen slovar (tekma se shrani brez značilk).
-    Različica 2 doda stanje igralca in ekipe ob STATE_MINUTE ter nakupe s časom.
+    Različica 2 doda stanje ob 15. minuti in nakupe s časom; različica 3 stanje ob vseh
+    STATE_MINUTES (tekma, ki je krajša, nima poznejših posnetkov).
     """
     try:
         info = timeline["info"]
@@ -163,9 +167,11 @@ def timeline_features(timeline: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
         for pid, purchases in _purchases(frames, puuids).items():
             features[puuids[pid]]["purchases"] = purchases
-        state_frame = _frame_at(frames, STATE_MINUTE)
-        if state_frame is not None:
-            for pid, values in _state_at(state_frame, frames, puuids).items():
+        for minute in STATE_MINUTES:
+            state_frame = _frame_at(frames, minute)
+            if state_frame is None:
+                continue
+            for pid, values in _state_at(state_frame, frames, puuids, minute).items():
                 features[puuids[pid]].update(values)
         return features
     except (KeyError, TypeError, ValueError):
@@ -205,54 +211,53 @@ def _purchases(frames: list[dict[str, Any]], puuids: dict[int, str]) -> dict[int
 
 
 def _state_at(
-    frame: dict[str, Any], frames: list[dict[str, Any]], puuids: dict[int, str]
+    frame: dict[str, Any], frames: list[dict[str, Any]], puuids: dict[int, str], minute: int
 ) -> dict[int, dict[str, int]]:
-    """Stanje igralca in ekipe ob STATE_MINUTE (okvir) in dogodki pred to minuto."""
+    """Stanje igralca in ekipe ob dani minuti (okvir) in dogodki pred to minuto."""
+    m = minute
     states = frame["participantFrames"]
     player: dict[int, dict[str, int]] = {}
     for pid in puuids:
         state = states[str(pid)]
         values = {
-            "gold_15": int(state["totalGold"]),
-            "xp_15": int(state["xp"]),
-            "level_15": int(state["level"]),
-            "cs_15": _cs(state),
+            f"gold_{m}": int(state["totalGold"]),
+            f"xp_{m}": int(state["xp"]),
+            f"level_{m}": int(state["level"]),
+            f"cs_{m}": _cs(state),
         }
         damage = state.get("damageStats") or {}
         if "totalDamageDoneToChampions" in damage:
-            values["dmg_champ_15"] = int(damage["totalDamageDoneToChampions"])
+            values[f"dmg_champ_{m}"] = int(damage["totalDamageDoneToChampions"])
         if "totalDamageTaken" in damage:
-            values["dmg_taken_15"] = int(damage["totalDamageTaken"])
-        values.update(
-            kills_15=0, deaths_15=0, assists_15=0, shutdown_gold_15=0, shutdowns_given_15=0
-        )
+            values[f"dmg_taken_{m}"] = int(damage["totalDamageTaken"])
+        values.update(**{f"{name}_{m}": 0 for name in COUNT_FIELDS})
         player[pid] = values
 
     team_gold = dict.fromkeys(TEAMS, 0)
     team_xp = dict.fromkeys(TEAMS, 0)
     for pid, values in player.items():
-        team_gold[_team(pid)] += values["gold_15"]
-        team_xp[_team(pid)] += values["xp_15"]
+        team_gold[_team(pid)] += values[f"gold_{m}"]
+        team_xp[_team(pid)] += values[f"xp_{m}"]
 
     team: dict[int, dict[str, int]] = {t: dict.fromkeys(TEAM_COUNTERS, 0) for t in TEAMS}
     first_blood: int | None = None
-    for event in _events_before(frames, STATE_MINUTE):
+    for event in _events_before(frames, minute):
         kind = event["type"]
         if kind == "CHAMPION_KILL":
             killer, victim = int(event.get("killerId", 0)), int(event.get("victimId", 0))
             if killer in player:
-                player[killer]["kills_15"] += 1
-                player[killer]["shutdown_gold_15"] += int(event.get("shutdownBounty", 0))
+                player[killer][f"kills_{m}"] += 1
+                player[killer][f"shutdown_gold_{m}"] += int(event.get("shutdownBounty", 0))
             if victim in player:
-                player[victim]["deaths_15"] += 1
+                player[victim][f"deaths_{m}"] += 1
                 if int(event.get("shutdownBounty", 0)) > 0:
-                    player[victim]["shutdowns_given_15"] += 1
+                    player[victim][f"shutdowns_given_{m}"] += 1
                 team[_team(victim)]["deaths"] += 1
                 if first_blood is None:
                     first_blood = TEAMS[1] if _team(victim) == TEAMS[0] else TEAMS[0]
             for assistant in event.get("assistingParticipantIds") or []:
                 if int(assistant) in player:
-                    player[int(assistant)]["assists_15"] += 1
+                    player[int(assistant)][f"assists_{m}"] += 1
         elif kind == "ELITE_MONSTER_KILL":
             counter = MONSTER_COUNTERS.get(str(event.get("monsterType")))
             if counter and int(event.get("killerTeamId", 0)) in team:
@@ -269,16 +274,17 @@ def _state_at(
     for pid, values in player.items():
         own = _team(pid)
         enemy = TEAMS[1] if own == TEAMS[0] else TEAMS[0]
-        values["team_gold_diff_15"] = team_gold[own] - team_gold[enemy]
-        values["team_xp_diff_15"] = team_xp[own] - team_xp[enemy]
-        values["team_kills_15"] = team[enemy]["deaths"]
-        values["enemy_kills_15"] = team[own]["deaths"]
+        values[f"team_gold_diff_{m}"] = team_gold[own] - team_gold[enemy]
+        values[f"team_xp_diff_{m}"] = team_xp[own] - team_xp[enemy]
+        values[f"team_kills_{m}"] = team[enemy]["deaths"]
+        values[f"enemy_kills_{m}"] = team[own]["deaths"]
         for counter in TEAM_COUNTERS:
             if counter == "deaths":
                 continue
-            values[f"team_{counter}_15"] = team[own][counter]
-            values[f"enemy_{counter}_15"] = team[enemy][counter]
-        values["first_blood_team"] = int(first_blood == own)
+            values[f"team_{counter}_{m}"] = team[own][counter]
+            values[f"enemy_{counter}_{m}"] = team[enemy][counter]
+        if minute == STATE_MINUTE:
+            values["first_blood_team"] = int(first_blood == own)
         result[pid] = values
     return result
 
