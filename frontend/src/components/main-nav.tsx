@@ -12,7 +12,7 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Moje analize", href: "/analize", ready: false },
+  { label: "Moje analize", href: "/analize", ready: true },
   { label: "V živo", href: "/", ready: true },
   { label: "Napredek", href: "/napredek", ready: false },
   { label: "Ekipa", href: "/ekipa", ready: false },
@@ -49,6 +49,9 @@ function NavLinks({ pathname }: { pathname: string | null }) {
               className={`${BASE} cursor-not-allowed text-muted/60`}
             >
               {item.label}
+              <span className="ml-1.5 font-label text-[10px] tracking-wider text-muted/70">
+                kmalu
+              </span>
             </span>
           );
         }

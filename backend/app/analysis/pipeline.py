@@ -70,7 +70,7 @@ def profile_enemy_team(session: Session, analysis: LiveAnalysis) -> dict:
     return build_enemy_comp(champions, missing=len(enemy_ids) - len(champions))
 
 
-def profile_enemy_styles(session: Session, riot: RiotClient, analysis: LiveAnalysis) -> dict:
+def profile_enemy_styles(session: Session, riot: RiotClient | None, analysis: LiveAnalysis) -> dict:
     """Profil sloga vsakega nasprotnika (po puuid); {} brez mediane vlog v bazi."""
     baselines = load_baselines(session)
     if not baselines:

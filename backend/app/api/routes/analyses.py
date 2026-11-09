@@ -9,10 +9,12 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy import select
 
 from app.analysis.guest_limit import GUEST_DAILY_LIMIT
 from app.analysis.pipeline import build_matchup
 from app.api.deps import (
+    CurrentUser,
     DbSession,
     GuestLimit,
     OptionalUser,
@@ -45,6 +47,21 @@ class AnalysisOut(BaseModel):
     # Profil sloga nasprotnikov (US-06) po puuid; None, dokler korak profiliranja ni končan.
     style: dict[str, Any] | None
     created_at: datetime
+
+
+class AnalysisSummary(BaseModel):
+    id: uuid.UUID
+    status: AnalysisStatus
+    game_name: str
+    tag_line: str
+    platform: str
+    # Šampion igralca (is_target) in nasprotna ekipa za hiter pregled seznama.
+    champion_name: str | None
+    enemy_champions: list[str]
+    created_at: datetime
+
+
+MAX_LISTED_ANALYSES = 50
 
 
 GUEST_LIMIT_MESSAGE = (
@@ -87,6 +104,38 @@ def start_analysis(
     queue(analysis.id)
     db.refresh(analysis)
     return analysis
+
+
+@router.get("", response_model=list[AnalysisSummary])
+def list_my_analyses(user: CurrentUser, db: DbSession) -> list[AnalysisSummary]:
+    """Analize prijavljenega uporabnika, najnovejše najprej."""
+    rows = db.scalars(
+        select(LiveAnalysis)
+        .where(LiveAnalysis.user_id == user.id)
+        .order_by(LiveAnalysis.created_at.desc())
+        .limit(MAX_LISTED_ANALYSES)
+    )
+    summaries = []
+    for analysis in rows:
+        target = next((p for p in analysis.participants if p["is_target"]), None)
+        enemies = [
+            p["champion_name"]
+            for p in analysis.participants
+            if target is not None and p["team_id"] != target["team_id"] and p["champion_name"]
+        ]
+        summaries.append(
+            AnalysisSummary(
+                id=analysis.id,
+                status=analysis.status,
+                game_name=analysis.game_name,
+                tag_line=analysis.tag_line,
+                platform=analysis.platform,
+                champion_name=target["champion_name"] if target else None,
+                enemy_champions=enemies,
+                created_at=analysis.created_at,
+            )
+        )
+    return summaries
 
 
 def _existing_analysis(analysis_id: uuid.UUID, db: DbSession) -> uuid.UUID:

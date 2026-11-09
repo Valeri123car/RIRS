@@ -105,3 +105,24 @@ def test_matchup_analize_brez_tekme_ni_mogoc(api):
     response = api.get(f"/analyses/{analysis_id}/matchup", params={"opponent": 51})
 
     assert response.status_code == 409
+
+
+def test_seznam_analiz_vrne_samo_analize_prijavljenega_uporabnika(api):
+    mine = auth_headers(api, "moja@example.com")
+    other = auth_headers(api, "tvoja@example.com")
+    my_id = start(api, headers=mine).json()["id"]
+    start(api, headers=other)
+    start(api)  # gost
+
+    result = api.get("/analyses", headers=mine)
+
+    assert result.status_code == 200
+    items = result.json()
+    assert [item["id"] for item in items] == [my_id]
+    assert (items[0]["game_name"], items[0]["status"]) == ("Luka", "completed")
+    # Testna baza nima uvoženih šampionov (imena so None), zato seznam nasprotnikov ni poln.
+    assert "champion_name" in items[0] and isinstance(items[0]["enemy_champions"], list)
+
+
+def test_seznam_analiz_zahteva_prijavo(api):
+    assert api.get("/analyses").status_code == 401
