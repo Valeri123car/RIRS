@@ -61,7 +61,7 @@ def test_zagon_prenese_tekme_in_zapise_izid(db: Session):
         select(MatchParticipant).where(MatchParticipant.match_id == "EUW1_7100000002")
     ).first()
     assert {"cs_at_10", "xp_at_10", "gold_at_15", "deaths_before_14"} <= set(participant.features)
-    assert participant.features["timeline_v"] == 2
+    assert participant.features["timeline_v"] == 3
     assert {"gold_15", "team_gold_diff_15", "team_dragons_15", "purchases"} <= set(
         participant.features
     )
@@ -201,7 +201,7 @@ def test_ponoven_prenos_casovnic_doda_znacilke_obstojecim_tekmam(db: Session):
     assert sorted(client.calls) == sorted(f"timeline:{m}" for m in FIXTURE_MATCHES)
     features = db.scalars(select(MatchParticipant.features)).all()
     assert len(features) == 30
-    assert all(f["timeline_v"] == 2 and "gold_15" in f for f in features)
+    assert all(f["timeline_v"] == 3 and "gold_15" in f for f in features)
 
 
 def test_ponoven_prenos_preskoci_tekme_z_novimi_znacilkami(db: Session):
