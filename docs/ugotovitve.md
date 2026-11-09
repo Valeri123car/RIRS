@@ -537,3 +537,34 @@ dobi kritične predmete (Infinity Edge, Runaan's, Mortal Reminder proti tankom).
 tekem, a ga še ne uporabljamo); (2) rune in sposobnosti so še vedno iz profila, ne iz podatkov
 (Riotove rune iz `raw` niso preslikane v imena); (3) priporočilo ne ve, ali igralcu gre dobro –
 to je predlog stikala »gre mi dobro / slabo«.
+
+## Poskus 12 – ponovni test po zbiranju do 13.075 tekem (2026-11-09, #85)
+
+Zbiranje 22:04–23:00 (EUW, KR, NA vzporedno, ~73 tekem/min, s časovnicami v3): **+4006 tekem** →
+13.075 tekem (12.897 ≥ 15 min; EUW 5.4k, KR 4.1k, NA 3.4k, EUNE 95). Vseh 173 šampionov ima
+≥ 30 iger (prag za priporočilo iz pravih buildov).
+
+### Model buildov (GroupKFold 5, `python -m app.ml`)
+
+| Verzija | Tekem | AUC | Izhodišče brez sestave | Prispevek sestave (odklon) |
+|---|---|---|---|---|
+| v5 (poskus 5, ena CV) | 6588 | 0,5811 ± 0,0057 | 0,5846 ± 0,0035 | −0,0036 |
+| v6 | 8885 | 0,5836 ± 0,0042 | 0,5860 ± 0,0019 | −0,0023 (0,0025) |
+| **v7** | **12.897** | **0,5890 ± 0,0022** | **0,5897 ± 0,0019** | **−0,0007 (0,0028)** |
+
+Izboljšanje: AUC raste (0,581 → 0,589), odklon se manjša (±0,0057 → ±0,0022), prispevek sestave se
+približuje ničli (−0,0036 → −0,0007). **Pogoj aktivacije ni izpolnjen** (prispevek ni večji od
+odklona), model ostane neaktiven. Sestava še vedno ne doda signala; razlika do izhodišča je zdaj
+znotraj šuma, ne več sistematično negativna. Aktivno ostane priporočilo po pravilih iz pravih buildov.
+
+### Arhetipi sloga (GMM)
+
+3699 igralcev z ≥ 5 tekemi (prej 2998); BIC izbere 8 komponent (7: 50.647, 8: 50.631 – krivulja
+je spet ravna). Nove gruče: »Agresiven v linijski fazi + Močan farmer« (100), »Tvegan (zgodnje
+smrti) + Agresiven v linijski fazi« (400), »Pasiven + Previden« (203). Z več podatki se pojavijo
+kombinirani arhetipi, kar kaže na zvezno razporeditev, ne na ostre skupine.
+
+### Priporočilo (pravila iz pravih buildov)
+
+Pyke ima 942 iger (prej 642) in priporočilo ostane stabilno (Umbral Glaive, Edge of Night,
+Frozen Heart / Youmuu's). Delež zmag z predmetom se zaradi večjega vzorca spreminja za 1–2 o. t.
