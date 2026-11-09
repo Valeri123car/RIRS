@@ -101,3 +101,178 @@ def test_kratka_tekma_nima_znacilk_po_koncu(timeline):
 
 def test_pokvarjena_casovnica_vrne_prazne_znacilke():
     assert timeline_features({"info": {"frames": "ne"}}) == {}
+
+
+# --- stanje ob 15. minuti in nakupi (timeline_v 2) ---------------------------------------
+
+
+def _min(minutes: float) -> int:
+    return int(minutes * 60_000)
+
+
+def _puuid(timeline: dict, participant_id: int) -> str:
+    return timeline["info"]["participants"][participant_id - 1]["puuid"]
+
+
+@pytest.fixture
+def events_timeline(timeline) -> dict:
+    """Časovnica z znanimi dogodki: ekipa 100 = igralci 1–5, ekipa 200 = 6–10."""
+    for frame in timeline["info"]["frames"]:
+        frame["events"] = []
+    events = [
+        {"type": "ITEM_PURCHASED", "timestamp": 5_000, "participantId": 1, "itemId": 1055},
+        {"type": "ITEM_PURCHASED", "timestamp": 5_000, "participantId": 0, "itemId": 3865},
+        {
+            "type": "CHAMPION_KILL",
+            "timestamp": _min(3),
+            "killerId": 1,
+            "victimId": 6,
+            "assistingParticipantIds": [2],
+            "shutdownBounty": 0,
+        },
+        {"type": "ITEM_PURCHASED", "timestamp": _min(5), "participantId": 1, "itemId": 1001},
+        {
+            "type": "ITEM_UNDO",
+            "timestamp": _min(5) + 2_000,
+            "participantId": 1,
+            "beforeId": 1001,
+            "afterId": 0,
+            "goldGain": 300,
+        },
+        {
+            "type": "ELITE_MONSTER_KILL",
+            "timestamp": _min(6),
+            "killerTeamId": 100,
+            "monsterType": "DRAGON",
+        },
+        {
+            "type": "ELITE_MONSTER_KILL",
+            "timestamp": _min(7),
+            "killerTeamId": 100,
+            "monsterType": "HORDE",
+        },
+        {
+            "type": "ELITE_MONSTER_KILL",
+            "timestamp": _min(8),
+            "killerTeamId": 200,
+            "monsterType": "HORDE",
+        },
+        {"type": "TURRET_PLATE_DESTROYED", "timestamp": _min(9), "teamId": 200, "killerId": 1},
+        {"type": "TURRET_PLATE_DESTROYED", "timestamp": _min(9.5), "teamId": 200, "killerId": 2},
+        {
+            "type": "CHAMPION_KILL",
+            "timestamp": _min(10),
+            "killerId": 7,
+            "victimId": 1,
+            "assistingParticipantIds": [],
+            "shutdownBounty": 300,
+        },
+        {
+            "type": "BUILDING_KILL",
+            "timestamp": _min(12),
+            "teamId": 200,
+            "killerId": 1,
+            "buildingType": "TOWER_BUILDING",
+        },
+        {
+            "type": "ELITE_MONSTER_KILL",
+            "timestamp": _min(14.5),
+            "killerTeamId": 200,
+            "monsterType": "RIFTHERALD",
+        },
+        # po 15. minuti: ne šteje v stanje, nakup pa ostane v seznamu nakupov
+        {
+            "type": "CHAMPION_KILL",
+            "timestamp": _min(15.5),
+            "killerId": 6,
+            "victimId": 2,
+            "assistingParticipantIds": [],
+            "shutdownBounty": 0,
+        },
+        {
+            "type": "ELITE_MONSTER_KILL",
+            "timestamp": _min(16),
+            "killerTeamId": 200,
+            "monsterType": "DRAGON",
+        },
+        {"type": "ITEM_PURCHASED", "timestamp": _min(20), "participantId": 1, "itemId": 3006},
+    ]
+    for event in events:
+        index = min(event["timestamp"] // 60_000 + 1, len(timeline["info"]["frames"]) - 1)
+        timeline["info"]["frames"][index]["events"].append(event)
+    return timeline
+
+
+def test_casovnica_dobi_razlicico_znacilk(timeline):
+    features = timeline_features(timeline)
+
+    assert all(f["timeline_v"] == 2 for f in features.values())
+
+
+def test_stanje_igralca_ob_15_minuti(timeline):
+    state = timeline["info"]["frames"][15]["participantFrames"]["1"]
+    state["damageStats"] = {"totalDamageDoneToChampions": 4200, "totalDamageTaken": 5100}
+
+    features = timeline_features(timeline)[_puuid(timeline, 1)]
+
+    assert features["gold_15"] == state["totalGold"]
+    assert features["xp_15"] == state["xp"]
+    assert features["level_15"] == state["level"]
+    assert features["cs_15"] == state["minionsKilled"] + state["jungleMinionsKilled"]
+    assert features["dmg_champ_15"] == 4200
+    assert features["dmg_taken_15"] == 5100
+
+
+def test_prednost_ekipe_v_zlatu_in_xp_ob_15(timeline):
+    frame = timeline["info"]["frames"][15]["participantFrames"]
+    gold = {pid: frame[str(pid)]["totalGold"] for pid in range(1, 11)}
+    xp = {pid: frame[str(pid)]["xp"] for pid in range(1, 11)}
+    lead = sum(gold[p] for p in range(1, 6)) - sum(gold[p] for p in range(6, 11))
+    xp_lead = sum(xp[p] for p in range(1, 6)) - sum(xp[p] for p in range(6, 11))
+
+    features = timeline_features(timeline)
+
+    assert features[_puuid(timeline, 1)]["team_gold_diff_15"] == lead
+    assert features[_puuid(timeline, 6)]["team_gold_diff_15"] == -lead
+    assert features[_puuid(timeline, 3)]["team_xp_diff_15"] == xp_lead
+
+
+def test_kili_smrti_asistence_in_shutdowni_do_15(events_timeline):
+    features = timeline_features(events_timeline)
+    p1, p2, p6, p7 = (features[_puuid(events_timeline, i)] for i in (1, 2, 6, 7))
+
+    assert (p1["kills_15"], p1["deaths_15"], p1["assists_15"]) == (1, 1, 0)
+    assert (p2["kills_15"], p2["deaths_15"], p2["assists_15"]) == (0, 0, 1)  # smrt v 15:30
+    assert p7["shutdown_gold_15"] == 300 and p1["shutdown_gold_15"] == 0
+    assert p1["shutdowns_given_15"] == 1 and p6["shutdowns_given_15"] == 0
+    assert p1["first_blood_team"] == 1 and p6["first_blood_team"] == 0
+    assert p1["team_kills_15"] == 1 and p1["enemy_kills_15"] == 1
+
+
+def test_cilji_ekipe_do_15(events_timeline):
+    features = timeline_features(events_timeline)
+    blue, red = features[_puuid(events_timeline, 4)], features[_puuid(events_timeline, 9)]
+
+    assert (blue["team_dragons_15"], blue["enemy_dragons_15"]) == (1, 0)  # zmaj v 16. ne šteje
+    assert (blue["team_grubs_15"], blue["enemy_grubs_15"]) == (1, 1)
+    assert (blue["team_heralds_15"], blue["enemy_heralds_15"]) == (0, 1)
+    assert (blue["team_towers_15"], blue["enemy_towers_15"]) == (1, 0)
+    assert (blue["team_plates_15"], blue["enemy_plates_15"]) == (2, 0)
+    assert (red["team_dragons_15"], red["enemy_towers_15"], red["enemy_plates_15"]) == (0, 1, 2)
+
+
+def test_nakupi_s_casom_in_razveljavitvijo(events_timeline):
+    features = timeline_features(events_timeline)
+
+    assert features[_puuid(events_timeline, 1)]["purchases"] == [[1055, 5], [3006, 1200]]
+    assert features[_puuid(events_timeline, 2)]["purchases"] == []
+
+
+def test_kratka_tekma_nima_stanja_ob_15(timeline):
+    timeline["info"]["frames"] = timeline["info"]["frames"][:12]
+
+    features = timeline_features(timeline)[_puuid(timeline, 1)]
+
+    assert "gold_15" not in features and "team_gold_diff_15" not in features
+    assert "kills_15" not in features and "team_dragons_15" not in features
+    assert features["purchases"] == []
