@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Field, Select, TextInput } from "@/components/ui/field";
 import { PLATFORMS } from "@/lib/riot";
 
+/** Izmišljene aktivne tekme za predstavitev (backend: app/riot/demo_client.py). */
+const DEMO_RIOT_IDS = ["DemoPyke#DEMO", "DemoJinx#DEMO", "DemoAmbessa#DEMO"];
+
 /** US-02: vnos Riot ID igralca v aktivni tekmi (deluje tudi za goste). */
 export function StartAnalysisForm() {
   const { start, pending, error } = useStartAnalysis();
@@ -41,6 +44,19 @@ export function StartAnalysisForm() {
             ))}
           </Select>
         </Field>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-on-surface-variant">
+        <span className="font-label tracking-widest uppercase">Demo igra:</span>
+        {DEMO_RIOT_IDS.map((id) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setRiotId(id)}
+            className="rounded-sm border border-outline/50 px-2 py-1 text-primary transition-colors hover:border-primary"
+          >
+            {id}
+          </button>
+        ))}
       </div>
       <StartError error={error} />
       <Button type="submit" disabled={pending} className="self-start">

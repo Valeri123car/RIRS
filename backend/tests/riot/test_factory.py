@@ -3,6 +3,7 @@ import pytest
 
 from app.core.config import Settings
 from app.riot.client import LiveRiotClient
+from app.riot.demo_client import DemoRiotClient
 from app.riot.errors import RiotConfigError
 from app.riot.factory import build_riot_client
 from app.riot.fixture_client import FixtureRiotClient
@@ -14,7 +15,11 @@ def settings(**values) -> Settings:
 
 
 def test_privzeto_je_nacin_fixtures():
-    assert isinstance(build_riot_client(settings()), FixtureRiotClient)
+    client = build_riot_client(settings())
+
+    # Demo odjemalec ovije pravega (za DemoPyke#DEMO ...), ostalo gre skozi fixtures.
+    assert isinstance(client, DemoRiotClient)
+    assert isinstance(client._inner, FixtureRiotClient)
 
 
 def test_nacin_live_brez_kljuca_je_napaka():
@@ -33,7 +38,8 @@ def test_nacin_live_s_kljucem_in_redis_vrne_pravi_klient():
         redis=fakeredis.FakeRedis(),
     )
 
-    assert isinstance(client, LiveRiotClient)
+    assert isinstance(client, DemoRiotClient)
+    assert isinstance(client._inner, LiveRiotClient)
 
 
 def test_neznan_nacin_je_zavrnjen_ob_branju_nastavitev():
