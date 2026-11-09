@@ -235,6 +235,90 @@ napovedi zmage (priklic 0,60 > preciznost 0,56).
 
 ---
 
+## Poskus 6 – analiza podatkov končnih statistik (2026-11-09, ~15:00)
+
+**Namen:** ugotoviti, kaj se povezuje z zmago, in tako izbrati značilke za model stanja ob
+15. minuti. Postopek sledi predavanjem *Razvoj inteligentnih rešitev – 02 Inženiring podatkov in
+značilnic*.
+
+**Podatki:** končne statistike iz shranjenega JSON-a Match-V5 (`matches.raw`, brez novih klicev
+API). 7238 tekem ≥ 15 min, 72.380 igralcev, 44 številskih in 5 kategoričnih značilk:
+- **igralec:** KDA, kill participation, CS, zlato, škoda šampionom po vrstah, prejeta in ublažena
+  škoda, škoda ciljem in stolpom, CC score, vision, wardi, level, uporabe Flasha in urokov,
+  shutdowni (`bountyGold`), zmaji, herald, baron, Elder;
+- **runa:** keystone, primarno in sekundarno drevo;
+- **ekipa:** prednost v zlatu, cilji in kili/asistence junglerja.
+
+> **Uhajanje izida (target leakage):** vse to so vrednosti ob **koncu** tekme. Zmagovalec uniči
+> stolpe in nexus ter pri tem dobi zlato, zato značilke izid že vsebujejo. Model iz njih doseže
+> AUC 0,9997 (sama prednost v zlatu 0,999), a je za priporočila med tekmo neuporaben. Analiza je
+> zato **samo opisna**; napovedni model bo uporabljal samo stanje ob 15. minuti (iz časovnic).
+> Delitev je pravilna (`GroupKFold` po tekmah) – visok AUC ni napaka v vrednotenju, ampak lastnost
+> značilk.
+
+### 1. Distribucije
+
+![Distribucije po izidu](slike/p6_distribucije.png)
+
+- **Manjkajočih vrednosti ni.** Riot vedno vrne vse polje; kratke tekme (< 15 min) so izločene.
+- **Desno izkrivljene** (asimetrija > 1) so skoraj vse števne značilke: KDA 2,56, CC 2,24–2,84,
+  vision 1,94, wardi 2,2, Flash 3,55, bounty 2,57, Elder 9,75. Po predavanjih: **sqrt** za rahlo
+  (kills 1,10 → −0,14, assists 1,18 → −0,01, turret škoda 1,35 → 0,12) in **log1p** za močno
+  izkrivljene (KDA 2,56 → 0,59, ublažena škoda 1,96 → 0,07, vision 1,94 → 0,39). Pri drevesih
+  (LightGBM) transformacija ni potrebna, pri logistični regresiji in MLP pa je.
+- **Osamelci** (IQR): največ pri `cs_pm` (19,6 % – podporniki in junglerji imajo drugačno
+  porazdelitev), wardih (14,7 %) in Flashu (15,1 %). To niso napake, ampak vloge → položaj
+  mora biti značilka, ne pa razlog za brisanje.
+- **Veliko ničel:** bounty 69 %, Elder 99 %, herald 84 % – binarizacija (je/ni) je pri teh
+  smiselnejša od števila.
+- **Kategorične:** 173 šampionov (le 1 z manj kot 30 primeri), 17 keystonov, 5 položajev.
+
+### 2. Korelacije med značilkami
+
+![Spearmanova korelacija](slike/p6_korelacije.png)
+
+Pari z |Spearman| > 0,8 (odvečne, iz para zadošča ena):
+
+| Značilka A | Značilka B | Pearson | Spearman |
+|---|---|---|---|
+| zlato | level | 0,83 | 0,86 |
+| stolpi ekipe | inhibitorji ekipe | 0,82 | 0,85 |
+| baron (igralec) | baron (ekipa) | 0,84 | 0,83 |
+| CS | zlato | 0,77 | 0,83 |
+| kili | zlato/min | 0,80 | 0,82 |
+
+**PCA:** prva komponenta (zlato, level, stolpi, kili, škoda ciljem) pojasni 21 % variance; za 90 %
+jih je potrebnih 21 od 44. Značilke so torej v veliki meri različne – sklop „kdo je spredaj“ je
+največji skupni dejavnik.
+
+### 3. Odvisnost od izhoda (zmaga)
+
+![Odvisnost od zmage](slike/p6_odvisnost.png)
+
+| Metoda (predavanja) | Najmočnejše značilke |
+|---|---|
+| **Filter** – vzajemna informacija | prednost v zlatu 0,66; stolpi 0,30; KDA 0,28; inhibitorji 0,26; zmaji 0,17; baron 0,14; smrti 0,11; asistence junglerja 0,10 |
+| **Filter** – točkovno-biserialna *r* | zlato +0,91; stolpi ±0,70; inhibitorji +0,57; zmaji ±0,53; KDA +0,52; smrti −0,42; jungler asistence +0,41; bounty −0,28 |
+| **Ovijanje** – SFS (LogReg + StandardScaler, 8 značilk) | zlato, stolpi (obe ekipi), baron, zmaji nasprotnika, asistence, bounty, jungle kampi nasprotnika – 8 značilk enako dobro kot 44 (AUC 0,9995) |
+| **Vgrajeni** – L1 logistična regresija (C = 0,01) | ohrani 17 od 44; največje uteži: zlato, stolpi, zmaji, bounty, inhibitorji |
+| **Vgrajeni** – LightGBM gain | zlato 95 %; samo statistike igralca: KDA 56 %, kill participation 10 %, baron 7 % |
+
+**Kar je za zmago skoraj nepomembno** (MI ≈ 0, |r| < 0,05): CC score, prava škoda, vision,
+wardi, Flash in uroki, ublažena škoda, Elder (redek), runa in šampion (MI 0,005). Zmagovalci in
+poraženci se tu skoraj ne razlikujejo (Flash 3,86 proti 3,78, CC 24,0 proti 22,4).
+
+**Zaključek:**
+
+- Zmago določa **stanje prednosti** (zlato, stolpi, cilji, smrti), ne slog igralca (CC, vision,
+  uroki). To se ujema s poskusom 2: končni build je posledica prednosti, ne njen vzrok.
+- Za model ob 15. minuti so kandidatne značilke zato: **prednost ekipe v zlatu in XP, zmaji,
+  herald in grubi, stolpi, kili/smrti/asistence (tudi junglerja), shutdowni** do 15. minute ter
+  nakupi do tega trenutka. CC, vision in uroki niso vredni dodatnega dela.
+- Pri tem modelu bodo predpriprave po predavanjih: binarizacija redkih dogodkov, sqrt/log1p za
+  števne značilke (pri linearnih modelih), odstranitev enega iz vsakega močno koreliranega para.
+
+---
+
 ## Zakaj je napoved zmage tako težka (51 % win rate)
 
 Matchmaking sestavlja tekme tako, da ima vsaka ekipa ~50 % možnosti, igralci pa dolgoročno ~50–51 %
