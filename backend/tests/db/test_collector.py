@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.collector.service import CollectorConfig, collect_matches
+from app.collector.service import CollectorConfig, backfill_timelines, collect_matches
 from app.models.collector_run import CollectorRun, CollectorStatus
 from app.models.match import Match, MatchParticipant
 from app.models.riot_account import RiotAccount
@@ -60,7 +60,11 @@ def test_zagon_prenese_tekme_in_zapise_izid(db: Session):
     participant = db.scalars(
         select(MatchParticipant).where(MatchParticipant.match_id == "EUW1_7100000002")
     ).first()
-    assert set(participant.features) == {"cs_at_10", "xp_at_10", "gold_at_15", "deaths_before_14"}
+    assert {"cs_at_10", "xp_at_10", "gold_at_15", "deaths_before_14"} <= set(participant.features)
+    assert participant.features["timeline_v"] == 2
+    assert {"gold_15", "team_gold_diff_15", "team_dragons_15", "purchases"} <= set(
+        participant.features
+    )
 
 
 def test_igralci_iz_tekem_so_racuni_brez_uporabnika(db: Session):
@@ -185,3 +189,32 @@ def test_prekinjen_zagon_se_ob_naslednjem_oznaci_kot_napaka(db: Session):
     assert (stale.status, stale.error) == (CollectorStatus.ERROR, "Zagon je bil prekinjen.")
     assert stale.finished_at is not None
     assert recent.status is CollectorStatus.RUNNING
+
+
+def test_ponoven_prenos_casovnic_doda_znacilke_obstojecim_tekmam(db: Session):
+    collect_matches(db, CountingClient(), CollectorConfig(timelines=False))
+    client = CountingClient()
+
+    updated = backfill_timelines(db, client, platform="euw1", limit=10)
+
+    assert updated == 3
+    assert sorted(client.calls) == sorted(f"timeline:{m}" for m in FIXTURE_MATCHES)
+    features = db.scalars(select(MatchParticipant.features)).all()
+    assert len(features) == 30
+    assert all(f["timeline_v"] == 2 and "gold_15" in f for f in features)
+
+
+def test_ponoven_prenos_preskoci_tekme_z_novimi_znacilkami(db: Session):
+    collect_matches(db, CountingClient(), CONFIG)  # časovnice v2 že ob zajemu
+    client = CountingClient()
+
+    assert backfill_timelines(db, client, platform="euw1", limit=10) == 0
+    assert client.calls == []
+
+
+def test_ponoven_prenos_uposteva_omejitev_in_platformo(db: Session):
+    collect_matches(db, CountingClient(), CollectorConfig(timelines=False))
+
+    assert backfill_timelines(db, CountingClient(), platform="kr", limit=10) == 0
+    assert backfill_timelines(db, CountingClient(), platform="euw1", limit=2) == 2
+    assert backfill_timelines(db, CountingClient(), platform="euw1", limit=10) == 1
