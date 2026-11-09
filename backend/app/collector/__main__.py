@@ -1,10 +1,14 @@
-"""Ročni zagon zbiralnika: uv run python -m app.collector [--players 2 --matches 5]."""
+"""Ročni zagon zbiralnika: uv run python -m app.collector [--players 2 --matches 5].
+
+Ponoven prenos časovnic obstoječih tekem (nove značilke):
+uv run python -m app.collector --platform euw1 --backfill-timelines --matches 500
+"""
 
 import argparse
 import logging
 import sys
 
-from app.collector.service import CollectorConfig, collect_matches
+from app.collector.service import CollectorConfig, backfill_timelines, collect_matches
 from app.core.config import get_settings
 from app.db.session import get_session_factory
 from app.models.collector_run import CollectorStatus
@@ -27,6 +31,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--per-player", type=_positive, help="ID-jev tekem na igralca (1–100)")
     parser.add_argument("--matches", type=_positive, help="največ novih tekem v zagonu")
     parser.add_argument("--no-timelines", action="store_true", help="brez časovnic")
+    parser.add_argument(
+        "--backfill-timelines",
+        action="store_true",
+        help="namesto zajema dopolni značilke časovnic obstoječih tekem (največ --matches)",
+    )
     args = parser.parse_args(argv)
     if args.per_player is not None and args.per_player > 100:
         parser.error("--per-player je lahko največ 100")
@@ -47,6 +56,14 @@ def main(argv: list[str] | None = None) -> int:
     except RiotConfigError as exc:
         print(f"Zbiralnik ni zagnan: {exc}", file=sys.stderr)
         return 1
+    if args.backfill_timelines:
+        with get_session_factory()() as session:
+            updated = backfill_timelines(
+                session, riot, platform=config.platform, limit=config.max_new_matches
+            )
+        print(f"Dopolnjene časovnice ({config.platform}): {updated} tekem")
+        return 0
+
     with get_session_factory()() as session:
         run = collect_matches(session, riot, config)
 

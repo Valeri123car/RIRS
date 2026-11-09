@@ -14,11 +14,17 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
-from app.collector.parse import MatchParseError, ParsedMatch, parse_match, timeline_features
+from app.collector.parse import (
+    TIMELINE_VERSION,
+    MatchParseError,
+    ParsedMatch,
+    parse_match,
+    timeline_features,
+)
 from app.core.config import Settings
 from app.models.collector_run import CollectorRun, CollectorStatus
 from app.models.match import Match, MatchParticipant
@@ -141,7 +147,7 @@ def _download_and_store(
         logger.warning("Tekma %s ni rangirana solo tekma, preskočena", match_id)
         return False
 
-    features: dict[str, dict[str, int]] = {}
+    features: dict[str, dict[str, Any]] = {}
     if config.timelines:
         try:
             features = timeline_features(riot.get_match_timeline(match_id, config.platform))
@@ -154,7 +160,7 @@ def store_match(
     session: Session,
     parsed: ParsedMatch,
     raw: dict[str, Any],
-    features: dict[str, dict[str, int]] | None = None,
+    features: dict[str, dict[str, Any]] | None = None,
 ) -> bool:
     """Shrani tekmo z udeleženci; vrne False, če je tekma že v bazi (npr. vzporedni zagon)."""
     features = features or {}
@@ -213,6 +219,48 @@ def store_match(
         )
     )
     return True
+
+
+def backfill_timelines(session: Session, riot: RiotClient, platform: str, limit: int) -> int:
+    """Ponovno prenese časovnice tekem brez značilk TIMELINE_VERSION in jih dopolni.
+
+    Obdela največ `limit` najnovejših takih tekem na platformi; vrne število dopolnjenih tekem.
+    Vsaka tekma se potrdi sproti, zato prekinitev ne izgubi že dopolnjenih.
+    """
+    outdated = (
+        select(MatchParticipant.match_id)
+        .where(
+            func.coalesce(MatchParticipant.features["timeline_v"].as_integer(), 0)
+            < TIMELINE_VERSION
+        )
+        .distinct()
+    )
+    match_ids = session.scalars(
+        select(Match.match_id)
+        .where(Match.platform == platform, Match.match_id.in_(outdated))
+        .order_by(Match.game_start.desc())
+        .limit(limit)
+    ).all()
+
+    updated = 0
+    for match_id in match_ids:
+        try:
+            features = timeline_features(riot.get_match_timeline(match_id, platform))
+        except RiotNotFoundError:
+            logger.warning("Tekma %s nima časovnice, preskočena", match_id)
+            continue
+        if not features:
+            logger.warning("Časovnica tekme %s je nepopolna, preskočena", match_id)
+            continue
+        for puuid, values in features.items():
+            session.execute(
+                update(MatchParticipant)
+                .where(MatchParticipant.match_id == match_id, MatchParticipant.puuid == puuid)
+                .values(features=values)
+            )
+        session.commit()
+        updated += 1
+    return updated
 
 
 def _describe(exc: Exception) -> str:
