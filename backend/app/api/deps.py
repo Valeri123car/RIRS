@@ -16,7 +16,7 @@ from app.core.config import Settings, get_settings
 from app.core.ip_limit import IpLimitRule, IpRateLimiter
 from app.core.security import InvalidTokenError, decode_token
 from app.db.session import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.riot.client import RiotClient
 from app.riot.factory import build_riot_client
 
@@ -52,6 +52,16 @@ def get_current_user(
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def get_admin_user(user: CurrentUser) -> User:
+    """Prijavljen administrator; navaden uporabnik dobi 403."""
+    if user.role is not UserRole.ADMIN:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Potrebna je vloga administrator.")
+    return user
+
+
+AdminUser = Annotated[User, Depends(get_admin_user)]
 
 
 @lru_cache

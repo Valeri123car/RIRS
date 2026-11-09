@@ -26,6 +26,14 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-3">
+      {user.role === "admin" && (
+        <Link
+          href="/admin/modeli"
+          className="font-label text-xs tracking-wider text-secondary uppercase hover:underline"
+        >
+          Modeli
+        </Link>
+      )}
       <Link
         href="/profil"
         title={user.email}
