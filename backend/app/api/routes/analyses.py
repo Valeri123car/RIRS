@@ -6,11 +6,12 @@ from collections.abc import Iterator
 from datetime import datetime
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pydantic import BaseModel, ConfigDict
 
 from app.analysis.guest_limit import GUEST_DAILY_LIMIT
+from app.analysis.pipeline import build_matchup
 from app.api.deps import (
     DbSession,
     GuestLimit,
@@ -39,6 +40,8 @@ class AnalysisOut(BaseModel):
     enemy_comp: dict[str, Any] | None
     # Priporočilo builda (US-04); None, dokler korak ni končan ali če šampiona ni v bazi.
     recommendation: dict[str, Any] | None
+    # Matchup kartica (US-05); opponent je None, če linijskega nasprotnika ni bilo mogoče določiti.
+    matchup: dict[str, Any] | None
     created_at: datetime
 
 
@@ -96,6 +99,22 @@ ExistingAnalysisId = Annotated[uuid.UUID, Depends(_existing_analysis)]
 @router.get("/{analysis_id}", response_model=AnalysisOut)
 def get_analysis(analysis_id: ExistingAnalysisId, db: DbSession) -> LiveAnalysis:
     return db.get_one(LiveAnalysis, analysis_id)
+
+
+@router.get("/{analysis_id}/matchup")
+def get_matchup(
+    analysis_id: ExistingAnalysisId,
+    db: DbSession,
+    opponent: Annotated[int, Query(ge=1, le=100_000, description="ID nasprotnega šampiona")],
+) -> dict[str, Any]:
+    """Matchup kartica proti izbranemu nasprotniku (eden izmed petih nasprotnih šampionov)."""
+    analysis = db.get_one(LiveAnalysis, analysis_id)
+    if analysis.status != AnalysisStatus.COMPLETED or not analysis.participants:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Analiza še ni končana ali nima tekme.")
+    try:
+        return build_matchup(db, analysis, opponent_id=opponent)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
 
 
 # Končna stanja: po njih se tok zapre.

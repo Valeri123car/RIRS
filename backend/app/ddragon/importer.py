@@ -45,12 +45,21 @@ def import_static_data(
                     name=data.name,
                     damage_profile=data.damage_profile,
                     classes=data.classes,
+                    stats=data.stats,
+                    spells=data.spells,
                     **data.ratings,
                 )
             )
             result.champions.created += 1
         else:
-            changed = _apply(champion, slug=data.slug, name=data.name, classes=data.classes)
+            changed = _apply(
+                champion,
+                slug=data.slug,
+                name=data.name,
+                classes=data.classes,
+                stats=data.stats,
+                spells=data.spells,
+            )
             _count(result.champions, changed)
 
     existing_items = _by_id(session, Item, [i.id for i in items])

@@ -148,3 +148,66 @@ def test_sestavine_cevlji_in_potrosni_predmeti_niso_dokoncani(raw):
 )
 def test_predmeti_izven_summoners_rift_so_izpusceni(item_id, raw):
     assert parse_items({item_id: raw}) == []
+
+
+STATS = {
+    "hp": 650,
+    "hpperlevel": 114,
+    "mp": 0,
+    "mpperlevel": 0,
+    "movespeed": 345,
+    "armor": 38,
+    "armorperlevel": 4.8,
+    "spellblock": 32,
+    "spellblockperlevel": 2.05,
+    "attackrange": 175,
+    "hpregen": 3,
+    "hpregenperlevel": 0.5,
+    "attackdamage": 60,
+    "attackdamageperlevel": 5,
+    "attackspeedperlevel": 2.5,
+    "attackspeed": 0.651,
+}
+
+
+def spell(spell_id, name, description, cooldown=(10, 9, 8, 7, 6)):
+    return {"id": spell_id, "name": name, "description": description, "cooldown": list(cooldown)}
+
+
+def test_sampion_dobi_osnovne_statistike_za_izracun_po_levelu():
+    raw = champion() | {"stats": STATS}
+
+    [aatrox] = parse_champions({"Aatrox": raw}, overrides={})
+
+    assert aatrox.stats["hp"] == 650 and aatrox.stats["hpperlevel"] == 114
+    assert aatrox.stats["attackspeed"] == 0.651
+    assert "movespeed" in aatrox.stats and "mp" not in aatrox.stats
+
+
+def test_sposobnosti_dobijo_tipko_ime_opis_brez_html_in_cas_obnove():
+    raw = champion() | {
+        "spells": [
+            spell("AatroxQ", "The Darkin Blade", "Aatrox <status>Knocks Up</status> enemies."),
+            spell("AatroxW", "Infernal Chains", "Pulls enemies.<br>Slows them."),
+            spell("AatroxE", "Umbral Dash", "Dashes."),
+            spell("AatroxR", "World Ender", "Transforms.", cooldown=(120, 100, 80)),
+        ]
+    }
+
+    [aatrox] = parse_champions({"Aatrox": raw}, overrides={})
+
+    assert [s["key"] for s in aatrox.spells] == ["Q", "W", "E", "R"]
+    assert aatrox.spells[0] == {
+        "key": "Q",
+        "name": "The Darkin Blade",
+        "description": "Aatrox Knocks Up enemies.",
+        "cooldown": [10, 9, 8, 7, 6],
+    }
+    assert aatrox.spells[1]["description"] == "Pulls enemies. Slows them."
+    assert aatrox.spells[3]["cooldown"] == [120, 100, 80]
+
+
+def test_sampion_brez_statistik_in_sposobnosti_ima_prazne_vrednosti():
+    [aatrox] = parse_champions({"Aatrox": champion()}, overrides={})
+
+    assert aatrox.stats == {} and aatrox.spells == []

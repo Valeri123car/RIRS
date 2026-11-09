@@ -72,3 +72,36 @@ def test_neveljaven_vnos_ne_porabi_analize(api):
         start(api, riot_id="brez-oznake")
 
     assert start(api).status_code == 202
+
+
+def test_matchup_z_izbranim_nasprotnikom(api, db):
+    from app.models.champion import Champion
+
+    stats = {"hp": 600, "hpperlevel": 100, "attackdamage": 60, "attackrange": 525}
+    db.merge(Champion(id=222, slug="Jinx", name="Jinx", classes=["Marksman"], stats=stats))
+    db.merge(Champion(id=51, slug="Caitlyn", name="Caitlyn", classes=["Marksman"], stats=stats))
+    analysis_id = start(api).json()["id"]
+
+    response = api.get(f"/analyses/{analysis_id}/matchup", params={"opponent": 51})
+
+    assert response.status_code == 200
+    card = response.json()
+    assert card["opponent"] == {"id": 51, "name": "Caitlyn"}
+    assert card["opponent_source"] == "choice"
+    assert [p["level"] for p in card["levels"]] == list(range(1, 19))
+
+
+def test_matchup_nasprotnik_mora_biti_v_nasprotni_ekipi(api):
+    analysis_id = start(api).json()["id"]
+
+    response = api.get(f"/analyses/{analysis_id}/matchup", params={"opponent": 222})
+
+    assert response.status_code == 422
+
+
+def test_matchup_analize_brez_tekme_ni_mogoc(api):
+    analysis_id = start(api, "Miha#EUNE").json()["id"]
+
+    response = api.get(f"/analyses/{analysis_id}/matchup", params={"opponent": 51})
+
+    assert response.status_code == 409

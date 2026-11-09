@@ -52,6 +52,11 @@ class Champion(TimestampMixin, Base):
     tank: Mapped[int] = _rating_column()
     poke: Mapped[int] = _rating_column()
 
+    # Osnovne statistike iz Data Dragon (hp, hpperlevel, armor ...) za moč po levelu (US-05).
+    stats: Mapped[dict[str, float]] = mapped_column(JSONB, default=dict, server_default="{}")
+    # Sposobnosti Q/W/E/R: [{"key", "name", "description", "cooldown"}] (US-05).
+    spells: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list, server_default="[]")
+
     # Seznam oken moči, npr. [{"level": 6, "reason": "R"}].
     power_spikes: Mapped[list[dict[str, Any]]] = mapped_column(
         JSONB, default=list, server_default="[]"
