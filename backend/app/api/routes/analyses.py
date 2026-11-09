@@ -42,6 +42,8 @@ class AnalysisOut(BaseModel):
     recommendation: dict[str, Any] | None
     # Matchup kartica (US-05); opponent je None, če linijskega nasprotnika ni bilo mogoče določiti.
     matchup: dict[str, Any] | None
+    # Profil sloga nasprotnikov (US-06) po puuid; None, dokler korak profiliranja ni končan.
+    style: dict[str, Any] | None
     created_at: datetime
 
 

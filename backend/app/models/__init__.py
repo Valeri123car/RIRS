@@ -8,6 +8,7 @@ from app.models.match import Match, MatchParticipant
 from app.models.ml_model import MlModel, ModelKind, ModelStatus
 from app.models.riot_account import RiotAccount
 from app.models.riot_verification import RiotVerification
+from app.models.style_baseline import StyleBaseline
 from app.models.user import ExplanationLevel, User, UserRole
 
 __all__ = [
@@ -26,6 +27,7 @@ __all__ = [
     "ModelStatus",
     "RiotAccount",
     "RiotVerification",
+    "StyleBaseline",
     "User",
     "UserRole",
 ]

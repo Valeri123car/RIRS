@@ -15,6 +15,8 @@ from app.ml.build_ranker import load_active_build_ranker
 from app.models.champion import Champion
 from app.models.item import Item
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
+from app.profiling.baselines import load_baselines
+from app.profiling.style import build_style_profile
 from app.recommend.base import RecommendationInput, Recommender
 from app.recommend.model import ModelRecommender
 from app.recommend.rules import RuleBasedRecommender
@@ -34,6 +36,7 @@ def run_analysis(
     analysis = session.get_one(LiveAnalysis, analysis_id)
     _set_status(session, analysis, AnalysisStatus.PROFILING, notify)
     analysis.enemy_comp = profile_enemy_team(session, analysis)
+    analysis.style = profile_enemy_styles(session, riot, analysis)
     _set_status(session, analysis, AnalysisStatus.RECOMMENDING, notify)
     analysis.recommendation = recommend_build(
         session, analysis, recommender or default_recommender(session)
@@ -62,6 +65,19 @@ def profile_enemy_team(session: Session, analysis: LiveAnalysis) -> dict:
     """Profil nasprotne ekipe glede na igralca, ki se analizira."""
     champions, enemy_ids = _enemy_champions(session, analysis)
     return build_enemy_comp(champions, missing=len(enemy_ids) - len(champions))
+
+
+def profile_enemy_styles(session: Session, riot: RiotClient, analysis: LiveAnalysis) -> dict:
+    """Profil sloga vsakega nasprotnika (po puuid); {} brez mediane vlog v bazi."""
+    baselines = load_baselines(session)
+    if not baselines:
+        return {}
+    target_team = next((p["team_id"] for p in analysis.participants if p["is_target"]), None)
+    return {
+        p["puuid"]: build_style_profile(session, riot, p["puuid"], analysis.platform, baselines)
+        for p in analysis.participants
+        if p["team_id"] != target_team and p.get("puuid")
+    }
 
 
 def _enemy_champions(session: Session, analysis: LiveAnalysis) -> tuple[list[Champion], list[int]]:
