@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_session_factory
 from app.ddragon.client import DataDragonClient, DataDragonError
-from app.ddragon.importer import ImportResult, import_static_data
-from app.ddragon.parse import parse_champions, parse_items
+from app.ddragon.importer import ImportResult, import_runes, import_static_data
+from app.ddragon.parse import parse_champions, parse_items, parse_runes
 
 
 def run_import(
@@ -18,7 +18,9 @@ def run_import(
     version = version or client.latest_version()
     champions = parse_champions(client.champions(version))
     items = parse_items(client.items(version))
-    return version, import_static_data(session, champions, items)
+    result = import_static_data(session, champions, items)
+    result.runes = import_runes(session, parse_runes(client.runes(version)))
+    return version, result
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -34,7 +36,11 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         session.commit()
 
-    for label, counts in (("Šampioni", result.champions), ("Predmeti", result.items)):
+    for label, counts in (
+        ("Šampioni", result.champions),
+        ("Predmeti", result.items),
+        ("Rune", result.runes),
+    ):
         print(
             f"{label}: novih {counts.created}, spremenjenih {counts.updated}, "
             f"nespremenjenih {counts.unchanged}"

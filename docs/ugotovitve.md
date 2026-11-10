@@ -644,3 +644,24 @@ izkušenj ekip, zmaji, grubs, heraldi, stolpi, plošče, prva kri, število doko
 
 **Zaključek:** model buildov ostane neaktiven (ADR-0006). Več tekem pomaga do ~6000, nato malo;
 omejitev so značilke, ne podatki.
+
+## Poskus 15 – rune in vrstni red nakupov iz podatkov (2026-11-10, #101)
+
+Namesto modela za zmago priporočilo zdaj uporablja, kar najboljši igralci res počnejo
+(`python -m app.recommend.precompute`, tabela `champion_build_stats`, 173 šampionov, vloga = glavna
+vloga šampiona, ≥ 30 iger):
+- **Rune:** najpogostejše strani (drevo + ključna runa + sekundarno drevo) iz `matches.raw` (perks),
+  s pogostimi manjšimi in statističnimi runami. Imena iz Data Dragon `runesReforged.json`
+  (tabela `runes`, uvoz z `python -m app.ddragon`). Variante dobijo 1., 2. in 3. najpogostejšo
+  stran (≥ 20 iger in ≥ 5 % šampionovih iger); prikaz kaže pogostost in delež zmag.
+- **Vrstni red nakupov:** mediana minute prvega nakupa dokončanega predmeta (iz
+  `features.purchases`); izbrani predmeti se uredijo po tem času, ob predmetu je »običajno kupljen
+  okoli N. minute«.
+- **Začetni predmeti:** najpogostejši nakupi v prvih 35 s.
+- **Vrstni red sposobnosti ostaja iz profila razreda:** časovnice s `SKILL_LEVEL_UP` dogodki se ne
+  shranjujejo; za podatkovni vrstni red bi bilo treba ponovno prenesti časovnice (~195.000 igralcev).
+
+Primer (Pyke, 1395 iger): standardna stran Hail of Blades / Resolve (39 % iger, 45 % zmag),
+varna Sorcery (32 %, 47 %), agresivna Inspiration (25 %, 52 %); predmeti Umbral Glaive (~14. min),
+Youmuu's (~17.), Frozen Heart in Edge of Night (~23.). Razlika v zmagah med stranmi je majhna in
+na teh podatkih ni dokaz, da je ena boljša (vzorec ≤ 500 iger na stran).
