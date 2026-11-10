@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 
 from app.analysis.guest_limit import GUEST_DAILY_LIMIT
-from app.analysis.pipeline import build_matchup
+from app.analysis.pipeline import build_matchup, default_recommender, recommend_build
 from app.api.deps import (
     CurrentUser,
     DbSession,
@@ -24,6 +24,7 @@ from app.api.deps import (
 )
 from app.api.schemas import RiotIdInput
 from app.models.live_analysis import AnalysisStatus, LiveAnalysis
+from app.recommend.base import GameState
 
 router = APIRouter(prefix="/analyses", tags=["analyses"])
 
@@ -160,6 +161,22 @@ ExistingAnalysisId = Annotated[uuid.UUID, Depends(_existing_analysis)]
 @router.get("/{analysis_id}", response_model=AnalysisOut)
 def get_analysis(analysis_id: ExistingAnalysisId, db: DbSession) -> LiveAnalysis:
     return db.get_one(LiveAnalysis, analysis_id)
+
+
+@router.get("/{analysis_id}/recommendation")
+def get_recommendation(
+    analysis_id: ExistingAnalysisId,
+    db: DbSession,
+    state: Annotated[GameState, Query(description="Stanje igre: ahead, even ali behind")] = "even",
+) -> dict[str, Any]:
+    """Priporočilo builda, prilagojeno stanju igre, ki ga izbere igralec."""
+    analysis = db.get_one(LiveAnalysis, analysis_id)
+    if analysis.status != AnalysisStatus.COMPLETED or not analysis.participants:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Analiza še ni končana ali nima tekme.")
+    result = recommend_build(db, analysis, default_recommender(db), game_state=state)
+    if result is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Priporočila ni mogoče sestaviti.")
+    return result
 
 
 @router.get("/{analysis_id}/matchup")

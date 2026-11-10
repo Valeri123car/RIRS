@@ -199,7 +199,11 @@ export function AnalysisView({ id }: { id: string }) {
       {analysis.enemy_comp && <EnemyCompPanel comp={analysis.enemy_comp} />}
 
       {analysis.status === "completed" && (
-        <BuildPanel recommendation={analysis.recommendation ?? null} version={version} />
+        <BuildPanel
+          analysisId={analysis.id}
+          recommendation={analysis.recommendation ?? null}
+          version={version}
+        />
       )}
 
       {analysis.status === "completed" && analysis.matchup && (

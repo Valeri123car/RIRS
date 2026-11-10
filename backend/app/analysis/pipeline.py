@@ -19,7 +19,7 @@ from app.models.live_analysis import AnalysisStatus, LiveAnalysis
 from app.profiling.archetypes import classify, load_active_archetypes
 from app.profiling.baselines import load_baselines
 from app.profiling.style import build_style_profile
-from app.recommend.base import RecommendationInput, Recommender
+from app.recommend.base import GameState, RecommendationInput, Recommender
 from app.recommend.champion_stats import load_build_stats
 from app.recommend.model import ModelRecommender
 from app.recommend.rules import RuleBasedRecommender
@@ -103,9 +103,17 @@ def default_recommender(session: Session) -> Recommender:
 
 
 def recommend_build(
-    session: Session, analysis: LiveAnalysis, recommender: Recommender
+    session: Session,
+    analysis: LiveAnalysis,
+    recommender: Recommender,
+    game_state: GameState = "even",
 ) -> dict | None:
-    """Build za igralčevega šampiona; None, če šampiona ni v bazi znanja."""
+    """Build za igralčevega šampiona; None, če šampiona ni v bazi znanja.
+
+    Za stanje, ki ni »even«, se vedno uporabijo pravila: model stanja igre ne pozna.
+    """
+    if game_state != "even":
+        recommender = RuleBasedRecommender()
     champion_id = next((p["champion_id"] for p in analysis.participants if p["is_target"]), None)
     champion = session.get(Champion, champion_id) if champion_id is not None else None
     if champion is None or analysis.enemy_comp is None:
@@ -119,6 +127,7 @@ def recommend_build(
             items=items,
             enemy_champions=enemies,
             build_stats=load_build_stats(session, champion.id),
+            game_state=game_state,
         )
     )
 

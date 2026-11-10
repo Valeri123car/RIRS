@@ -59,8 +59,12 @@ export type BuildVariant = {
 };
 
 /** Priporočilo builda in run (US-04), iz pravil ali modela. */
+export type GameState = "ahead" | "even" | "behind";
+
 export type Recommendation = {
   source: "rules" | "model";
+  /** Stanje igre, ki ga je izbral igralec (neobvezno: starejše analize ga nimajo). */
+  game_state?: GameState;
   label: string;
   model_id: number | null;
   champion: { id: number; name: string };
@@ -202,6 +206,13 @@ export function useAnalysisProgress(id: string): ProgressState {
 export function fetchMatchup(analysisId: string, opponentId: number): Promise<Matchup> {
   return apiGet<Matchup>(
     `/analyses/${encodeURIComponent(analysisId)}/matchup?opponent=${encodeURIComponent(opponentId)}`,
+  );
+}
+
+/** Priporočilo builda, prilagojeno stanju igre, ki ga izbere igralec. */
+export function fetchRecommendation(analysisId: string, state: GameState): Promise<Recommendation> {
+  return apiGet<Recommendation>(
+    `/analyses/${encodeURIComponent(analysisId)}/recommendation?state=${encodeURIComponent(state)}`,
   );
 }
 
