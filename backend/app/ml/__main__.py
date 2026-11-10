@@ -35,10 +35,11 @@ def main(argv: list[str] | None = None) -> int:
         metrics = trained.metrics
         print(
             f"Model build_ranker v{model.version} (id {model.id}, patch {model.patch}): "
-            f"AUC {metrics['auc']} ± {metrics['auc_std']}, izhodišče brez sestave "
-            f"{metrics['baseline_auc']} ± {metrics['baseline_auc_std']}, prispevek sestave "
+            f"testni AUC {metrics['auc']}, izhodišče brez sestave "
+            f"{metrics['baseline_auc']}, prispevek sestave "
             f"{metrics['contribution']} (odklon {metrics['contribution_std']}), "
-            f"log loss {metrics['log_loss']}, tekem {metrics['matches']}, "
+            f"log loss {metrics['log_loss']}, tekem {metrics['matches']} "
+            f"(učnih {metrics['train_matches']}, testnih {metrics['test_matches']}), "
             f"predmetov {metrics['items']}"
         )
         if not args.activate:
