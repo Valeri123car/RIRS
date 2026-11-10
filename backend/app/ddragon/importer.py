@@ -10,9 +10,10 @@ from dataclasses import dataclass, field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.ddragon.parse import ChampionData, ItemData
+from app.ddragon.parse import ChampionData, ItemData, RuneData
 from app.models.champion import Champion
 from app.models.item import Item
+from app.models.rune import Rune
 
 
 @dataclass
@@ -26,6 +27,7 @@ class Counts:
 class ImportResult:
     champions: Counts = field(default_factory=Counts)
     items: Counts = field(default_factory=Counts)
+    runes: Counts = field(default_factory=Counts)
 
 
 def import_static_data(
@@ -84,13 +86,30 @@ def import_static_data(
     return result
 
 
-def _by_id[T: (Champion, Item)](session: Session, model: type[T], ids: list[int]) -> dict[int, T]:
+def import_runes(session: Session, runes: list[RuneData]) -> Counts:
+    """Upsert run in dreves; imena in razvrstitev določa Riot."""
+    counts = Counts()
+    existing = _by_id(session, Rune, [r.id for r in runes])
+    for data in runes:
+        rune = existing.get(data.id)
+        if rune is None:
+            session.add(Rune(id=data.id, name=data.name, tree_id=data.tree_id, slot=data.slot))
+            counts.created += 1
+        else:
+            _count(counts, _apply(rune, name=data.name, tree_id=data.tree_id, slot=data.slot))
+    session.flush()
+    return counts
+
+
+def _by_id[T: (Champion, Item, Rune)](
+    session: Session, model: type[T], ids: list[int]
+) -> dict[int, T]:
     if not ids:
         return {}
     return {row.id: row for row in session.scalars(select(model).where(model.id.in_(ids)))}
 
 
-def _apply(row: Champion | Item, **values: object) -> bool:
+def _apply(row: Champion | Item | Rune, **values: object) -> bool:
     """Nastavi vrednosti, ki so drugačne; vrne True, če se je kaj spremenilo."""
     changed = False
     for name, value in values.items():

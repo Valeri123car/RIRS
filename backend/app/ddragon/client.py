@@ -31,6 +31,9 @@ class DataDragonClient:
     def items(self, version: str) -> dict[str, dict[str, Any]]:
         return self._get(self._data_path(version, "item.json"))["data"]
 
+    def runes(self, version: str) -> list[dict[str, Any]]:
+        return self._get(self._data_path(version, "runesReforged.json"))
+
     @staticmethod
     def _data_path(version: str, name: str) -> str:
         if not VERSION_PATTERN.fullmatch(version):

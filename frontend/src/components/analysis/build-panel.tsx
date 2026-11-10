@@ -49,6 +49,11 @@ function Items({ variant, version }: { variant: BuildVariant; version: string })
                 {item.name}
               </span>
               <span className="text-sm text-on-surface-variant">{item.reason}</span>
+              {item.typical_minute !== undefined && (
+                <span className="font-mono text-xs text-muted">
+                  Običajno kupljen okoli {item.typical_minute}. minute
+                </span>
+              )}
             </span>
           </li>
         ))}
@@ -59,6 +64,7 @@ function Items({ variant, version }: { variant: BuildVariant; version: string })
 
 function Runes({ variant }: { variant: BuildVariant }) {
   const { runes } = variant;
+  const minor = runes.primary_perks?.slice(1);
   return (
     <section className="flex flex-col gap-2">
       <SectionTitle>Rune</SectionTitle>
@@ -67,9 +73,59 @@ function Runes({ variant }: { variant: BuildVariant }) {
         <dd className="text-on-surface">{runes.primary_tree}</dd>
         <dt className="text-muted">Ključna runa</dt>
         <dd className="font-bold text-primary">{runes.keystone}</dd>
+        {minor && minor.length > 0 && (
+          <>
+            <dt className="text-muted">Manjše rune</dt>
+            <dd className="text-on-surface">{minor.join(", ")}</dd>
+          </>
+        )}
         <dt className="text-muted">Sekundarno drevo</dt>
         <dd className="text-on-surface">{runes.secondary_tree}</dd>
+        {runes.secondary_perks && runes.secondary_perks.length > 0 && (
+          <>
+            <dt className="text-muted">Sekundarne rune</dt>
+            <dd className="text-on-surface">{runes.secondary_perks.join(", ")}</dd>
+          </>
+        )}
+        {runes.shards && runes.shards.length > 0 && (
+          <>
+            <dt className="text-muted">Statistične rune</dt>
+            <dd className="text-on-surface">{runes.shards.join(", ")}</dd>
+          </>
+        )}
       </dl>
+      {runes.pick_rate !== undefined && runes.win_rate !== undefined && (
+        <p className="text-xs text-on-surface-variant">
+          Ta stran run: {runes.pick_rate} % iger tega šampiona, {runes.win_rate} % zmag.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function StartItems({ variant, version }: { variant: BuildVariant; version: string }) {
+  const start = variant.start_items;
+  if (!start || start.items.length === 0) return null;
+  return (
+    <section className="flex flex-col gap-2">
+      <SectionTitle>Začetni predmeti</SectionTitle>
+      <ul className="flex flex-wrap gap-2">
+        {start.items.map((item, index) => (
+          <li key={`${item.id}-${index}`} title={item.name}>
+            <Image
+              src={itemIconUrl(version, item.id)}
+              alt={item.name}
+              width={32}
+              height={32}
+              className="border border-outline/60"
+            />
+          </li>
+        ))}
+      </ul>
+      <p className="text-xs text-on-surface-variant">
+        Najpogostejši začetni nakup ({start.games} iger, {Math.round((100 * start.wins) / start.games)} %
+        zmag).
+      </p>
     </section>
   );
 }
@@ -224,6 +280,7 @@ export function BuildPanel({
       >
         <Items variant={variant} version={version} />
         <div className="flex min-w-0 flex-col gap-6">
+          <StartItems variant={variant} version={version} />
           <Runes variant={variant} />
           <SkillOrder variant={variant} />
         </div>

@@ -20,6 +20,7 @@ from app.recommend.base import RULES_LABEL, VARIANTS, RecommendationInput
 from app.recommend.champion_stats import BuildStats
 
 ITEMS_PER_VARIANT = 4
+VARIANT_KEYS = tuple(key for key, _ in VARIANTS)
 MIN_ITEMS = 3
 MAX_NAMED_CHAMPIONS = 3
 
@@ -493,24 +494,14 @@ def _variants(context: _Context) -> list[dict[str, Any]]:
         if len(picks) < MIN_ITEMS:
             continue
         seen.append(frozenset(p.item.id for p in picks))
-        primary_tree, keystone, secondary_tree = context.profile.runes[key]
+        picks = _in_purchase_order(context, picks)
         variants.append(
             {
                 "key": key,
                 "label": label,
-                "runes": {
-                    "primary_tree": primary_tree,
-                    "keystone": keystone,
-                    "secondary_tree": secondary_tree,
-                },
-                "items": [
-                    {
-                        "id": p.item.id,
-                        "name": p.item.name,
-                        "reason": context.reason(p.parts, p.item),
-                    }
-                    for p in picks
-                ],
+                "runes": _runes(context, len(variants)),
+                "start_items": context.build_stats.start_items if context.build_stats else None,
+                "items": [_item_out(context, p) for p in picks],
                 "skill_order": {
                     "priority": list(context.profile.skill_priority),
                     "levels": skill_levels(context.profile.skill_priority),
@@ -518,6 +509,45 @@ def _variants(context: _Context) -> list[dict[str, Any]]:
             }
         )
     return variants
+
+
+def _runes(context: _Context, variant_index: int) -> dict[str, Any]:
+    """Rune iz najpogostejših strani šampiona (variante dobijo 1., 2. in 3. stran); sicer razred."""
+    stats = context.build_stats
+    if stats is not None and stats.rune_pages:
+        page = stats.rune_pages[min(variant_index, len(stats.rune_pages) - 1)]
+        return {
+            "primary_tree": page["primary_tree"],
+            "keystone": page["keystone"],
+            "secondary_tree": page["secondary_tree"],
+            "primary_perks": page["primary_perks"],
+            "secondary_perks": page["secondary_perks"],
+            "shards": page["shards"],
+            "pick_rate": round(100 * page["games"] / stats.games),
+            "win_rate": round(100 * page["wins"] / page["games"]),
+        }
+    primary_tree, keystone, secondary_tree = context.profile.runes[VARIANT_KEYS[variant_index]]
+    return {"primary_tree": primary_tree, "keystone": keystone, "secondary_tree": secondary_tree}
+
+
+def _in_purchase_order(context: _Context, picks: list[_Pick]) -> list[_Pick]:
+    """Predmeti po tipičnem času nakupa (mediana minute prvega nakupa pri tem šampionu)."""
+    stats = context.build_stats
+    if stats is None or not stats.item_minutes:
+        return picks
+    return sorted(picks, key=lambda p: stats.item_minutes.get(p.item.id, float("inf")))
+
+
+def _item_out(context: _Context, pick: _Pick) -> dict[str, Any]:
+    out: dict[str, Any] = {
+        "id": pick.item.id,
+        "name": pick.item.name,
+        "reason": context.reason(pick.parts, pick.item),
+    }
+    stats = context.build_stats
+    if stats is not None and pick.item.id in stats.item_minutes:
+        out["typical_minute"] = round(stats.item_minutes[pick.item.id])
+    return out
 
 
 def _pick(context: _Context, mix: Mix, excluded: set[int]) -> list[_Pick]:

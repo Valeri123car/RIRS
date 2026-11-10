@@ -45,12 +45,38 @@ export type EnemyComp = {
   missing_champions: number;
 };
 
-export type BuildItem = { id: number; name: string; reason: string };
+export type BuildItem = {
+  id: number;
+  name: string;
+  reason: string;
+  /** Mediana minute prvega nakupa pri tem šampionu (iz zbranih tekem); ni vedno na voljo. */
+  typical_minute?: number;
+};
+
+export type Runes = {
+  primary_tree: string;
+  keystone: string;
+  secondary_tree: string;
+  /** Podrobnosti strani iz zbranih tekem (neobvezno; sicer samo drevesa in ključna runa). */
+  primary_perks?: string[];
+  secondary_perks?: string[];
+  shards?: string[];
+  /** Delež iger šampiona s to stranjo in delež zmag z njo, v %. */
+  pick_rate?: number;
+  win_rate?: number;
+};
+
+export type StartItems = {
+  items: { id: number; name: string }[];
+  games: number;
+  wins: number;
+};
 
 export type BuildVariant = {
   key: "standard" | "safe" | "aggressive";
   label: string;
-  runes: { primary_tree: string; keystone: string; secondary_tree: string };
+  runes: Runes;
+  start_items?: StartItems | null;
   /** Dokončani predmeti po vrstnem redu nakupa. */
   items: BuildItem[];
   skill_order: { priority: string[]; levels: string[] };

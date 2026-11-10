@@ -189,3 +189,24 @@ def _item_tags(raw: dict[str, Any]) -> list[str]:
 
 def _snake_case(value: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", value).lower()
+
+
+@dataclass(frozen=True)
+class RuneData:
+    id: int
+    name: str
+    tree_id: int | None = None
+    slot: int | None = None
+
+
+def parse_runes(trees: list[dict[str, Any]]) -> list[RuneData]:
+    """trees je runesReforged.json: drevesa z vrsticami run (vrstica 0 = ključne rune)."""
+    result: list[RuneData] = []
+    for tree in trees:
+        result.append(RuneData(id=int(tree["id"]), name=tree["name"]))
+        for slot, row in enumerate(tree.get("slots", [])):
+            result.extend(
+                RuneData(id=int(rune["id"]), name=rune["name"], tree_id=int(tree["id"]), slot=slot)
+                for rune in row.get("runes", [])
+            )
+    return result

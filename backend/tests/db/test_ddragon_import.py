@@ -8,6 +8,7 @@ from app.ddragon.importer import import_static_data
 from app.ddragon.parse import ChampionData, ItemData
 from app.models.champion import Champion, DamageProfile
 from app.models.item import Item
+from app.models.rune import Rune
 
 # Visoki ID-ji, da se testi ne prekrivajo z morebiti že uvoženimi podatki.
 RATINGS = {"cc": 1, "healing": 3, "engage": 0, "burst": 1, "tank": 0, "poke": 0}
@@ -103,10 +104,20 @@ def fake_data_dragon() -> DataDragonClient:
         }
     }
 
+    rune_json = [
+        {
+            "id": 9000,
+            "name": "Testna drevo",
+            "slots": [{"runes": [{"id": 9001, "name": "Testni keystone"}]}],
+        }
+    ]
+
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/api/versions.json":
             return httpx.Response(200, json=["16.22.1"])
         name = request.url.path.rsplit("/", 1)[-1]
+        if name == "runesReforged.json":
+            return httpx.Response(200, json=rune_json)
         data = champion_json if name == "championFull.json" else item_json
         return httpx.Response(200, json={"data": data})
 
@@ -118,6 +129,8 @@ def test_run_import_uvozi_zadnjo_verzijo(db):
 
     assert version == "16.22.1"
     assert (result.champions.created, result.items.created) == (1, 1)
+    assert result.runes.created == 2
+    assert db.get(Rune, 9001).name == "Testni keystone" and db.get(Rune, 9001).slot == 0
     assert db.get(Champion, 9103).damage_profile == DamageProfile.MAGIC
     assert db.get(Item, 9075).tags == ["anti_heal", "armor"]
     ahri = db.get(Champion, 9103)
