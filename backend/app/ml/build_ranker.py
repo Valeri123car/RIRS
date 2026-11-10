@@ -12,7 +12,7 @@ from typing import Any
 import lightgbm as lgb
 import numpy as np
 from sklearn.metrics import log_loss, roc_auc_score
-from sklearn.model_selection import GroupKFold
+from sklearn.model_selection import GroupKFold, GroupShuffleSplit
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
@@ -28,6 +28,7 @@ from app.models.ml_model import MlModel, ModelKind, ModelStatus
 
 MIN_TRAINING_ROWS = 200
 CV_FOLDS = 5
+TEST_SIZE = 1 / 3
 SEED = 7
 NUM_ROUNDS = 200
 PARAMS: dict[str, Any] = {
@@ -80,31 +81,46 @@ def train_build_ranker(rows: Sequence[TrainingRow], patch: str) -> TrainedRanker
     keep = [i for i in range(len(columns)) if i not in comp_columns]
     keep_columns = [columns[i] for i in keep]
 
-    # Ena delitev je šumna (poskusi 4–5: odklon ±0,01–0,02), zato metrike povprečimo čez
-    # GroupKFold; cele tekme so v isti skupini, da isti dogodek ni na obeh straneh.
-    aucs, baseline_aucs, losses = [], [], []
-    for train_idx, test_idx in GroupKFold(n_splits=CV_FOLDS).split(features, labels, groups):
-        test_labels = labels[test_idx]
-        model = _fit(features[train_idx], labels[train_idx], columns)
-        predicted = model.predict(features[test_idx])
-        baseline = _fit(features[train_idx][:, keep], labels[train_idx], keep_columns)
-        baseline_predicted = baseline.predict(features[test_idx][:, keep])
-        aucs.append(roc_auc_score(test_labels, predicted))
-        baseline_aucs.append(roc_auc_score(test_labels, baseline_predicted))
-        losses.append(log_loss(test_labels, predicted))
-    gains = np.array(aucs) - np.array(baseline_aucs)
+    # Učna (2/3) in testna (1/3) množica: cele tekme so na isti strani, da isti dogodek ni v obeh.
+    splitter = GroupShuffleSplit(n_splits=1, test_size=TEST_SIZE, random_state=SEED)
+    train_idx, test_idx = next(splitter.split(features, labels, groups))
+    group_array = np.array(groups)
 
-    # Končni model se nauči na vseh podatkih; metrike zgoraj ocenjujejo ta postopek.
-    booster = _fit(features, labels, columns)
+    # Odklon prispevka sestave: GroupKFold samo znotraj učne množice (ena delitev je šumna,
+    # poskusi 4–5: ±0,01–0,02); testna množica pri tem ni uporabljena.
+    cv_gains = []
+    for fit_idx, val_idx in GroupKFold(n_splits=CV_FOLDS).split(
+        features[train_idx], labels[train_idx], group_array[train_idx]
+    ):
+        fit_rows, val_rows = train_idx[fit_idx], train_idx[val_idx]
+        full = _fit(features[fit_rows], labels[fit_rows], columns)
+        base = _fit(features[fit_rows][:, keep], labels[fit_rows], keep_columns)
+        val_labels = labels[val_rows]
+        cv_gains.append(
+            roc_auc_score(val_labels, full.predict(features[val_rows]))
+            - roc_auc_score(val_labels, base.predict(features[val_rows][:, keep]))
+        )
+
+    # Končni model se nauči samo na učni množici; testna je neodvisna ocena.
+    booster = _fit(features[train_idx], labels[train_idx], columns)
+    baseline = _fit(features[train_idx][:, keep], labels[train_idx], keep_columns)
+    test_labels = labels[test_idx]
+    predicted = booster.predict(features[test_idx])
+    baseline_predicted = baseline.predict(features[test_idx][:, keep])
+    auc = roc_auc_score(test_labels, predicted)
+    baseline_auc = roc_auc_score(test_labels, baseline_predicted)
     metrics = {
-        "auc": round(float(np.mean(aucs)), 4),
-        "auc_std": round(float(np.std(aucs)), 4),
-        "baseline_auc": round(float(np.mean(baseline_aucs)), 4),
-        "baseline_auc_std": round(float(np.std(baseline_aucs)), 4),
-        # Prispevek značilk sestave po delitvah in njegov odklon: pogoj aktivacije.
-        "contribution": round(float(gains.mean()), 4),
-        "contribution_std": round(float(gains.std()), 4),
-        "log_loss": round(float(np.mean(losses)), 4),
+        "auc": round(float(auc), 4),
+        "baseline_auc": round(float(baseline_auc), 4),
+        # Prispevek značilk sestave na testni množici; odklon iz CV na učni (pogoj aktivacije).
+        "contribution": round(float(auc - baseline_auc), 4),
+        "contribution_std": round(float(np.std(cv_gains)), 4),
+        "log_loss": round(float(log_loss(test_labels, predicted)), 4),
+        "split": "2/3 učna, 1/3 testna (po tekmah)",
+        "train_rows": len(train_idx),
+        "test_rows": len(test_idx),
+        "train_matches": len(set(group_array[train_idx])),
+        "test_matches": len(set(group_array[test_idx])),
         "folds": CV_FOLDS,
         "rows": len(rows),
         "matches": len(set(groups)),

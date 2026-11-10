@@ -568,3 +568,32 @@ kombinirani arhetipi, kar kaže na zvezno razporeditev, ne na ostre skupine.
 
 Pyke ima 942 iger (prej 642) in priporočilo ostane stabilno (Umbral Glaive, Edge of Night,
 Frozen Heart / Youmuu's). Delež zmag z predmetom se zaradi večjega vzorca spreminja za 1–2 o. t.
+
+## Poskus 13 – delitev 2/3 učna, 1/3 testna na 19.589 tekmah (2026-11-10, #97)
+
+Učenje (`python -m app.ml`) zdaj uporablja eno stalno delitev po tekmah (`GroupShuffleSplit`,
+seme 7): **2/3 učna, 1/3 testna množica**; cela tekma je vedno na isti strani. Končni model in
+izhodišče brez sestave se naučita samo na učni množici, metrike pa so na neodvisni testni.
+Odklon prispevka sestave se še vedno oceni z GroupKFold 5, a samo znotraj učne množice.
+
+Podatki: 19.324 tekem z uporabnimi igralci (od 19.589 v bazi; 105 predmetov), patch 16.22.
+
+| | tekem | 
+|---|---|
+| učna | 12.882 |
+| testna | 6.442 |
+
+Rezultat modela v8 (id 12):
+
+| Metrika (testna množica) | Vrednost |
+|---|---|
+| AUC z značilkami sestave | 0,5900 |
+| AUC izhodišče (brez sestave) | 0,5893 |
+| Prispevek sestave | +0,0007 |
+| Odklon prispevka (CV na učni) | 0,002 |
+| Log loss | 0,6797 |
+
+**Zaključek:** prispevek sestave (+0,0007) ni večji od odklona (0,002), zato je model v8
+neaktiven (ADR-0006); aktivno ostane priporočilo po pravilih. Rezultat potrjuje poskuse 5, 10
+in 12 z neodvisno testno množico. AUC okoli 0,59 kaže, da build ob začetku tekme napove izid
+komaj nad naključjem (izid določa stanje tekme, ne nakup).

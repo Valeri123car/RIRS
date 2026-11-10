@@ -58,7 +58,15 @@ def test_model_z_znacilkami_sestave_premaga_izhodisce():
     trained = train_build_ranker(synthetic_rows(), patch="16.22")
 
     metrics = trained.metrics
-    assert set(metrics) >= {"auc", "auc_std", "log_loss", "baseline_auc", "baseline_auc_std"}
+    assert set(metrics) >= {
+        "auc",
+        "log_loss",
+        "baseline_auc",
+        "contribution",
+        "contribution_std",
+        "train_matches",
+        "test_matches",
+    }
     assert metrics["auc"] > metrics["baseline_auc"]
     # Prispevek sestave mora biti večji od odklona med delitvami (pogoj aktivacije).
     assert metrics["contribution"] > metrics["contribution_std"] >= 0
