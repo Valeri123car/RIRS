@@ -66,6 +66,26 @@ MIXES = {
 }
 
 
+def mix_for(key: str, state: str) -> Mix:
+    """Razmerje variante, prilagojeno stanju igre: vodilni dodajo škodo, zaostajajoči obrambo."""
+    base = MIXES[key]
+    if state == "ahead":
+        return Mix(
+            offense=base.offense * 1.4,
+            defense=base.defense * 0.4,
+            counters=base.counters,
+            penetration=base.penetration + 0.5,
+        )
+    if state == "behind":
+        return Mix(
+            offense=base.offense * 0.6,
+            defense=base.defense * 1.8 + 0.3,
+            counters=base.counters,
+            penetration=base.penetration,
+        )
+    return base
+
+
 @dataclass(frozen=True)
 class Counter:
     tags: frozenset[str]
@@ -288,6 +308,7 @@ class _Context:
     shares: dict[str, int]  # {"physical": 60, "magic": 40}
     counter_tags: dict[str, frozenset[str]] = field(default_factory=dict)
     build_stats: BuildStats | None = None
+    game_state: str = "even"
 
     def __post_init__(self) -> None:
         for key, counter in COUNTERS.items():
@@ -400,6 +421,7 @@ class RuleBasedRecommender:
             threats={t["key"]: t for t in data.enemy_comp.get("threats", [])},
             shares=data.enemy_comp.get("damage", {"physical": 50, "magic": 50}),
             build_stats=stats,
+            game_state=data.game_state,
         )
         variants = _variants(context)
         if not variants:
@@ -408,6 +430,7 @@ class RuleBasedRecommender:
             "source": "rules",
             "label": RULES_LABEL,
             "model_id": None,
+            "game_state": data.game_state,
             "champion": {"id": data.champion.id, "name": data.champion.name},
             "variants": variants,
         }
@@ -462,10 +485,11 @@ def _variants(context: _Context) -> list[dict[str, Any]]:
     seen: list[frozenset[int]] = []
     for key, label in VARIANTS:
         excluded: set[int] = set()
-        picks = _pick(context, MIXES[key], excluded)
+        mix = mix_for(key, context.game_state)
+        picks = _pick(context, mix, excluded)
         while len(picks) >= MIN_ITEMS and frozenset(p.item.id for p in picks) in seen:
             excluded.add(picks[-1].item.id)
-            picks = _pick(context, MIXES[key], excluded)
+            picks = _pick(context, mix, excluded)
         if len(picks) < MIN_ITEMS:
             continue
         seen.append(frozenset(p.item.id for p in picks))

@@ -4,9 +4,21 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { Panel } from "@/components/ui/panel";
-import { itemIconUrl, type BuildVariant, type Recommendation } from "@/lib/analysis";
+import {
+  fetchRecommendation,
+  itemIconUrl,
+  type BuildVariant,
+  type GameState,
+  type Recommendation,
+} from "@/lib/analysis";
 
 const SKILLS = ["Q", "W", "E", "R"] as const;
+
+const GAME_STATES: { key: GameState; label: string }[] = [
+  { key: "ahead", label: "Gre mi dobro" },
+  { key: "even", label: "Izenačeno" },
+  { key: "behind", label: "Gre mi slabo" },
+];
 
 function SectionTitle({ children }: { children: string }) {
   return (
@@ -109,13 +121,33 @@ function SkillOrder({ variant }: { variant: BuildVariant }) {
 
 /** US-04: variante builda in run z oznako vira (pravila ali model). */
 export function BuildPanel({
-  recommendation,
+  analysisId,
+  recommendation: initial,
   version,
 }: {
+  analysisId: string;
   recommendation: Recommendation | null;
   version: string;
 }) {
   const [selected, setSelected] = useState(0);
+  const [recommendation, setRecommendation] = useState(initial);
+  const [state, setState] = useState<GameState>("even");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function chooseState(next: GameState) {
+    if (next === state || pending) return;
+    setPending(true);
+    setError(null);
+    try {
+      setRecommendation(await fetchRecommendation(analysisId, next));
+      setState(next);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Priporočila ni bilo mogoče naložiti.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   if (!recommendation || recommendation.variants.length === 0) {
     return (
@@ -135,6 +167,33 @@ export function BuildPanel({
       <p className="self-start rounded-sm border border-secondary/60 bg-secondary/10 px-2 py-0.5 font-label text-[11px] tracking-widest text-secondary uppercase">
         {recommendation.label}
       </p>
+
+      <div className="flex flex-col gap-2">
+        <SectionTitle>Kako ti gre v igri?</SectionTitle>
+        <div role="group" aria-label="Stanje igre" className="flex flex-wrap gap-2">
+          {GAME_STATES.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={state === key}
+              disabled={pending}
+              onClick={() => chooseState(key)}
+              className={`rounded-sm border px-4 py-1.5 font-label text-sm tracking-wide transition-colors disabled:opacity-60 ${
+                state === key
+                  ? "border-secondary bg-secondary/15 text-secondary"
+                  : "border-outline/50 text-on-surface-variant hover:border-secondary/60"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {error && (
+          <p role="alert" className="text-sm text-error">
+            {error}
+          </p>
+        )}
+      </div>
 
       <div role="tablist" aria-label="Variante builda" className="flex flex-wrap gap-2">
         {variants.map((v, index) => (

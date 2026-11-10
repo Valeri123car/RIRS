@@ -196,3 +196,49 @@ def test_podporne_predmete_dobi_samo_podpora():
 
 def test_brez_dovolj_predmetov_ni_priporocila():
     assert recommend(JINX, items=ITEMS[:2]) is None
+
+
+def _defensive(result):
+    return sum(
+        1
+        for variant in result["variants"]
+        for chosen in variant["items"]
+        if {"armor", "spell_block", "magic_resist"} & set(ITEM_TAGS[chosen["id"]])
+    )
+
+
+ITEM_TAGS = {i.id: i.tags for i in ITEMS}
+
+
+def recommend_state(champion, state, enemies=HEALERS):
+    data = RecommendationInput(
+        champion=champion,
+        enemy_comp=build_enemy_comp(enemies),
+        items=ITEMS,
+        game_state=state,
+    )
+    return RuleBasedRecommender().recommend(data)
+
+
+@pytest.mark.parametrize("champion", [JINX, LUX, ORNN])
+def test_stanje_igre_je_v_odgovoru_in_privzeto_izenaceno(champion):
+    assert recommend(champion)["game_state"] == "even"
+    for state in ("ahead", "behind"):
+        assert recommend_state(champion, state)["game_state"] == state
+
+
+@pytest.mark.parametrize("champion", [JINX, LUX])
+def test_zaostajanje_prinese_vsaj_toliko_obrambnih_predmetov_kot_vodstvo(champion):
+    behind = _defensive(recommend_state(champion, "behind", MAGES))
+    ahead = _defensive(recommend_state(champion, "ahead", MAGES))
+
+    assert behind >= ahead
+
+
+def test_stanje_igre_spremeni_nabor_predmetov():
+    even = recommend_state(JINX, "even")["variants"]
+    behind = recommend_state(JINX, "behind")["variants"]
+
+    assert [[i["id"] for i in v["items"]] for v in even] != [
+        [i["id"] for i in v["items"]] for v in behind
+    ]

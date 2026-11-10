@@ -153,3 +153,39 @@ def test_brisanje_zahteva_prijavo_in_analiza_gosta_ni_brisljiva(api):
 
     assert api.delete(f"/analyses/{analysis_id}").status_code == 401
     assert api.delete(f"/analyses/{analysis_id}", headers=auth_headers(api)).status_code == 404
+
+
+def test_priporocilo_z_neveljavnim_stanjem_igre_je_zavrnjeno(api):
+    analysis_id = start(api).json()["id"]
+
+    response = api.get(f"/analyses/{analysis_id}/recommendation", params={"state": "winning"})
+
+    assert response.status_code == 422
+
+
+def test_priporocilo_analize_brez_tekme_ni_mogoce(api):
+    analysis_id = start(api, "Miha#EUNE").json()["id"]
+
+    response = api.get(f"/analyses/{analysis_id}/recommendation", params={"state": "ahead"})
+
+    assert response.status_code == 409
+
+
+def test_priporocilo_po_stanju_igre(api, db):
+    from app.models.champion import Champion
+    from app.models.item import Item
+
+    db.merge(Champion(id=222, slug="Jinx", name="Jinx", classes=["Marksman"]))
+    for item_id, tags in enumerate(
+        (["damage", "critical_strike"], ["damage", "armor_pen"], ["armor", "health"], ["damage"]),
+        start=3000,
+    ):
+        db.merge(Item(id=item_id, name=f"Predmet {item_id}", cost=3000, tags=tags, completed=True))
+    analysis_id = start(api).json()["id"]
+
+    response = api.get(f"/analyses/{analysis_id}/recommendation", params={"state": "behind"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["game_state"] == "behind" and body["source"] == "rules"
+    assert api.get(f"/analyses/{analysis_id}/recommendation").json()["game_state"] == "even"
