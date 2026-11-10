@@ -597,3 +597,50 @@ Rezultat modela v8 (id 12):
 neaktiven (ADR-0006); aktivno ostane priporočilo po pravilih. Rezultat potrjuje poskuse 5, 10
 in 12 z neodvisno testno množico. AUC okoli 0,59 kaže, da build ob začetku tekme napove izid
 komaj nad naključjem (izid določa stanje tekme, ne nakup).
+
+## Poskus 14 – navzkrižna validacija, učna krivulja in stanje ob 15. minuti (2026-11-10, #99)
+
+Podatki: 193.240 igralcev iz 19.324 tekem (192.330 z časovnico v3). Skripti: lokalni
+(`feat.py`, `curve.py`, `cv5.py`, zagon prek `uv run python` z `PYTHONPATH=.`).
+
+### A) GroupKFold 5 (po tekmah), vse tekme
+| | AUC |
+|---|---|
+| s sestavo | 0,5927 ± 0,0036 |
+| brez sestave | 0,5934 ± 0,0013 |
+| **prispevek sestave** | **−0,0007 ± 0,0026** (po foldih od −0,0043 do +0,0033) |
+
+### B) Učna krivulja (stalna testna 1/3, učna množica 25–100 %)
+| učnih tekem | s sestavo | brez sestave | prispevek |
+|---|---|---|---|
+| 3.220 | 0,5707 | 0,5767 | −0,0061 |
+| 6.441 | 0,5803 | 0,5857 | −0,0054 |
+| 9.661 | 0,5878 | 0,5888 | −0,0010 |
+| 12.882 | 0,5900 | 0,5893 | +0,0007 |
+
+Prispevek sestave z več podatki monotono raste (−0,006 → +0,0007), a ga še ne presega odklon
+(0,002). Skupni AUC hitro raste do ~6000 tekem in se nato izravna (0,58 → 0,59).
+
+### C) Nove značilke: stanje ob 15. minuti + časovnica nakupov
+Dodano 27 značilk iz `timeline_features` v3: zlato, izkušnje, CS, raven, KDA, razlika zlata in
+izkušenj ekip, zmaji, grubs, heraldi, stolpi, plošče, prva kri, število dokončanih predmetov do
+15. minute in čas prvega dokončanega predmeta.
+
+| Množica značilk | testna 1/3 | CV 5 |
+|---|---|---|
+| A osnova (šampion, brez sestave) | 0,5927 | 0,5935 ± 0,0014 |
+| B + sestava | 0,5885 | 0,5927 ± 0,0032 |
+| C + stanje ob 15. min | 0,8643 | 0,8693 ± 0,0064 |
+| D stanje + sestava | 0,8647 | 0,8701 ± 0,0064 |
+
+- Stanje ob 15. minuti dvigne AUC z 0,59 na **0,87**: izid odloča potek tekme (zlato, izkušnje,
+  cilji), ne začetna izbira. To potrjuje poskus 7.
+- **Prispevek sestave ob nadzorovanem stanju: +0,0008 ± 0,0005** – v vseh foldih pozitiven in
+  večji od odklona, a praktično zanemarljiv (0,08 o. t. AUC). Brez nadzora stanja je prispevek
+  −0,0007 ± 0,0022 (šum). Sestava torej ima majhen, a verjetno resničen vpliv, ki ga prekrije
+  razlika v stanju tekme.
+- Za priporočilo ob začetku tekme te značilke niso uporabne (stanje ni znano). Uporabne bi bile
+  sredi igre (npr. samodejna ocena »gre mi dobro / slabo«, #95), a Spectator-V5 časovnice ne da.
+
+**Zaključek:** model buildov ostane neaktiven (ADR-0006). Več tekem pomaga do ~6000, nato malo;
+omejitev so značilke, ne podatki.
